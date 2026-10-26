@@ -15,7 +15,19 @@ const nextConfig: NextConfig = {
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         ],
       },
+      {
+        // PSX Personal Assistant: the in-app mic needs microphone access on this page only.
+        source: "/personal-assistant.html",
+        headers: [{ key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" }],
+      },
+      {
+        source: "/personal",
+        headers: [{ key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" }],
+      },
     ];
+  },
+  async rewrites() {
+    return [{ source: "/personal", destination: "/personal-assistant.html" }];
   },
 };
 
