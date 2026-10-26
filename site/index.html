@@ -287,12 +287,9 @@ button.li:hover{background:color-mix(in srgb,var(--surface-2) 70%,transparent)}
 .logo{position:relative}
 .mono{position:absolute;inset:0;border-radius:inherit;display:grid;place-items:center;background:hsl(var(--h) 46% 93%);color:hsl(var(--h) 58% 27%);box-shadow:inset 0 0 0 1px hsl(var(--h) 36% 84%)}
 .mono b{font-weight:680;font-size:10.5px;letter-spacing:.02em}
-.mono i{position:absolute;right:-5px;bottom:-5px;width:19px;height:19px;border-radius:7px;display:grid;place-items:center;background:hsl(var(--h) 52% 33%);color:#fff;box-shadow:0 0 0 2px var(--surface)}
-.mono i svg{width:11px;height:11px}
-.logo[style*="52px"] .mono b{font-size:13px}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mono{background:hsl(var(--h) 26% 17%);color:hsl(var(--h) 62% 78%);box-shadow:inset 0 0 0 1px hsl(var(--h) 24% 27%)} :root:not([data-theme="light"]) .mono i{background:hsl(var(--h) 44% 46%)}}
+.mono svg{width:46%;height:46%}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mono{background:hsl(var(--h) 26% 17%);color:hsl(var(--h) 62% 78%);box-shadow:inset 0 0 0 1px hsl(var(--h) 24% 27%)}}
 :root[data-theme="dark"] .mono{background:hsl(var(--h) 26% 17%);color:hsl(var(--h) 62% 78%);box-shadow:inset 0 0 0 1px hsl(var(--h) 24% 27%)}
-:root[data-theme="dark"] .mono i{background:hsl(var(--h) 44% 46%)}
 @media (min-width:420px){.hspark{display:block}}
 
 /* bars */
@@ -1262,7 +1259,7 @@ const SYM_HUE = { OGDC:24, PPL:38, MARI:12, POL:52, PSO:2, HBL:168, MCB:212, UBL
 function logoMark(s){
   if (!s || !SYM[s] && !/^[A-Z0-9]/.test(s)) return esc(s || "?");
   const h = SYM_HUE[s] ?? (hash(s) % 360); const ico = SEC_ICON[SYM[s]?.sec];
-  return `<span class="mono" style="--h:${h}"><b>${esc(logoTxt(s))}</b>${ico ? `<i title="${esc(SYM[s].sec)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico}</svg></i>` : ""}</span>`;
+  return `<span class="mono" style="--h:${h}" title="${esc(SYM[s]?.sec || s)}">${ico ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico}</svg>` : `<b>${esc(logoTxt(s))}</b>`}</span>`;
 }
 function monthlyAccount(){
   const m = new Map();
