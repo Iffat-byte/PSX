@@ -1,21 +1,29 @@
+# The live site is PSX Personal Assistant: one static page in /site.
+# (The older Next.js app is still in this repo but is no longer built or published.)
 [build]
-  command = "npm run build"
-  publish = ".next"
+  command = "echo 'static site, no build'"
+  publish = "site"
 
-[build.environment]
-  NODE_VERSION = "22"
-
-# Next.js runtime: always install it so server pages, headers and rewrites deploy.
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
-# PSX Personal Assistant (static page in /public)
+# Old addresses lead to the app.
 [[redirects]]
   from = "/personal"
-  to = "/personal-assistant.html"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/personal-assistant.html"
+  to = "/"
+  status = 301
+
+# Every other old page (e.g. /portfolio, /assistant) opens the app instead of a 404.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
   status = 200
 
 [[headers]]
-  for = "/personal-assistant.html"
+  for = "/*"
   [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(self), geolocation=()"
