@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place — in English or Roman Urdu. Free."><meta name="theme-color" content="#08090B"><link rel="icon" href="/icon-192.png" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><link rel="canonical" href="https://psx-pilot.netlify.app/"><meta property="og:type" content="website"><meta property="og:site_name" content="PSX Personal Assistant"><meta property="og:title" content="PSX Personal Assistant — your shares, our accounts"><meta property="og:description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place — in English or Roman Urdu. Free."><meta property="og:url" content="https://psx-pilot.netlify.app/"><meta property="og:image" content="https://psx-pilot.netlify.app/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="PSX Personal Assistant"><meta name="twitter:description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place — in English or Roman Urdu. Free."><meta name="twitter:image" content="https://psx-pilot.netlify.app/og.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>PSX Personal Assistant</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -472,7 +472,43 @@ const SYMBOLS = [
   ["INDU","Indus Motor Company","Autos",2100,.26,["indu","indus motor","toyota"]],
   ["SEARL","The Searle Company","Pharma",95,.45,["searl","searle"]],
   ["NESTLE","Nestlé Pakistan","Food",7800,.18,["nestle"]],
-  ["ATRL","Attock Refinery","Refinery",700,.40,["atrl","attock"]]
+  ["ATRL","Attock Refinery","Refinery",700,.40,["atrl","attock"]],
+  ["NRL","National Refinery","Refinery",260,.42,["nrl","national refinery"]],
+  ["PRL","Pakistan Refinery","Refinery",30,.50,["prl","pakistan refinery"]],
+  ["APL","Attock Petroleum","Oil Marketing",560,.28,["apl","attock petroleum"]],
+  ["SNGP","Sui Northern Gas Pipelines","Oil & Gas",110,.38,["sngp","sui northern"]],
+  ["SSGC","Sui Southern Gas Company","Oil & Gas",35,.45,["ssgc","sui southern"]],
+  ["BAFL","Bank Alfalah","Banks",80,.28,["bafl","alfalah","bank alfalah"]],
+  ["FABL","Faysal Bank","Banks",70,.30,["fabl","faysal"]],
+  ["AKBL","Askari Bank","Banks",40,.32,["akbl","askari"]],
+  ["BOP","The Bank of Punjab","Banks",12,.40,["bop","bank of punjab"]],
+  ["HMB","Habib Metropolitan Bank","Banks",90,.26,["hmb","habib metropolitan","habib metro"]],
+  ["FCCL","Fauji Cement","Cement",45,.40,["fccl","fauji cement"]],
+  ["CHCC","Cherat Cement","Cement",280,.36,["chcc","cherat"]],
+  ["KOHC","Kohat Cement","Cement",400,.34,["kohc","kohat"]],
+  ["PIOC","Pioneer Cement","Cement",230,.36,["pioc","pioneer"]],
+  ["FATIMA","Fatima Fertilizer","Fertilizer",110,.26,["fatima"]],
+  ["EPCL","Engro Polymer & Chemicals","Chemicals",45,.34,["epcl","engro polymer"]],
+  ["LOTCHEM","Lotte Chemical Pakistan","Chemicals",20,.36,["lotchem","lotte"]],
+  ["KAPCO","Kot Addu Power Company","Power",35,.32,["kapco","kot addu"]],
+  ["NPL","Nishat Power","Power",40,.30,["npl","nishat power"]],
+  ["NML","Nishat Mills","Textile",120,.32,["nml","nishat mills"]],
+  ["ILP","Interloop","Textile",80,.34,["ilp","interloop"]],
+  ["NETSOL","NetSol Technologies","Technology",170,.45,["netsol"]],
+  ["AVN","Avanceon","Technology",55,.45,["avn","avanceon"]],
+  ["PTC","Pakistan Telecommunication Company","Telecom",30,.45,["ptc","ptcl"]],
+  ["HCAR","Honda Atlas Cars","Autos",300,.34,["hcar","honda"]],
+  ["PSMC","Pak Suzuki Motor","Autos",450,.38,["psmc","suzuki"]],
+  ["MTL","Millat Tractors","Autos",600,.28,["mtl","millat"]],
+  ["ISL","International Steels","Steel",90,.36,["isl","international steels"]],
+  ["ASTL","Amreli Steels","Steel",30,.42,["astl","amreli"]],
+  ["GHGL","Ghani Glass","Glass",40,.34,["ghgl","ghani glass"]],
+  ["PAEL","Pak Elektron","Engineering",40,.45,["pael","pel","pak elektron"]],
+  ["COLG","Colgate-Palmolive Pakistan","Consumer",1600,.22,["colg","colgate"]],
+  ["UNITY","Unity Foods","Food",30,.45,["unity"]],
+  ["GLAXO","GlaxoSmithKline Pakistan","Pharma",300,.34,["glaxo","gsk"]],
+  ["ABOT","Abbott Laboratories Pakistan","Pharma",1000,.26,["abot","abbott"]],
+  ["AGP","AGP Limited","Pharma",110,.32,["agp"]]
 ].map(([s,n,sec,seed,vol,al]) => ({s,n,sec,seed,vol,al}));
 const SYM = Object.fromEntries(SYMBOLS.map(x => [x.s, x]));
 const SYMBOL_RE = /^[A-Z0-9][A-Z0-9.\-]{0,11}$/;
@@ -1155,8 +1191,9 @@ function history(sym){
   for (let i=DAYS.length-2;i>=0;i--){ const g=Math.sqrt(-2*Math.log(Math.max(r(),1e-12)))*Math.cos(2*Math.PI*r()); c[i]=c[i+1]/Math.exp((0.12-0.5*info.vol*info.vol)*dt+g*info.vol*Math.sqrt(dt)); }
   return HIST[sym] = DAYS.map((d,i) => ({d, c: round2(c[i])}));
 }
-function closeOn(sym, iso){ const h = history(sym); if (!h.length) return null; let best = h[0].c; for (const p of h){ if (p.d <= iso) best = p.c; else break; } return best; }
-function quote(sym){ const h = history(sym); if (h.length < 2) return null; return { price: h[h.length-1].c, prev: h[h.length-2].c }; }
+function closeOn(sym, iso){ const u = S?.prices?.[sym]; if (u && u.p > 0 && iso >= u.d) return u.p; const h = history(sym); if (!h.length) return null; let best = h[0].c; for (const p of h){ if (p.d <= iso) best = p.c; else break; } return best; }
+function quote(sym){ const u = S?.prices?.[sym]; if (u && u.p > 0) return { price: u.p, prev: u.d === todayISO() && u.prev > 0 ? u.prev : u.p, user: true, d: u.d };
+  const h = history(sym); if (h.length < 2) return null; return { price: h[h.length-1].c, prev: h[h.length-2].c, user: false }; }
 const AS_OF = DAYS[DAYS.length-1];
 
 /* =========================================================================
@@ -1171,7 +1208,7 @@ function snapshot(txs){
     const q = quote(s); const price = q ? q.price : null;
     const value = price !== null ? p.q*price : p.cost;
     const day = q ? (q.price - q.prev)*p.q : 0;
-    holdings.push({s, q:p.q, cost:p.cost, avg:p.cost/p.q, price, prev:q?q.prev:null, value, pl:value-p.cost, plPct: p.cost ? (value-p.cost)/p.cost : 0, day, realized:p.realized, div:p.div, weight:0});
+    holdings.push({s, q:p.q, cost:p.cost, avg:p.cost/p.q, price, userPrice: !!q?.user, priceDate: q?.d || null, prev:q?q.prev:null, value, pl:value-p.cost, plPct: p.cost ? (value-p.cost)/p.cost : 0, day, realized:p.realized, div:p.div, weight:0});
   }
   const mv = holdings.reduce((a,h)=>a+h.value,0);
   holdings.forEach(h => h.weight = mv > 0 ? h.value/mv : 0);
@@ -1243,6 +1280,7 @@ function save(){
   try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch {}
   clearTimeout(saveTimer);
   if (UI.dbRef) saveTimer = setTimeout(() => { UI.dbRef.set({json: JSON.stringify(S), savedAt: Date.now()}).catch(() => {}); }, 700);
+  if (UI.sbUser){ clearTimeout(sbSaveTimer); UI.syncState = "pending"; sbSaveTimer = setTimeout(pushAccount, 900); }
 }
 function commit(fn){ fn(S); save(); render(); }
 
@@ -1298,7 +1336,15 @@ const SEC_ICON = {
   "Autos":'<path d="M4.5 16v-4l2.2-5h10.6l2.2 5v4h-15ZM7 16v2.5M17 16v2.5M4.5 12h15"/>',
   "Pharma":'<path d="M10.6 4.4a5 5 0 0 1 7 7l-6.2 6.2a5 5 0 0 1-7-7l6.2-6.2ZM7.5 7.5l9 9"/>',
   "Food":'<path d="M6 9h12l-1.2 10a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 9ZM9 9V6.5a3 3 0 0 1 6 0V9"/>',
-  "Refinery":'<path d="M12 3c1 3.2 5 5.2 5 10a5 5 0 0 1-10 0c0-2.2 1-3.7 2-4.7 0 2 1 3.2 2 3.2 0-3-1-6 1-8.5Z"/>'
+  "Refinery":'<path d="M12 3c1 3.2 5 5.2 5 10a5 5 0 0 1-10 0c0-2.2 1-3.7 2-4.7 0 2 1 3.2 2 3.2 0-3-1-6 1-8.5Z"/>',
+  "Chemicals":'<path d="M9.5 3.5h5M10.5 3.5v6L5.2 18.2A1.5 1.5 0 0 0 6.5 20.5h11a1.5 1.5 0 0 0 1.3-2.3L13.5 9.5v-6M8 15h8"/>',
+  "Textile":'<path d="M7 4h10M7 20h10M8.5 4v16M15.5 4v16M8.5 8l7 3M8.5 12l7 3M8.5 16l7-1"/>',
+  "Telecom":'<path d="M12 20v-8M8.5 8.5a5 5 0 0 1 7 0M6 6a8.5 8.5 0 0 1 12 0M10.8 11a1.7 1.7 0 0 1 2.4 0"/>',
+  "Steel":'<path d="M4 6h16M4 18h16M12 6v12M8 6v2M16 6v2M8 16v2M16 16v2"/>',
+  "Glass":'<path d="M7 3.5h10l-1.4 10.2a3.6 3.6 0 0 1-7.2 0L7 3.5ZM12 17.5v3M9 20.5h6M7.6 8h8.8"/>',
+  "Engineering":'<circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.5M12 18v2.5M3.5 12H6M18 12h2.5M6 6l1.8 1.8M16.2 16.2 18 18M6 18l1.8-1.8M16.2 7.8 18 6"/>',
+  "Consumer":'<path d="M5.5 8h13l-1 12h-11l-1-12ZM9 8V6.5a3 3 0 0 1 6 0V8"/>',
+  "Other":'<rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>'
 };
 const SYM_HUE = { OGDC:24, PPL:38, MARI:12, POL:52, PSO:2, HBL:168, MCB:212, UBL:228, MEBL:146, BAHL:190, NBP:132, LUCK:262, DGKC:282, MLCF:300, FFC:96, EFERT:76, ENGROH:320, HUBC:200, SYS:248, TRG:338, INDU:352, SEARL:180, NESTLE:220, ATRL:30 };
 function logoMark(s){
@@ -1352,6 +1398,7 @@ function buildTasks(sn){
   S.reminders.filter(remDueToday).sort((a,b) => a.date < b.date ? -1 : 1).slice(0, 2).forEach(rem => tasks.push({id:"rem-"+rem.id, rem: rem.id, tone: rem.date < t0 && !rem.done ? "r" : "b", icon:"bell", title: rem.text, body: rem.done ? L("Mukammal","Done") : L(`Yaad-dahani: ${relDay(rem.date)} (${fmtDate(rem.date)})`, `Reminder: ${relDay(rem.date)} (${fmtDate(rem.date)})`), act:{label:L("Yaad-dahaniyan","Reminders"), go:"updates", sub:"reminders"}}));
   const un = unreadToday() - S.reminders.filter(r => !r.done && r.date && r.date <= t0).length;
   tasks.push({id:"upd-"+t0, upd:true, tone:"g", icon:"bell", title: un > 0 ? L(`Aaj ki ${un} updates aap ka intezar kar rahi hain`, `${un} updates are waiting for you today`) : L("Aaj ki saari updates parh li","All of today's updates read"), body: L("Aap ke shares ki khabrein, ahem tareekhein aur seekhne ki baat.","News on your shares, key dates and a learning tip."), act:{label:L("Updates parhein","Read updates"), go:"updates", sub:"today"}});
+  if (!inClaude() && UI.accountReady && !UI.sbUser) tasks.unshift({id:"account", tone:"y", icon:"lock", title:L("Apna data mehfooz karein","Keep your data safe"), body:L("Abhi aap ka data sirf is browser mein hai. Muft account banayein taake phone badalne ya browser saaf hone par bhi kuch gum na ho.","Right now your data lives only in this browser. Create a free account so nothing is lost if you change phones or clear your browser."), act:{label:L("Account banayein / Sign in","Create account / Sign in"), auth:true}});
   if (!S.txs.length) tasks.unshift({id:"start", tone:"g", icon:"plus", title:L("Apni pehli entry karein","Add your first entry"), body:L("Jo shares aap ke paas hain, unki khareed ki entry karein. Baaqi hisaab hum kar denge.","Enter the shares you own. We'll do the rest of the maths."), act:{label:L("Entry karein","Add entry"), go:"add"}});
   return tasks.slice(0,6);
 }
@@ -1375,7 +1422,7 @@ function renderShell(){
       : `<a href="#${n.r}" data-go="${n.r}" ${UI.route===n.r?'aria-current="page"':''}>${ic(n.icon)}${esc(n.label)}${n.badge ? `<span class="nbadge num" aria-label="${n.badge} ${L("nayi","new")}">${n.badge}</span>` : ""}</a>`).join("")}</nav>
     <div class="rail-foot stack">
       ${S.demo ? `<div class="notice gold small">${ic("info",18)}<div>${L("Aap demo data dekh rahe hain. Prices bhi demo hain, asli PSX prices nahi.","You are viewing demo data. Prices are demo too, not real PSX prices.")}</div></div>` : ""}
-      <div class="tiny faint">${UI.storage === "cloud" ? ic("lock",13)+" "+L("Data aapke account mein private save hai","Data saved privately to your account") : L("Data sirf is browser mein save hai","Data saved in this browser only")}</div>
+      <div class="tiny faint" id="sync-line">${syncLine()}</div>
     </div>`;
   $("#topbar-in").innerHTML = `${brandHTML()}
     <div class="top-actions">
@@ -1431,7 +1478,7 @@ function viewHome(){
   const h = new Date().getHours();
   const greet = h < 12 ? L("Subah bakhair","Good morning") : h < 17 ? L("Assalam-o-Alaikum","Good afternoon") : L("Shaam bakhair","Good evening");
   const tasks = buildTasks(sn); const done = S.doneTasks[todayISO()] || [];
-  const series = sn.holdings.length ? portfolioSeries(63) : [];
+  const series = sn.holdings.length && !sn.holdings.some(h => h.userPrice) ? portfolioSeries(63) : [];
   const sChange = series.length > 1 ? series[series.length - 1] - series[0] : 0;
   const sPct = series.length > 1 && series[0] ? sChange / series[0] : 0;
   const isDone = t => t.rem ? !!S.reminders.find(r => r.id === t.rem)?.done : t.upd ? unreadToday() - S.reminders.filter(r => !r.done && r.date && r.date <= todayISO()).length <= 0 : done.includes(t.id);
@@ -1443,8 +1490,9 @@ function viewHome(){
   </div>
 
   <section class="balance" aria-label="${L("Portfolio ka khulasa","Portfolio summary")}">
-    <div class="hero-top"><span class="lbl2">${L("Portfolio ki maujooda value","Current portfolio value")}</span>${S.demo || sn.holdings.length ? `<span class="demo-tag">${L("Demo prices","Demo prices")} · ${fmtDate(AS_OF)}</span>` : ""}</div>
+    <div class="hero-top"><span class="lbl2">${L("Portfolio ki maujooda value","Current portfolio value")}</span>${S.demo || sn.holdings.length ? `<span class="demo-tag">${esc(priceTag(sn.holdings))}</span>` : ""}</div>
     <div class="big num"><span class="cur">Rs</span><span>${num(sn.mv)}</span></div>
+    ${sn.holdings.some(h => !h.userPrice) ? `<button class="link" data-go="portfolio" data-sub="prices" style="color:rgba(232,201,140,.9);margin-top:6px">${L("Asli qeematein darj karein","Enter real prices")} ${ic("chev",14,2.2)}</button>` : ""}
     <div class="chip ${sn.day >= 0 ? "up" : "down"} num">${ic(sn.day >= 0 ? "trend" : "down", 15, 2.2)} ${rsS(sn.day)} (${pct(sn.dayPct,2,true)}) <span class="when">${L("aaj","today")}</span></div>
     ${series.length > 1 ? `${sparkSVG(series, { stroke: "#E8C98C", fill: "#D6B26E", cls: "spark" })}
       <div class="row tiny num" style="justify-content:space-between;margin-top:6px;color:var(--on-navy-3)"><span>${L("Pichle 3 mahine","Last 3 months")}</span><span style="color:${sChange >= 0 ? "var(--gain-on-dark)" : "var(--loss-on-dark)"}">${rsS(sChange)} (${pct(sPct,1,true)})</span></div>` : ""}
@@ -1472,7 +1520,7 @@ function viewHome(){
           <div class="dot ${t.tone}">${ic(t.icon,17)}</div>
           <div style="min-width:0;flex:1">
             <h3>${esc(t.title)}</h3><p>${esc(t.body)}</p>
-            ${t.act && !d0 ? `<button class="link go" ${t.act.share ? `data-act="share" data-s="${t.act.share}"` : `data-go="${t.act.go}" ${t.act.sub ? `data-sub="${t.act.sub}"` : ""}`}>${esc(t.act.label)} ${ic("chev",14,2.2)}</button>` : ""}
+            ${t.act && !d0 ? `<button class="link go" ${t.act.auth ? `data-act="auth"` : t.act.share ? `data-act="share" data-s="${t.act.share}"` : `data-go="${t.act.go}" ${t.act.sub ? `data-sub="${t.act.sub}"` : ""}`}>${esc(t.act.label)} ${ic("chev",14,2.2)}</button>` : ""}
           </div>
           ${t.upd ? `<span class="check" aria-hidden="true">${ic("check",15,2.6)}</span>` : `<button class="check" data-act="task" data-id="${esc(t.id)}" aria-label="${d0 ? L("Wapas karein","Undo") : L("Ho gaya","Mark done")}" aria-pressed="${d0}">${ic("check",15,2.6)}</button>`}
         </article>`; }).join("")}</div>
@@ -1491,7 +1539,7 @@ function holdingRow(h){
   return `<button class="li" data-act="share" data-s="${h.s}">
     <div class="logo">${logoMark(h.s)}</div>
     <div class="mid"><div class="main-t">${esc(h.s)}</div><div class="sub-t num">${num(h.q)} · ${L("avg","avg")} ${rs(h.avg,2)}</div></div>
-    <span title="${L("Pichle 30 din ki demo qeemat","Last 30 days, demo price")}" style="display:contents">${sparkSVG(hs, { w: 72, h: 28, stroke: "var(--ink-3)", fill: "#86918C", cls: "hspark", dot: false })}</span>
+    ${h.userPrice ? "" : `<span title="${L("Pichle 30 din ki demo qeemat","Last 30 days, demo price")}" style="display:contents">${sparkSVG(hs, { w: 72, h: 28, stroke: "var(--ink-3)", fill: "#86918C", cls: "hspark", dot: false })}</span>`}
     <div class="right"><div class="v num">${rs(h.value)}</div><div class="d num ${tone(h.pl)}">${pct(h.plPct,1,true)}</div></div>
   </button>`;
 }
@@ -1508,9 +1556,9 @@ function viewPortfolio(){
   const sub = UI.sub.portfolio || "shares";
   const sn = snap();
   const tabs = [
-    ["shares", L("Mere shares","My shares")], ["where", L("Paisa kahan laga?","Where's my money?")], ["history", L("Khareed/farokht","Buy/sell history")],
+    ["shares", L("Mere shares","My shares")], ["prices", L("Qeematein","Prices")], ["where", L("Paisa kahan laga?","Where's my money?")], ["history", L("Khareed/farokht","Buy/sell history")],
     ["dividends", L("Dividends","Dividends")], ["monthly", L("Mahana hisaab","Monthly account")], ["calc", L("Calculators","Calculators")], ["broker", L("Broker se match","Broker match")]
-  ];
+  ].filter(([k]) => !isSimple() || ["shares","prices","history","dividends",sub].includes(k));
   return `
   <div class="page-head">
     <div style="min-width:0"><div class="eyebrow">${L(`${sn.holdings.length} companies`, `${sn.holdings.length} companies`)}</div><h1 class="h-page">${L("Mera Portfolio","My Portfolio")}</h1><p class="muted small" style="margin-top:4px">${L("Aap ke shares, hisaab aur munafa — sab ek jagah","Your shares, accounts and profit — all in one place")}</p></div>
@@ -1519,12 +1567,12 @@ function viewPortfolio(){
   ${issuesNotice(sn)}
   <div class="card pad stats">
     <div><div class="lbl">${L("Lagaya (abhi ke shares)","Invested (current shares)")}</div><div class="sv num">${rs(sn.cost)}</div></div>
-    <div><div class="lbl">${L("Abhi value","Value now")}</div><div class="sv num">${rs(sn.mv)}</div><div class="tiny faint">${L("Demo prices","Demo prices")}</div></div>
+    <div><div class="lbl">${L("Abhi value","Value now")}</div><div class="sv num">${rs(sn.mv)}</div><div class="tiny faint">${esc(priceTag(sn.holdings))}</div></div>
     <div><div class="lbl">${L("Munafa / nuqsan (sab mila kar)","Total profit / loss")}</div><div class="sv num ${tone(sn.totalPL)}">${rsS(sn.totalPL)}</div>
       <div class="tiny faint num">${L("Bechne ka munafa","Booked")} ${rsS(sn.realized)} · ${L("Dividend","Dividend")} ${rs(sn.dividends)}</div></div>
   </div>
-  <div class="seg" role="tablist">${tabs.map(([k,l]) => `<button role="tab" data-act="psub" data-v="${k}" aria-pressed="${sub===k}">${esc(l)}</button>`).join("")}</div>
-  ${sub === "shares" ? pShares(sn) : sub === "where" ? pWhere(sn) : sub === "history" ? pHistory() : sub === "dividends" ? pDividends(sn) : sub === "monthly" ? monthlyView() : sub === "calc" ? pCalc(sn) : reconView()}`;
+  <div class="seg" role="tablist">${tabs.map(([k,l]) => `<button role="tab" data-act="psub" data-v="${k}" aria-pressed="${sub===k}">${esc(l)}</button>`).join("")}${moreTabsBtn()}</div>
+  ${sub === "shares" ? pShares(sn) : sub === "prices" ? pPrices(sn) : sub === "where" ? pWhere(sn) : sub === "history" ? pHistory() : sub === "dividends" ? pDividends(sn) : sub === "monthly" ? monthlyView() : sub === "calc" ? pCalc(sn) : reconView()}`;
 }
 function pShares(sn){
   if (!sn.holdings.length) return `<div class="card"><div class="empty"><b>${L("Aap ke paas abhi koi share nahi","You don't own any shares yet")}</b><p>${L("Pehli khareed ki entry karein.","Add your first purchase.")}</p><button class="btn primary" style="margin-top:14px" data-go="add">${L("Entry karein","Add entry")}</button></div></div>`;
@@ -2195,9 +2243,9 @@ function viewUpdates(){
   let sub = UI.sub.updates || "today"; if (sub === "dates") sub = "news";
   const unread = unreadToday();
   const dueRem = S.reminders.filter(r => !r.done && r.date && r.date <= todayISO()).length;
-  const tabs = [["today", L("Aaj ki update","Today") + (unread ? ` · ${unread}` : "")], ["dividend", L("Dividend assistant","Dividend assistant")], ["news", L("Announcements","Announcements")], ["reminders", L("Yaad-dahaniyan","Reminders") + (dueRem ? ` · ${dueRem}` : "")], ["shariah", L("Shariah status","Shariah status")]];
+  const tabs = [["today", L("Aaj ki update","Today") + (unread ? ` · ${unread}` : "")], ["dividend", L("Dividend assistant","Dividend assistant")], ["news", L("Announcements","Announcements")], ["reminders", L("Yaad-dahaniyan","Reminders") + (dueRem ? ` · ${dueRem}` : "")], ["shariah", L("Shariah status","Shariah status")]].filter(([k]) => !isSimple() || ["today","dividend","reminders",sub].includes(k));
   return `<div><h1 class="h-page">${L("Meri Updates","My Updates")}</h1><p class="muted small">${L("Sirf woh baatein jo aap ke apne shares se mutalliq hain","Only what relates to your own shares")}</p></div>
-  <div class="seg" role="tablist">${tabs.map(([k,l]) => `<button role="tab" data-act="usub" data-v="${k}" aria-pressed="${sub===k}">${esc(l)}</button>`).join("")}</div>
+  <div class="seg" role="tablist">${tabs.map(([k,l]) => `<button role="tab" data-act="usub" data-v="${k}" aria-pressed="${sub===k}">${esc(l)}</button>`).join("")}${moreTabsBtn()}</div>
   ${sub === "today" ? uToday() : sub === "dividend" ? uDividend() : sub === "news" ? (UI.annOpen ? annExplainer() : uNews()) : sub === "reminders" ? uReminders() : uShariah()}`;
 }
 
@@ -2526,10 +2574,13 @@ function viewMore(){
       ["timeline","history",L("Meri investment ki kahani","My investment history"), L("Shuru se ab tak","From the start till now")]]],
     [L("App","App"), [
       ["settings","gear",L("Settings, privacy aur data","Settings, privacy and data"), L("Zabaan, charges, backup","Language, charges, backup")],
-      ["plan","lock",L("Mera plan","My plan"), "PSX Personal Assistant Plus"]]]
+      ["plan","lock",L("Mera plan","My plan"), L("Beta · abhi muft","Beta · free for now")]]]
   ];
+  const SIMPLE_TOOLS = ["ask","tip","monthly","settings"];
+  if (isSimple()) groups.forEach(g => g[1] = g[1].filter(([k]) => SIMPLE_TOOLS.includes(k)));
   return `<div><h1 class="h-page">${L("More Tools","More Tools")}</h1><p class="muted small">${L("Har tool ek aam sawal se shuru hota hai","Every tool starts with a simple question")}</p></div>
-  ${groups.map(([g, items]) => `<section class="stack"><div class="eyebrow">${esc(g)}</div><div class="tools">${items.map(([k,icn,title,sub]) => `<button class="tool" data-act="tool" data-v="${k}"><div class="ti">${ic(icn,21)}</div><div style="min-width:0"><b>${esc(title)}</b><span>${esc(sub)}</span></div>${["tip","letter","ask"].includes(k) ? `<span style="margin-left:auto">${aiTag}</span>` : ""}</button>`).join("")}</div></section>`).join("")}`;
+  ${groups.map(([g, items]) => `<section class="stack"><div class="eyebrow">${esc(g)}</div><div class="tools">${items.map(([k,icn,title,sub]) => `<button class="tool" data-act="tool" data-v="${k}"><div class="ti">${ic(icn,21)}</div><div style="min-width:0"><b>${esc(title)}</b><span>${esc(sub)}</span></div>${["tip","letter","ask"].includes(k) ? `<span style="margin-left:auto">${aiTag}</span>` : ""}</button>`).join("")}</div></section>`).join("")}
+  <div class="card pad row" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><div style="min-width:0"><b>${isSimple() ? L("Simple mode chal raha hai","Simple mode is on") : L("Saare tools nazar aa rahe hain","All tools are showing")}</b><p class="small muted">${isSimple() ? L("Sirf zaroori cheezein dikh rahi hain. Tax report, broker match, charges check waghera ke liye saare tools kholein.","Only the essentials show. Open all tools for the tax report, broker match, charges check and more.") : L("Kam cheezein dekhni hon to Simple mode wapas chalayein.","Turn Simple mode back on to see less.")}</p></div><button class="btn line sm" data-act="simple-toggle">${isSimple() ? L("Saare tools dikhayein","Show all tools") : L("Simple mode","Simple mode")}</button></div>`;
 }
 function aiUnavailable(){ return `<div class="soon"><div class="ti">${ic("spark",24)}</div><b>${L("AI madad is view mein available nahi","AI help isn't available in this view")}</b><span class="small muted" style="max-width:420px">${L("Yeh feature Claude ke zariye chalta hai. claude.ai par sign in kar ke yeh page kholein.","This feature runs through Claude. Open this page signed in on claude.ai.")}</span></div>`; }
 function toolView(t){
@@ -2564,9 +2615,9 @@ function toolView(t){
   }
   if (t === "settings") return settingsView();
   if (t === "plan") return `<div><h1 class="h-page">${L("Mera plan","My plan")}</h1></div>
-    <div class="plan stack"><div class="eyebrow" style="color:var(--on-navy-2)">PSX Personal Assistant Plus</div><div class="price num">Rs 400 <span style="font-size:15px;font-weight:600;color:var(--on-navy-2)">/ ${L("mahina","month")}</span></div>
+    <div class="plan stack"><div class="eyebrow" style="color:var(--on-navy-2)">PSX Personal Assistant Plus</div><div class="price">${L("Beta · abhi muft","Beta · free for now")}</div>
       <ul style="margin:0;padding-left:18px;line-height:1.9">${[L("Mukammal portfolio aur hisaab","Full portfolio and accounts"),L("Screenshot aur bol kar entry","Screenshot and voice entry"),L("Dividend assistant aur yaad-dahaniyan","Dividend assistant and reminders"),L("AI se sawal aur letter samjhao","AI questions and letter explainer"),L("Saalana tax report","Annual tax report")].map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
-    <div class="notice gold">${ic("info",18)}<div>${L("Payment abhi active nahi. Is waqt saare features muft dekh sakte hain. Payment ka tareeqa (jaise JazzCash/Easypaisa/card) jald add hoga.","Billing isn't active yet. All features are free to try for now. Payment options (e.g. JazzCash/Easypaisa/card) will be added soon.")}</div></div>`;
+    <div class="notice gold">${ic("info",18)}<div>${L("Abhi koi fees nahi. Saare features muft hain. Agar kabhi fees lagi to pehle saaf bataya jayega, aur aap ka data aap ka hi rahega.","There are no fees right now. Every feature is free. If that ever changes you'll be told clearly first, and your data stays yours.")}</div></div>`;
   return "";
 }
 function taxReport(){
@@ -2613,8 +2664,10 @@ function settingsView(){
   <div class="card pad stack"><h2 class="h-sec">${L("Zabaan aur theme","Language and theme")}</h2>
     <div class="row" style="flex-wrap:wrap"><div class="lang"><button data-act="lang" data-v="ur" aria-pressed="${S.lang!=="en"}">Roman Urdu</button><button data-act="lang" data-v="en" aria-pressed="${S.lang==="en"}">English</button></div>
     <div class="lang"><button data-act="theme-set" data-v="" aria-pressed="${!S.theme}">${L("Asal (dark)","Default (dark)")}</button><button data-act="theme-set" data-v="light" aria-pressed="${S.theme==="light"}">${L("Roshan","Light")}</button><button data-act="theme-set" data-v="dark" aria-pressed="${S.theme==="dark"}">${L("Andhera","Dark")}</button></div></div></div>
+  ${accountCard()}
   <div class="card pad stack"><h2 class="h-sec">${L("Privacy aur aap ka data","Privacy and your data")}</h2>
-    <div class="notice ${UI.storage==="cloud"?"green":"info"}">${ic("lock",18)}<div>${UI.storage === "cloud" ? L("Aap ka data aap ke Claude account mein private save hota hai. Koi aur — is page ka owner bhi — ise nahi dekh sakta.","Your data is saved privately to your Claude account. No one else — not even this page's owner — can see it.") : L("Aap ka data sirf is browser mein save hai. Browser ki history saaf karne se mit sakta hai, is liye backup rakhein.","Your data is saved in this browser only. Clearing browser data can erase it, so keep a backup.")}</div></div>
+    <div class="notice ${UI.storage==="cloud"||UI.storage==="account"?"green":"info"}">${ic("lock",18)}<div>${UI.storage === "account" ? L("Aap ka data aap ke account mein mehfooz hai aur har device par sign in karne se mil jata hai.","Your data is saved to your account and appears on any device you sign in on.") : UI.storage === "cloud" ? L("Aap ka data aap ke Claude account mein private save hota hai. Koi aur — is page ka owner bhi — ise nahi dekh sakta.","Your data is saved privately to your Claude account. No one else — not even this page's owner — can see it.") : L("Aap ka data sirf is browser mein save hai. Browser ki history saaf karne se mit sakta hai, is liye backup rakhein.","Your data is saved in this browser only. Clearing browser data can erase it, so keep a backup.")}</div></div>
+    ${inClaude() ? "" : `<a class="link" href="/privacy.html" target="_blank" rel="noopener">${L("Privacy policy parhein","Read the privacy policy")} ${ic("chev",14,2.2)}</a>`}
     <p class="small muted">${L("AI wale buttons (jaise \"Claude se poochein\") sirf tab aap ka portfolio ka khulasa ya tasveer Claude ko bhejte hain jab aap khud button dabayein. Baaqi saara hisaab isi app ke andar hota hai.","AI buttons (like \"Ask Claude\") send your portfolio summary or picture to Claude only when you tap them. All other calculations happen inside this app.")}</p>
     <div class="row" style="flex-wrap:wrap"><button class="btn line sm" data-act="backup">${ic("download",16)} ${L("Backup download","Download backup")}</button><label class="btn line sm" for="restore-file">${ic("upload",16)} ${L("Backup wapas laayein","Restore backup")}</label><input type="file" id="restore-file" accept="application/json,.json" hidden></div>
     <div class="divider"></div>
@@ -2644,7 +2697,8 @@ function renderSheet(){
       <div style="margin:12px 0">${sparkline(hist)}<div class="tiny faint">${L("Pichle 3 mahine · demo prices","Last 3 months · demo prices")}</div></div>
       <div class="kv"><span class="k">${L("Shares","Shares")}</span><span class="v num">${num(h.q)}</span></div>
       <div class="kv"><span class="k">${L("Meri average qeemat","My average price")}</span><span class="v num">${rs(h.avg,2)}</span></div>
-      <div class="kv"><span class="k">${L("Aaj ki qeemat (demo)","Today's price (demo)")}</span><span class="v num">${rs(h.price,2)}</span></div>
+      <div class="kv"><span class="k">${h.userPrice ? L(`Aap ki qeemat (${fmtDate(h.priceDate)})`, `Your price (${fmtDate(h.priceDate)})`) : L("Aaj ki qeemat (demo)","Today's price (demo)")}</span><span class="v num">${rs(h.price,2)}</span></div>
+      <button class="link" data-go="portfolio" data-sub="prices" style="margin-top:6px">${h.userPrice ? L("Qeemat badlein","Change the price") : L("Asli qeemat darj karein","Enter the real price")} ${ic("chev",14,2.2)}</button>
       <div class="kv"><span class="k">${L("Kitna lagaya","Invested")}</span><span class="v num">${rs(h.cost)}</span></div>
       <div class="kv"><span class="k">${L("Portfolio ka hissa","Share of portfolio")}</span><span class="v num">${pct(h.weight,1)}</span></div>
       ${h.div ? `<div class="kv"><span class="k">${L("Dividend mila","Dividends received")}</span><span class="v num gain">${rs(h.div)}</span></div>` : ""}
@@ -2973,6 +3027,7 @@ async function exportPdf(spec, filename){
     doc.text(doc.splitTextToSize(pdfSafe(L("Hisaab-kitaab aur taleem ke liye. Investment ka mashwara nahi. Jahan 'demo' likha hai woh qeematein asli PSX data nahi. Company announcements 'sample' hain jab tak authorised feed na lage.","For record-keeping and learning. Not investment advice. Prices marked 'demo' are not real PSX data. Announcements are 'sample' until an authorised feed is connected.")), W - 2 * M - 60), M, H - 30); doc.text(`${i} / ${n}`, W - M, H - 30, { align: "right" }); }
   const blob = doc.output("blob");
   if (UI.downloads){ try { await UI.downloads.save({ filename, data: blob }); return; } catch (e){ if (e?.code === "declined" || e?.code === "cancelled") return; } }
+  if (!inClaude()){ browserDownload(filename, blob); return; }
   const text = [spec.title, spec.subtitle, ...spec.sections.flatMap(s => [ "", s.heading, ...(s.text || []), ...(s.kv || []).map(([k, v]) => `${k}: ${v}`), ...(s.table ? [s.table.head.join(" | "), ...s.table.rows.map(r => r.join(" | "))] : []) ])].filter(x => x != null).join("\n");
   copyText(text, L("PDF download is view mein available nahi, is liye report ka text copy kar diya gaya.","PDF download isn't available in this view, so the report text was copied."));
 }
@@ -3074,6 +3129,12 @@ document.addEventListener("click", async (ev) => {
     case "holdings-to-broker": { const list = UI.entry.list; commit(st => { const b = brokerState(); const qty = { ...b.qty }; list.forEach(h => qty[h.symbol] = h.qty); st.broker = { ...b, qty, extra: [...new Set([...b.extra, ...list.map(h => h.symbol)])] }; }); UI.entry = null; toast(L("Broker match mein ginti daal di gayi","Counts added to broker match")); go("portfolio","broker"); break; }
     case "entry-back": stopMic(); UI.entry = null; render(); break;
     case "tasks-more": UI.allTasks = !UI.allTasks; render(); break;
+    case "simple-toggle": commit(st => st.settings = { ...st.settings, simple: !isSimple() }); break;
+    case "auth": closeSheet(); if (UI.sbUser) go("more", "settings"); else openSheet({ kind:"auth", mode:"in" }); break;
+    case "auth-mode": if (UI.sheet){ UI.sheet.mode = v; UI.sheet.msg = null; UI.sheet.err = null; renderSheet(); } break;
+    case "auth-out": await signOutAccount(); break;
+    case "sync-now": await pushAccount(); toast(UI.syncState === "ok" ? L("Account mein save ho gaya","Saved to your account") : L("Save nahi ho saka. Internet check karein.","Couldn't save. Check your internet.")); break;
+    case "price-clear": commit(st => { const pr = { ...st.prices }; delete pr[el.dataset.s]; st.prices = pr; }); toast(L(`${el.dataset.s} wapas demo qeemat par`, `${el.dataset.s} is back on the demo price`)); break;
     case "mic-start": startMic(); break;
     case "mic-stop": stopMic(); render(); break;
     case "ph-copy": copyText(dailyText(), L("Aaj ki update copy ho gayi — WhatsApp mein paste karein","Today's update copied — paste it in WhatsApp")); break;
@@ -3180,6 +3241,9 @@ document.addEventListener("submit", async (ev) => {
   const f = ev.target; ev.preventDefault();
   if (f.id === "entry-form"){ submitEntry(); return; }
   const k = f.dataset.form;
+  if (k === "auth"){ await submitAuth(ev); return; }
+  if (k === "prices"){ submitPrices(); return; }
+  if (k === "custom-sym"){ submitCustomSym(); return; }
   if (k === "rem-add"){ const text = $("#rem-t").value.trim(); const date = $("#rem-d").value; if (!text){ $("#rem-err").textContent = L("Kaam likhein.","Write the task."); $("#rem-t").focus(); return; } if (!date){ $("#rem-err").textContent = L("Tareekh chunein.","Pick a date."); return; }
     const sym = resolveSymbol($("#rem-s").value); UI.remDraft = null; addReminder({ text, date, repeat: $("#rem-r").value, symbol: sym || undefined }); return; }
   if (k === "rem-edit"){ const text = $("#re-t").value.trim(); if (!text){ $("#re-err").textContent = L("Kaam likhein.","Write the task."); return; } const id = UI.sheet.id; commit(st => st.reminders = st.reminders.map(r => r.id === id ? { ...r, text, date: $("#re-d").value, repeat: $("#re-r").value } : r)); closeSheet(); toast(L("Yaad-dahani badal di","Reminder updated")); return; }
@@ -3270,6 +3334,7 @@ window.addEventListener("hashchange", () => { const h = location.hash.slice(1); 
 /** Returns true when the file was saved; false when declined or when it fell back to copying the text. */
 async function offerDownload(filename, data, type){
   if (UI.downloads){ try { await UI.downloads.save({filename, data: new Blob([data], {type})}); return true; } catch (e){ if (e?.code === "declined" || e?.code === "cancelled") return false; } }
+  if (!inClaude()){ browserDownload(filename, new Blob([data], {type})); return true; }
   copyText(data, L("Download yahan available nahi, is liye data copy kar diya gaya.","Download isn't available here, so the data was copied."));
   return false;
 }
@@ -3282,6 +3347,220 @@ function fallbackCopy(text, done){
   root.innerHTML = `<div class="scrim" data-act="scrim"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div class="sheet-h"><h2>${L("Yeh text copy karein","Copy this text")}</h2><button class="icon-btn x" data-act="sheet-close" aria-label="${L("Band karein","Close")}">${ic("x",18)}</button></div><textarea class="input" style="min-height:240px;font-family:ui-monospace,monospace;font-size:12px" readonly>${esc(text)}</textarea></div></div>`;
   const ta = root.querySelector("textarea"); ta.focus(); ta.select();
 }
+/* =========================================================================
+   Simple mode, file downloads, service worker
+   ========================================================================= */
+const inClaude = () => !!window.claude?.use;
+const isSimple = () => S.settings?.simple !== false;
+const moreTabsBtn = () => isSimple() ? `<button data-act="simple-toggle" title="${L("Saare tabs aur tools dikhayein","Show all tabs and tools")}">${L("Aur ›","More ›")}</button>` : "";
+function browserDownload(filename, blob){
+  const url = URL.createObjectURL(blob); const a = document.createElement("a");
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+function registerSW(){
+  if (inClaude() || !("serviceWorker" in navigator) || location.protocol !== "https:") return;
+  navigator.serviceWorker.register("/sw.js").catch(() => {});
+}
+
+/* =========================================================================
+   Your own prices and your own companies
+   ========================================================================= */
+function registerCustom(c){
+  if (!c || !c.s || SYM[c.s]) return;
+  const x = { s: c.s, n: c.n || c.s, sec: c.sec || "Other", seed: c.p > 0 ? c.p : 100, vol: .3, al: [c.s.toLowerCase(), String(c.n || "").toLowerCase()].filter(a => a.length > 2), custom: true };
+  SYMBOLS.push(x); SYM[c.s] = x;
+}
+const demoClose = s => { const h = history(s); return h.length ? h[h.length - 1].c : null; };
+function priceState(holdings){
+  const user = holdings.filter(h => h.userPrice); const latest = user.map(h => h.priceDate).sort().pop() || null;
+  return { all: holdings.length, user: user.length, demo: holdings.length - user.length, latest };
+}
+function priceTag(holdings){
+  const p = priceState(holdings);
+  if (!p.all || p.user === 0) return L(`Demo prices · ${fmtDate(AS_OF)}`, `Demo prices · ${fmtDate(AS_OF)}`);
+  if (p.demo === 0) return L(`Aap ki qeematein · ${fmtDate(p.latest)}`, `Your prices · ${fmtDate(p.latest)}`);
+  return L(`${p.user}/${p.all} aap ki qeematein, baaqi demo`, `${p.user} of ${p.all} your prices, rest demo`);
+}
+function pPrices(sn){
+  const pr = S.prices || {}; const p = priceState(sn.holdings);
+  const secs = [...new Set(SYMBOLS.map(x => x.sec))].filter(x => x !== "Other").sort();
+  const rows = sn.holdings.map(h => { const u = pr[h.s]; const d = demoClose(h.s);
+    return `<div class="li" style="flex-wrap:wrap;gap:10px 12px">
+      <div class="logo">${logoMark(h.s)}</div>
+      <div class="mid"><div class="main-t">${esc(h.s)}</div><div class="sub-t">${u ? L(`Aap ki qeemat · ${fmtDate(u.d)}`, `Your price · ${fmtDate(u.d)}`) : L(`Abhi demo: ${d != null ? rs(d, 2) : "—"}`, `Now demo: ${d != null ? rs(d, 2) : "—"}`)}</div></div>
+      <div style="flex:none;width:132px"><div class="input-wrap"><span class="pre">Rs</span><input class="input num" style="min-height:42px;text-align:right" id="pr-${esc(h.s)}" data-pr="${esc(h.s)}" inputmode="decimal" value="${u ? u.p : ""}" placeholder="${L("Aaj ki","Today's")}" aria-label="${esc(h.s)} ${L("ki aaj ki qeemat","today's price")}"></div>
+        ${u ? `<button type="button" class="link tiny" style="margin-top:4px" data-act="price-clear" data-s="${esc(h.s)}">${L("Demo par wapas","Back to demo")}</button>` : ""}</div>
+    </div>`; }).join("");
+  return `<form class="card pad stack" data-form="prices" novalidate>
+    <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><h2 class="h-sec">${L("Apne shares ki asli qeematein","Real prices for your shares")}</h2>${p.all ? `<span class="pill ${p.demo ? "demo" : "ok"} num">${p.user}/${p.all} ${L("asli","real")}</span>` : ""}</div>
+    <p class="small muted">${L("Apni broker app mein har share ki maujooda qeemat dekh kar yahan likhein. Jis share ki qeemat likhi hogi, us ka hisaab demo ki jagah isi qeemat se hoga, aur portfolio ki value asli ho jayegi.","Look up each share's current price in your broker app and type it here. Wherever you enter a price, your portfolio uses it instead of the demo price, so the value becomes real.")}</p>
+    ${sn.holdings.length ? `<div class="list">${rows}</div>` : `<div class="empty">${L("Pehle shares ki entry karein.","Add your shares first.")}</div>`}
+    <span class="err" id="pr-err"></span>
+    ${sn.holdings.length ? `<button class="btn primary" type="submit">${ic("check",17,2.4)} ${L("Qeematein save karein","Save prices")}</button>` : ""}
+    <p class="tiny faint">${L("Asli, authorised PSX data feed ke baghair app khud qeematein nahi la sakti. Roz ya hafte mein ek dafa update kar dein; jo qeemat likhi ho us ki tareekh saath dikhti hai.","Without an authorised PSX data feed the app can't fetch prices itself. Update them daily or weekly; each price shows the date you entered it.")}</p>
+  </form>
+  <form class="card pad stack" data-form="custom-sym" novalidate>
+    <h2 class="h-sec">${L("Apni company list mein nahi mili?","Company not in the list?")}</h2>
+    <p class="small muted">${L(`App ${SYMBOLS.length} companies jaanti hai. Koi aur ho to yahan ek dafa add kar dein, phir us ki entries aam tareeqe se kar sakte hain.`, `The app knows ${SYMBOLS.length} companies. Add any other one here once, then enter its trades as usual.`)}</p>
+    <div class="fgrid two">
+      <div class="field"><label for="cs-sym">${L("PSX symbol","PSX symbol")}</label><input class="input" id="cs-sym" maxlength="12" autocapitalize="characters" placeholder="${L("Masalan: SAZEW","e.g. SAZEW")}"></div>
+      <div class="field"><label for="cs-name">${L("Company ka naam","Company name")}</label><input class="input" id="cs-name" maxlength="60"></div>
+      <div class="field"><label for="cs-sec">${L("Karobar (sector)","Sector")}</label><select class="input" id="cs-sec">${secs.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join("")}<option value="Other">${L("Doosra","Other")}</option></select></div>
+      <div class="field"><label for="cs-price">${L("Aaj ki qeemat","Today's price")}</label><div class="input-wrap"><span class="pre">Rs</span><input class="input num" id="cs-price" inputmode="decimal"></div></div>
+    </div>
+    <span class="err" id="cs-err"></span>
+    <button class="btn line" type="submit">${ic("plus",16)} ${L("Company add karein","Add company")}</button>
+  </form>`;
+}
+function submitPrices(){
+  const t0 = todayISO(); const upd = {}; let bad = null;
+  document.querySelectorAll("[data-pr]").forEach(inp => { const v = inp.value.trim(); if (v === "") return; const n = parseNum(v); if (!(n > 0 && n < 1e6)) bad = bad || inp.dataset.pr; else upd[inp.dataset.pr] = round2(n); });
+  const err = $("#pr-err");
+  if (bad){ err.textContent = L(`${bad} ki qeemat theek likhein.`, `Enter a valid price for ${bad}.`); return; }
+  const n = Object.keys(upd).length; if (!n){ err.textContent = L("Kam az kam ek share ki qeemat likhein.","Enter at least one share's price."); return; }
+  commit(st => { const pr = { ...(st.prices || {}) };
+    for (const [k, p] of Object.entries(upd)){ const old = pr[k]; if (old && old.p === p && old.d === t0) continue; pr[k] = { p, d: t0, prev: old ? (old.d === t0 ? old.prev : old.p) : null }; }
+    st.prices = pr; });
+  toast(L(`${n} shares ki qeemat save ho gayi`, `Saved prices for ${n} share(s)`));
+}
+function submitCustomSym(){
+  const sym = ($("#cs-sym").value || "").trim().toUpperCase(); const name = ($("#cs-name").value || "").trim(); const sec = $("#cs-sec").value; const price = parseNum($("#cs-price").value);
+  const err = $("#cs-err");
+  if (!window.PSXCore.SYMBOL_RE.test(sym)){ err.textContent = L("Symbol sirf English haroof/number mein likhein (jaise SAZEW).","Use letters and numbers only for the symbol (e.g. SAZEW)."); return; }
+  if (SYM[sym]){ err.textContent = L(`${sym} pehle se list mein hai.`, `${sym} is already in the list.`); return; }
+  if (name.length < 2){ err.textContent = L("Company ka naam likhein.","Enter the company name."); return; }
+  if (!(price > 0 && price < 1e6)){ err.textContent = L("Aaj ki qeemat likhein.","Enter today's price."); return; }
+  const c = { s: sym, n: name.slice(0, 60), sec, p: round2(price) };
+  registerCustom(c);
+  commit(st => { st.customSyms = [...(st.customSyms || []), c]; st.prices = { ...(st.prices || {}), [sym]: { p: c.p, d: todayISO(), prev: null } }; });
+  toast(L(`${sym} add ho gayi. Ab is ki entry kar sakte hain.`, `${sym} added. You can now enter its trades.`));
+}
+
+/* =========================================================================
+   Account (Supabase) — used on the public website. Inside claude.ai the page
+   keeps using Claude's own private per-person storage instead.
+   ========================================================================= */
+const SB_URL = "https://qhhifruqhystrsmssbyi.supabase.co";
+const SB_KEY = "sb_publishable_5U91VVYnxCQckyR-81RE1Q_psNUUF5q";   // publishable key: safe in the page, data is protected by row-level security
+let sbSaveTimer = null;
+async function connectAccount(){
+  if (inClaude()) return;
+  try { await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"); }
+  catch { UI.accountFailed = true; render(); return; }
+  const sb = window.supabase?.createClient?.(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+  if (!sb){ UI.accountFailed = true; render(); return; }
+  UI.sb = sb; UI.accountReady = true;
+  sb.auth.onAuthStateChange((event, session) => {
+    // Supabase advises not awaiting other client calls inside this callback, so hand off.
+    setTimeout(() => { if (event === "PASSWORD_RECOVERY") openSheet({ kind:"auth", mode:"newpass" }); handleSession(session); }, 0);
+  });
+  render();
+}
+async function handleSession(session){
+  const u = session?.user || null; const was = UI.sbUser?.id;
+  if (!u){ UI.sbUser = null; if (UI.storage === "account") UI.storage = "local"; render(); return; }
+  UI.sbUser = { id: u.id, email: u.email };
+  if (was === u.id) return;
+  UI.storage = "account"; UI.syncState = "syncing"; render();
+  try {
+    const { data, error } = await UI.sb.from("user_state").select("state, updated_at").eq("user_id", u.id).maybeSingle();
+    if (error) throw error;
+    if (data?.state && Array.isArray(data.state.txs)){
+      // The account copy wins. Keep this browser's own entries aside in case they differ.
+      if (S.txs.some(t => !t.demo) && JSON.stringify(S.txs) !== JSON.stringify(data.state.txs)){ try { localStorage.setItem(LS_KEY + ":before-sign-in", JSON.stringify(S)); } catch {} }
+      S = migrate(data.state); try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch {}
+      UI.syncState = "ok"; UI.syncedAt = Date.now();
+    } else {
+      await pushAccount();
+    }
+  } catch { UI.syncState = "error"; }
+  render();
+}
+async function pushAccount(){
+  if (!UI.sb || !UI.sbUser) return;
+  clearTimeout(sbSaveTimer); UI.syncState = "syncing"; refreshSyncLines();
+  try {
+    const { error } = await UI.sb.from("user_state").upsert({ user_id: UI.sbUser.id, state: S, updated_at: new Date().toISOString() });
+    UI.syncState = error ? "error" : "ok"; if (!error) UI.syncedAt = Date.now();
+  } catch { UI.syncState = "error"; }
+  refreshSyncLines();
+}
+function refreshSyncLines(){ ["sync-line", "sync-line2"].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = syncLine(); }); }
+function syncLine(){
+  if (UI.storage === "cloud") return ic("lock",13) + " " + L("Data aap ke Claude account mein private save hai","Data saved privately to your Claude account");
+  if (UI.sbUser){ const st = UI.syncState;
+    return ic("lock",13) + " " + (st === "error" ? L("Account mein save nahi ho saka — internet check karein","Couldn't save to your account — check your internet") : st === "syncing" || st === "pending" ? L("Account mein save ho raha hai…","Saving to your account…") : L("Account mein mehfooz hai","Safe in your account")); }
+  return L("Data sirf is browser mein save hai","Data saved in this browser only") + (UI.accountReady ? ` · <button class="link" data-act="auth" style="font-size:inherit">${L("Account banayein","Create account")}</button>` : "");
+}
+function accountCard(){
+  if (inClaude()) return "";
+  const head = `<h2 class="h-sec">${L("Mera account","My account")}</h2>`;
+  if (!UI.accountReady) return `<div class="card pad stack">${head}<p class="small muted">${UI.accountFailed ? L("Account service se rabta nahi ho saka. Internet check kar ke page dobara kholein.","Couldn't reach the account service. Check your internet and reload the page.") : L("Account service load ho rahi hai…","Loading the account service…")}</p></div>`;
+  if (!UI.sbUser) return `<div class="card pad stack">${head}<p class="small muted">${L("Muft account banayein. Phir aap ka portfolio har phone aur laptop par sign in karte hi mil jayega, aur browser saaf hone se bhi gum nahi hoga.","Create a free account. Your portfolio then appears on every phone and laptop you sign in on, and clearing the browser won't lose it.")}</p><div class="row" style="flex-wrap:wrap"><button class="btn primary sm" data-act="auth">${ic("lock",15)} ${L("Sign in / Account banayein","Sign in / Create account")}</button></div></div>`;
+  return `<div class="card pad stack">${head}<div class="kv"><span class="k">Email</span><span class="v" style="overflow-wrap:anywhere">${esc(UI.sbUser.email || "")}</span></div>
+    <div class="small muted" id="sync-line2">${syncLine()}</div>
+    <div class="row" style="flex-wrap:wrap"><button class="btn line sm" data-act="sync-now">${ic("upload",15)} ${L("Abhi save karein","Save now")}</button><button class="btn ghost sm" data-act="auth-out">${L("Sign out","Sign out")}</button></div>
+    <p class="tiny faint">${L("Sign out karne par is device se aap ka data hata diya jata hai; dobara sign in karne par wapas aa jata hai.","Signing out removes your data from this device; it comes back when you sign in again.")}</p></div>`;
+}
+UPDATE_SHEETS.auth = (s) => {
+  if (!UI.sb) return { title: L("Account","Account"), body: `<div class="notice red">${ic("alert",18)}<div>${L("Account service se rabta nahi ho saka. Internet check kar ke page dobara kholein.","Couldn't reach the account service. Check your internet and reload the page.")}</div></div>` };
+  const mode = s.mode || "in";
+  const T = { in: L("Sign in","Sign in"), up: L("Muft account banayein","Create a free account"), reset: L("Password bhool gaye?","Forgot your password?"), newpass: L("Naya password rakhein","Set a new password") };
+  const B = { in: L("Sign in","Sign in"), up: L("Account banayein","Create account"), reset: L("Link bhejein","Send link"), newpass: L("Password save karein","Save password") };
+  const needEmail = mode !== "newpass", needPass = mode !== "reset";
+  return { title: T[mode], body: `<form class="stack" data-form="auth" novalidate>
+    ${s.msg ? `<div class="notice green">${ic("check",18)}<div class="small">${esc(s.msg)}</div></div>` : ""}
+    ${s.err ? `<div class="notice red">${ic("alert",18)}<div class="small">${esc(s.err)}</div></div>` : ""}
+    ${mode === "up" ? `<p class="small muted">${L("Aap ka portfolio aap ke account mein mehfooz rahega aur har device par mil jayega.","Your portfolio is kept safe in your account and available on every device.")}</p>` : ""}
+    ${needEmail ? `<div class="field"><label for="au-e">Email</label><input class="input" type="email" id="au-e" autocomplete="email" value="${esc(s.email || "")}" required></div>` : ""}
+    ${needPass ? `<div class="field"><label for="au-p">${mode === "newpass" ? L("Naya password","New password") : L("Password","Password")}</label><input class="input" type="password" id="au-p" autocomplete="${mode === "in" ? "current-password" : "new-password"}" minlength="8" required>${mode !== "in" ? `<span class="hint">${L("Kam az kam 8 haroof","At least 8 characters")}</span>` : ""}</div>` : ""}
+    <button class="btn primary" type="submit" ${s.busy ? "disabled" : ""}>${s.busy ? `<span class="spin"></span>` : ""} ${B[mode]}</button>
+    ${mode === "in" ? `<div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><button type="button" class="link" data-act="auth-mode" data-v="up">${L("Naya account banayein","Create a new account")}</button><button type="button" class="link" data-act="auth-mode" data-v="reset">${L("Password bhool gaye?","Forgot password?")}</button></div>`
+      : mode !== "newpass" ? `<button type="button" class="link" data-act="auth-mode" data-v="in">${L("Pehle se account hai? Sign in karein","Already have an account? Sign in")}</button>` : ""}
+    <p class="tiny faint">${L("Aap ka data sirf aap ke account se khulta hai. Hum aap ka password nahi dekh sakte.","Your data opens only with your account. We can't see your password.")} <a class="link tiny" href="/privacy.html" target="_blank" rel="noopener">${L("Privacy","Privacy")}</a></p>
+  </form>` };
+};
+function authErr(e){
+  const m = String(e?.message || "").toLowerCase();
+  if (m.includes("invalid login")) return L("Email ya password ghalat hai.","Wrong email or password.");
+  if (m.includes("not confirmed")) return L("Pehle apni email mein bheja gaya confirmation link dabayein.","Confirm your email first using the link we sent.");
+  if (m.includes("already registered") || m.includes("already been registered") || m.includes("already exists")) return L("Is email ka account pehle se hai. Sign in karein.","An account with this email already exists. Sign in instead.");
+  if (m.includes("rate") || m.includes("too many") || m.includes("security purposes")) return L("Bohat zyada koshishein ho gayin. Thori dair baad dobara karein.","Too many attempts. Try again in a little while.");
+  if (m.includes("password")) return L("Ye password nahi chal sakta. Lamba aur mushkil password rakhein.","That password can't be used. Choose a longer, harder one.");
+  if (m.includes("fetch") || m.includes("network")) return L("Internet se rabta nahi ho saka.","Couldn't reach the internet.");
+  return L("Kuch masla hua. Dobara koshish karein.","Something went wrong. Please try again.");
+}
+async function submitAuth(){
+  const s = UI.sheet; if (!s || !UI.sb) return; const mode = s.mode || "in";
+  const email = ($("#au-e")?.value || "").trim(); const pass = $("#au-p")?.value || "";
+  s.email = email || s.email; s.err = null; s.msg = null;
+  if (mode !== "newpass" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ s.err = L("Sahi email likhein.","Enter a valid email address."); renderSheet(); return; }
+  if (mode !== "reset" && pass.length < 8){ s.err = L("Password kam az kam 8 haroof ka ho.","The password must be at least 8 characters."); renderSheet(); return; }
+  s.busy = true; renderSheet();
+  try {
+    if (mode === "in"){ const { error } = await UI.sb.auth.signInWithPassword({ email, password: pass }); if (error) throw error; closeSheet(); toast(L("Sign in ho gaya","Signed in")); return; }
+    if (mode === "up"){
+      const { data, error } = await UI.sb.auth.signUp({ email, password: pass, options: { emailRedirectTo: location.origin + "/" } }); if (error) throw error;
+      if (data.session){ closeSheet(); toast(L("Account ban gaya","Account created")); return; }
+      s.mode = "in"; s.msg = L(`${email} par confirmation email bheji hai. Email mein link dabayein, phir yahan sign in karein.`, `We've emailed a confirmation link to ${email}. Open it, then sign in here.`);
+    }
+    if (mode === "reset"){ const { error } = await UI.sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + "/" }); if (error) throw error;
+      s.msg = L("Agar is email ka account hai to password badalne ka link bhej diya gaya hai.","If an account exists for this email, a reset link is on its way."); }
+    if (mode === "newpass"){ const { error } = await UI.sb.auth.updateUser({ password: pass }); if (error) throw error; closeSheet(); toast(L("Naya password lag gaya","New password saved")); return; }
+  } catch (e){ s.err = authErr(e); }
+  s.busy = false; if (UI.sheet === s) renderSheet();
+}
+async function signOutAccount(){
+  if (!UI.sb) return;
+  await pushAccount();
+  try { await UI.sb.auth.signOut(); } catch {}
+  UI.sbUser = null; UI.storage = "local"; closeSheet();
+  const lang = S.lang; S = emptyState(lang); S.langChosen = true; S = migrate(S); try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch {}
+  toast(L("Sign out ho gaya. Is device se data hata diya gaya; sign in karne par wapas aa jayega.","Signed out. Your data was removed from this device and returns when you sign in."));
+  go("home");
+}
+
 function afterRender(){ liveCalc(); liveEntry(); const c = $("#chat"); if (c) c.scrollTop = c.scrollHeight; }
 
 /* =========================================================================
@@ -3293,12 +3572,16 @@ function migrate(st){ if (!st.langChosen) st.lang = "en"; st.readUpd ||= {}; st.
   const b = st.broker; if (!b || typeof b !== "object") st.broker = { asOf: null, qty: {}, cash: null, extra: [] };
   else if (!("qty" in b)){ const qty = {}; let cash = null; for (const [k, v] of Object.entries(b)){ if (k === "__cash") cash = v === "" || v == null ? null : Number(v); else if (v !== "" && v != null && isFinite(Number(v))) qty[k] = Number(v); } st.broker = { asOf: null, qty, cash, extra: [] }; }
   st.settings = { minPerShare: 0, sstPct: 0, otherPct: 0, flatFee: 0, ...st.settings };
+  if (st.settings.simple === undefined) st.settings.simple = true;
+  st.prices ||= {}; st.customSyms ||= []; st.customSyms.forEach(registerCustom);
   return st; }
 S = migrate(S);
 const h0 = location.hash.slice(1); if (["home","portfolio","add","updates","more"].includes(h0)) UI.route = h0;
 render();
 connectCloud();
 connectExtras();
+connectAccount();
+registerSW();
 window.matchMedia?.("(prefers-color-scheme: dark)").addEventListener?.("change", () => { if (!S.theme) renderShell(); });
 })();
 </script>

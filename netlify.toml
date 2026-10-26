@@ -1,10 +1,13 @@
-# The live site is PSX Personal Assistant: one static page in /site.
-# (The older Next.js app is still in this repo but is no longer built or published.)
+# PSX Personal Assistant: a static site built from app/index.html into /site.
+# The build runs the engine tests first, so a broken release never goes live.
 [build]
-  command = "echo 'static site, no build'"
+  command = "npm test && npm run build"
   publish = "site"
 
-# Old addresses lead to the app.
+[build.environment]
+  NODE_VERSION = "22"
+
+# Older addresses lead to the app.
 [[redirects]]
   from = "/personal"
   to = "/"
@@ -15,7 +18,7 @@
   to = "/"
   status = 301
 
-# Every other old page (e.g. /portfolio, /assistant) opens the app instead of a 404.
+# Any other unknown page (old /portfolio, /assistant ...) opens the app instead of a 404.
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -27,3 +30,9 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(self), geolocation=()"
+
+# The service worker must always be fetched fresh so updates reach installed apps.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
