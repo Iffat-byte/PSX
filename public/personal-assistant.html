@@ -1213,7 +1213,7 @@ function demoState(){
   buy("EFERT",288,400);
   const t0 = todayISO();
   return {
-    v:1, demo:true, lang:"ur", theme:null, name:"",
+    v:1, demo:true, lang:"en", theme:null, name:"",
     txs: tx,
     divRecords: [
       {id:"dv1", symbol:"FFC", dps:10, qty:250, status:"declared", book:addDays(t0,6), pay:addDays(t0,28), demo:true},
@@ -1235,7 +1235,7 @@ function demoState(){
     settings: {feePct:0.15, divTaxPct:15, monthlyGoal:25000, concLimit:25}
   };
 }
-function emptyState(lang){ return {v:1, demo:false, lang:lang||"ur", theme:S?.theme ?? null, name:S?.name ?? "", txs:[], divRecords:[], reminders:[], events:[], shariah:[], doneTasks:{}, broker:{}, readUpd:{}, readAnn:{}, annChecks:{}, settings:{feePct:0, divTaxPct:15, monthlyGoal:25000, concLimit:25}}; }
+function emptyState(lang){ return {v:1, demo:false, lang:lang||"en", theme:S?.theme ?? null, name:S?.name ?? "", txs:[], divRecords:[], reminders:[], events:[], shariah:[], doneTasks:{}, broker:{}, readUpd:{}, readAnn:{}, annChecks:{}, settings:{feePct:0, divTaxPct:15, monthlyGoal:25000, concLimit:25}}; }
 
 function loadLocal(){ try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; } }
 let saveTimer = null;
@@ -3026,7 +3026,7 @@ document.addEventListener("click", async (ev) => {
   if (a === "scrim"){ if (ev.target === el) closeSheet(); return; }
   if (el.tagName === "SELECT") return;
   switch (a){
-    case "lang": commit(s => s.lang = v); break;
+    case "lang": commit(s => { s.lang = v; s.langChosen = true; }); break;
     case "theme": commit(s => s.theme = isDark() ? "light" : "dark"); break;
     case "theme-set": commit(s => s.theme = v || null); break;
     case "task": { if (el.dataset.id.startsWith("rem-")){ completeReminder(el.dataset.id.slice(4)); break; } const d = todayISO(); commit(s => { const arr = s.doneTasks[d] || []; s.doneTasks = {[d]: arr.includes(el.dataset.id) ? arr.filter(x => x !== el.dataset.id) : [...arr, el.dataset.id]}; }); break; }
@@ -3289,7 +3289,7 @@ function afterRender(){ liveCalc(); liveEntry(); const c = $("#chat"); if (c) c.
    ========================================================================= */
 S = loadLocal();
 if (!S || !Array.isArray(S.txs)) S = demoState();
-function migrate(st){ st.readUpd ||= {}; st.readAnn ||= {}; st.annChecks ||= {}; st.reminders = (st.reminders || []).map(r => ({ repeat:"none", src: r.src || "user", ...r })); st.divRecords ||= []; st.events ||= [];
+function migrate(st){ if (!st.langChosen) st.lang = "en"; st.readUpd ||= {}; st.readAnn ||= {}; st.annChecks ||= {}; st.reminders = (st.reminders || []).map(r => ({ repeat:"none", src: r.src || "user", ...r })); st.divRecords ||= []; st.events ||= [];
   const b = st.broker; if (!b || typeof b !== "object") st.broker = { asOf: null, qty: {}, cash: null, extra: [] };
   else if (!("qty" in b)){ const qty = {}; let cash = null; for (const [k, v] of Object.entries(b)){ if (k === "__cash") cash = v === "" || v == null ? null : Number(v); else if (v !== "" && v != null && isFinite(Number(v))) qty[k] = Number(v); } st.broker = { asOf: null, qty, cash, extra: [] }; }
   st.settings = { minPerShare: 0, sstPct: 0, otherPct: 0, flatFee: 0, ...st.settings };
