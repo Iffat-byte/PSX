@@ -420,6 +420,34 @@ body{background:radial-gradient(1100px 620px at 8% -12%,var(--glow-1),transparen
 :root[data-theme="light"] .mono{background:hsl(var(--h) 46% 93%);color:hsl(var(--h) 58% 27%);box-shadow:inset 0 0 0 1px hsl(var(--h) 36% 84%)}
 .balance .chip{background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(214,178,110,.2)}
 .todo-row .dot.g{background:rgba(214,178,110,.12);color:var(--emerald-ink)}
+
+/* ---------- family league ---------- */
+.ava{display:inline-grid;place-items:center;flex:none;border-radius:50%;font-weight:650;color:hsl(var(--h) 70% 82%);background:radial-gradient(120% 120% at 30% 20%,hsl(var(--h) 45% 30%),hsl(var(--h) 40% 14%));box-shadow:inset 0 0 0 1px hsl(var(--h) 45% 40% / .7)}
+:root[data-theme="light"] .ava{color:hsl(var(--h) 60% 26%);background:hsl(var(--h) 55% 90%);box-shadow:inset 0 0 0 1px hsl(var(--h) 40% 75%)}
+.who{display:inline-flex;align-items:center;gap:8px;padding:3px 12px 3px 3px;min-height:38px;border-radius:999px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);font-weight:580;font-size:13.5px;color:var(--ink)}
+.who:hover{box-shadow:inset 0 0 0 1px rgba(214,178,110,.45)}
+.who > span:only-child{padding-left:9px}
+@media (max-width:420px){.who span:not(.ava){display:none}.who{padding:3px}}
+.podium{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:860px){.podium{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.pod{position:relative;display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:var(--r-lg);background:var(--surface);border:1px solid var(--line);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);min-width:0}
+.pod::before{content:"";position:absolute;inset:0 0 auto;height:3px;border-radius:var(--r-lg) var(--r-lg) 0 0;background:hsl(var(--h) 65% 55% / .8)}
+.pod.first{border-color:rgba(214,178,110,.45);background:linear-gradient(165deg,rgba(214,178,110,.12),transparent 55%),var(--surface);box-shadow:0 24px 60px -30px rgba(214,178,110,.45)}
+.pod.first::before{background:var(--gold-grad)}
+.medal{font-size:24px;line-height:1;width:28px;text-align:center}
+.pod-name{font-size:17px;font-weight:620;letter-spacing:-.01em}
+.pod-pct{font-family:var(--f-display);font-size:46px;font-weight:500;line-height:1.05;margin-top:10px;letter-spacing:-.01em}
+.pod.first .pod-pct.gain{background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pod-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;margin:12px 0 12px;padding-top:12px;border-top:1px solid var(--line)}
+.pod-grid div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.pod-grid span{font-size:11px;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;font-weight:560}
+.pod-grid b{font-weight:600;font-size:14.5px}
+.pod .btn{margin-top:auto}
+.awards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.award{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:var(--r-md);background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);min-width:0}
+.award .qi{width:34px;height:34px;flex:none;border-radius:10px;display:grid;place-items:center;background:rgba(214,178,110,.12);color:var(--emerald-ink);box-shadow:inset 0 0 0 1px rgba(214,178,110,.25)}
+.award b{font-size:14px}
+@media (max-width:380px){.awards{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1191,8 +1219,9 @@ function history(sym){
   for (let i=DAYS.length-2;i>=0;i--){ const g=Math.sqrt(-2*Math.log(Math.max(r(),1e-12)))*Math.cos(2*Math.PI*r()); c[i]=c[i+1]/Math.exp((0.12-0.5*info.vol*info.vol)*dt+g*info.vol*Math.sqrt(dt)); }
   return HIST[sym] = DAYS.map((d,i) => ({d, c: round2(c[i])}));
 }
-function closeOn(sym, iso){ const u = S?.prices?.[sym]; if (u && u.p > 0 && iso >= u.d) return u.p; const h = history(sym); if (!h.length) return null; let best = h[0].c; for (const p of h){ if (p.d <= iso) best = p.c; else break; } return best; }
-function quote(sym){ const u = S?.prices?.[sym]; if (u && u.p > 0) return { price: u.p, prev: u.d === todayISO() && u.prev > 0 ? u.prev : u.p, user: true, d: u.d };
+function closeOn(sym, iso){ if (FAMILY) return famPriceOn(sym, iso); const u = S?.prices?.[sym]; if (u && u.p > 0 && iso >= u.d) return u.p; const h = history(sym); if (!h.length) return null; let best = h[0].c; for (const p of h){ if (p.d <= iso) best = p.c; else break; } return best; }
+function quote(sym){ const u = pricesSrc()?.[sym]; if (u && u.p > 0) return { price: u.p, prev: u.d === todayISO() && u.prev > 0 ? u.prev : u.p, user: true, d: u.d };
+  if (FAMILY) return null;
   const h = history(sym); if (h.length < 2) return null; return { price: h[h.length-1].c, prev: h[h.length-2].c, user: false }; }
 const AS_OF = DAYS[DAYS.length-1];
 
@@ -1277,12 +1306,12 @@ function emptyState(lang){ return {v:1, demo:false, lang:lang||"en", theme:S?.th
 function loadLocal(){ try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; } }
 let saveTimer = null;
 function save(){
-  try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch {}
+  if (!FAMILY) try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch {}
   clearTimeout(saveTimer);
   if (UI.dbRef) saveTimer = setTimeout(() => { UI.dbRef.set({json: JSON.stringify(S), savedAt: Date.now()}).catch(() => {}); }, 700);
-  if (UI.sbUser){ clearTimeout(sbSaveTimer); UI.syncState = "pending"; sbSaveTimer = setTimeout(pushAccount, 900); }
+  famQueueSave();
 }
-function commit(fn){ fn(S); save(); render(); }
+function commit(fn){ if (FAMILY && UI.readOnly){ toast(UI.fam?.me ? L(`Ye ${memberName(UI.fam.viewing)} ka portfolio hai. Apne portfolio par wapas ja kar entry karein.`, `This is ${memberName(UI.fam.viewing)}'s portfolio. Switch back to yours to make changes.`) : L("Pehle batayein aap kaun hain.","First tell us who you are.")); return; } fn(S); save(); render(); }
 
 async function connectCloud(){
   if (!window.claude?.use) return;
@@ -1398,7 +1427,6 @@ function buildTasks(sn){
   S.reminders.filter(remDueToday).sort((a,b) => a.date < b.date ? -1 : 1).slice(0, 2).forEach(rem => tasks.push({id:"rem-"+rem.id, rem: rem.id, tone: rem.date < t0 && !rem.done ? "r" : "b", icon:"bell", title: rem.text, body: rem.done ? L("Mukammal","Done") : L(`Yaad-dahani: ${relDay(rem.date)} (${fmtDate(rem.date)})`, `Reminder: ${relDay(rem.date)} (${fmtDate(rem.date)})`), act:{label:L("Yaad-dahaniyan","Reminders"), go:"updates", sub:"reminders"}}));
   const un = unreadToday() - S.reminders.filter(r => !r.done && r.date && r.date <= t0).length;
   tasks.push({id:"upd-"+t0, upd:true, tone:"g", icon:"bell", title: un > 0 ? L(`Aaj ki ${un} updates aap ka intezar kar rahi hain`, `${un} updates are waiting for you today`) : L("Aaj ki saari updates parh li","All of today's updates read"), body: L("Aap ke shares ki khabrein, ahem tareekhein aur seekhne ki baat.","News on your shares, key dates and a learning tip."), act:{label:L("Updates parhein","Read updates"), go:"updates", sub:"today"}});
-  if (!inClaude() && UI.accountReady && !UI.sbUser) tasks.unshift({id:"account", tone:"y", icon:"lock", title:L("Apna data mehfooz karein","Keep your data safe"), body:L("Abhi aap ka data sirf is browser mein hai. Muft account banayein taake phone badalne ya browser saaf hone par bhi kuch gum na ho.","Right now your data lives only in this browser. Create a free account so nothing is lost if you change phones or clear your browser."), act:{label:L("Account banayein / Sign in","Create account / Sign in"), auth:true}});
   if (!S.txs.length) tasks.unshift({id:"start", tone:"g", icon:"plus", title:L("Apni pehli entry karein","Add your first entry"), body:L("Jo shares aap ke paas hain, unki khareed ki entry karein. Baaqi hisaab hum kar denge.","Enter the shares you own. We'll do the rest of the maths."), act:{label:L("Entry karein","Add entry"), go:"add"}});
   return tasks.slice(0,6);
 }
@@ -1407,7 +1435,7 @@ function buildTasks(sn){
    Shell rendering
    ========================================================================= */
 const NAV = () => [
-  {r:"home", label:L("Home","Home"), icon:"home"},
+  {r:"home", label: FAMILY ? L("Muqabla","League") : L("Home","Home"), icon: FAMILY ? "star" : "home"},
   {r:"portfolio", label:L("Mera Portfolio","My Portfolio"), icon:"wallet"},
   {r:"add", label:L("Add Entry","Add Entry"), icon:"plus"},
   {r:"updates", label:L("Meri Updates","My Updates"), icon:"bell", badge: unreadToday()},
@@ -1426,6 +1454,7 @@ function renderShell(){
     </div>`;
   $("#topbar-in").innerHTML = `${brandHTML()}
     <div class="top-actions">
+      ${FAMILY && UI.fam.status === "ready" ? `<button class="who" data-act="fam-who" aria-label="${L("Aap kaun hain? Badlein","Who are you? Change")}">${UI.fam.me ? avatar(UI.fam.me, 26) + `<span>${esc(memberName(UI.fam.me))}</span>` : `<span>${L("Aap kaun?","Who are you?")}</span>`}</button>` : ""}
       <div class="lang" role="group" aria-label="Language">
         <button data-act="lang" data-v="ur" aria-pressed="${S.lang!=="en"}" aria-label="Roman Urdu"><span class="full">Urdu</span><span class="short">UR</span></button>
         <button data-act="lang" data-v="en" aria-pressed="${S.lang==="en"}" aria-label="English"><span class="full">English</span><span class="short">EN</span></button>
@@ -1444,12 +1473,14 @@ function render(){
   applyTheme(); renderShell();
   const v = $("#view");
   const r = UI.route;
-  v.innerHTML = `<div class="screen">${r === "home" ? viewHome() : r === "portfolio" ? viewPortfolio() : r === "add" ? viewAdd() : r === "updates" ? viewUpdates() : viewMore()}</div>`;
+  if (FAMILY && UI.fam.status !== "ready"){ v.innerHTML = `<div class="screen">${famGateView()}</div>`; renderSheet(); return; }
+  if (FAMILY && r === "add" && UI.readOnly && UI.fam.me) famSelect(UI.fam.me);   // entries always go into your own portfolio
+  v.innerHTML = `<div class="screen">${famBanner()}${r === "home" ? (FAMILY ? viewBoard() : viewHome()) : r === "portfolio" ? viewPortfolio() : r === "add" ? viewAdd() : r === "updates" ? viewUpdates() : viewMore()}</div>`;
   renderSheet();
   afterRender();
   if (fid && !UI.sheet){ const el = document.getElementById(fid); if (el && el !== document.activeElement){ el.focus({preventScroll:true}); try { if (ss !== null) el.setSelectionRange(ss, se); } catch {} } }
 }
-function go(route, sub){ stopMic(); UI.route = route; if (sub !== undefined) UI.sub[route] = sub; if (route === "add" && sub === undefined) UI.entry = null; if (route === "more" && sub === undefined) UI.sub.more = null; try { window.history.replaceState(null, "", "#" + route); } catch {} render(); window.scrollTo({top:0}); $("#view").focus({preventScroll:true}); }
+function go(route, sub){ stopMic(); if (FAMILY && route === "add" && UI.fam.me && UI.readOnly) famSelect(UI.fam.me); UI.route = route; if (sub !== undefined) UI.sub[route] = sub; if (route === "add" && sub === undefined) UI.entry = null; if (route === "more" && sub === undefined) UI.sub.more = null; try { window.history.replaceState(null, "", "#" + route); } catch {} render(); window.scrollTo({top:0}); $("#view").focus({preventScroll:true}); }
 
 /* =========================================================================
    HOME
@@ -2563,7 +2594,7 @@ function viewMore(){
   const groups = [
     [L("Samajhne mein madad","Help me understand"), [
       ["tip","chat",L("Kya yeh WhatsApp stock tip sahi hai?","Is this WhatsApp stock tip genuine?"), L("Dhoke ki nishaniyan pakrein","Spot the warning signs")],
-      ["letter","doc",L("Company ka letter samjhao","Explain a company letter"), L("Announcement aasaan zabaan mein","Announcement in plain words")],
+      ...(UI.sample ? [["letter","doc",L("Company ka letter samjhao","Explain a company letter"), L("Announcement aasaan zabaan mein","Announcement in plain words")]] : []),
       ["ask","spark",L("Apne portfolio ke baare mein poochein","Ask about my portfolio"), L("Apne sawal, apni zabaan mein","Your questions, your language")],
       ["buycheck","star",L("Kharidne se pehle check: kya yeh mere liye theek hai?","Before buying: does this fit me?"), L("Aap ke portfolio par asar","Impact on your portfolio")]]],
     [L("Hisaab kitaab","Accounts"), [
@@ -2664,14 +2695,13 @@ function settingsView(){
   <div class="card pad stack"><h2 class="h-sec">${L("Zabaan aur theme","Language and theme")}</h2>
     <div class="row" style="flex-wrap:wrap"><div class="lang"><button data-act="lang" data-v="ur" aria-pressed="${S.lang!=="en"}">Roman Urdu</button><button data-act="lang" data-v="en" aria-pressed="${S.lang==="en"}">English</button></div>
     <div class="lang"><button data-act="theme-set" data-v="" aria-pressed="${!S.theme}">${L("Asal (dark)","Default (dark)")}</button><button data-act="theme-set" data-v="light" aria-pressed="${S.theme==="light"}">${L("Roshan","Light")}</button><button data-act="theme-set" data-v="dark" aria-pressed="${S.theme==="dark"}">${L("Andhera","Dark")}</button></div></div></div>
-  ${accountCard()}
   <div class="card pad stack"><h2 class="h-sec">${L("Privacy aur aap ka data","Privacy and your data")}</h2>
     <div class="notice ${UI.storage==="cloud"||UI.storage==="account"?"green":"info"}">${ic("lock",18)}<div>${UI.storage === "account" ? L("Aap ka data aap ke account mein mehfooz hai aur har device par sign in karne se mil jata hai.","Your data is saved to your account and appears on any device you sign in on.") : UI.storage === "cloud" ? L("Aap ka data aap ke Claude account mein private save hota hai. Koi aur — is page ka owner bhi — ise nahi dekh sakta.","Your data is saved privately to your Claude account. No one else — not even this page's owner — can see it.") : L("Aap ka data sirf is browser mein save hai. Browser ki history saaf karne se mit sakta hai, is liye backup rakhein.","Your data is saved in this browser only. Clearing browser data can erase it, so keep a backup.")}</div></div>
     ${inClaude() ? "" : `<a class="link" href="/privacy.html" target="_blank" rel="noopener">${L("Privacy policy parhein","Read the privacy policy")} ${ic("chev",14,2.2)}</a>`}
-    <p class="small muted">${L("AI wale buttons (jaise \"Claude se poochein\") sirf tab aap ka portfolio ka khulasa ya tasveer Claude ko bhejte hain jab aap khud button dabayein. Baaqi saara hisaab isi app ke andar hota hai.","AI buttons (like \"Ask Claude\") send your portfolio summary or picture to Claude only when you tap them. All other calculations happen inside this app.")}</p>
+    ${!UI.sample ? "" : `<p class="small muted">${L("AI wale buttons (jaise \"Claude se poochein\") sirf tab aap ka portfolio ka khulasa ya tasveer Claude ko bhejte hain jab aap khud button dabayein. Baaqi saara hisaab isi app ke andar hota hai.","AI buttons (like \"Ask Claude\") send your portfolio summary or picture to Claude only when you tap them. All other calculations happen inside this app.")}</p>`}
     <div class="row" style="flex-wrap:wrap"><button class="btn line sm" data-act="backup">${ic("download",16)} ${L("Backup download","Download backup")}</button><label class="btn line sm" for="restore-file">${ic("upload",16)} ${L("Backup wapas laayein","Restore backup")}</label><input type="file" id="restore-file" accept="application/json,.json" hidden></div>
     <div class="divider"></div>
-    ${S.demo ? `<button class="btn ghost" data-act="confirm" data-v="clear-demo">${L("Demo data hata kar apna data shuru karein","Remove demo data and start fresh")}</button>` : `<button class="btn ghost" data-act="confirm" data-v="load-demo">${L("Demo data dekhein (aap ka data mit jayega)","Load demo data (replaces your data)")}</button>`}
+    ${FAMILY ? "" : S.demo ? `<button class="btn ghost" data-act="confirm" data-v="clear-demo">${L("Demo data hata kar apna data shuru karein","Remove demo data and start fresh")}</button>` : `<button class="btn ghost" data-act="confirm" data-v="load-demo">${L("Demo data dekhein (aap ka data mit jayega)","Load demo data (replaces your data)")}</button>`}
     <button class="btn danger" data-act="confirm" data-v="erase">${ic("trash",16)} ${L("Mera saara data mita dein","Erase all my data")}</button>
   </div>
   <p class="footer-note">PSX Personal Assistant · ${L("Hisaab-kitaab aur taleem ke liye. Investment ka mashwara nahi. Prices demo hain — asli PSX data tab aayega jab koi licensed provider connect hoga.","For record-keeping and learning. Not investment advice. Prices are demo — real PSX data will appear only once a licensed provider is connected.")}</p>`;
@@ -3081,9 +3111,13 @@ document.addEventListener("click", async (ev) => {
   if (a === "scrim"){ if (ev.target === el) closeSheet(); return; }
   if (el.tagName === "SELECT") return;
   switch (a){
-    case "lang": commit(s => { s.lang = v; s.langChosen = true; }); break;
-    case "theme": commit(s => s.theme = isDark() ? "light" : "dark"); break;
-    case "theme-set": commit(s => s.theme = v || null); break;
+    case "lang": if (FAMILY){ UI.devLang = v; lsSet(FK.lang, v); S.lang = v; render(); break; } commit(s => { s.lang = v; s.langChosen = true; }); break;
+    case "theme": if (FAMILY){ UI.devTheme = isDark() ? "light" : "dark"; lsSet(FK.theme, UI.devTheme); S.theme = UI.devTheme; render(); break; } commit(s => s.theme = isDark() ? "light" : "dark"); break;
+    case "theme-set": if (FAMILY){ UI.devTheme = v || null; lsSet(FK.theme, UI.devTheme); S.theme = UI.devTheme; render(); break; } commit(s => s.theme = v || null); break;
+    case "fam-who": openSheet({ kind:"who" }); break;
+    case "fam-me": UI.fam.me = v; lsSet(FK.me, v); famSelect(v); closeSheet(); toast(L(`Khush aamdeed, ${memberName(v)}!`, `Welcome, ${memberName(v)}!`)); render(); break;
+    case "fam-view": famSelect(v); go("portfolio", "shares"); break;
+    case "fam-retry": UI.fam.status = "loading"; render(); location.reload(); break;
     case "task": { if (el.dataset.id.startsWith("rem-")){ completeReminder(el.dataset.id.slice(4)); break; } const d = todayISO(); commit(s => { const arr = s.doneTasks[d] || []; s.doneTasks = {[d]: arr.includes(el.dataset.id) ? arr.filter(x => x !== el.dataset.id) : [...arr, el.dataset.id]}; }); break; }
     case "share": openSheet({kind:"share", s: el.dataset.s}); break;
     case "sheet-close": closeSheet(); break;
@@ -3130,10 +3164,6 @@ document.addEventListener("click", async (ev) => {
     case "entry-back": stopMic(); UI.entry = null; render(); break;
     case "tasks-more": UI.allTasks = !UI.allTasks; render(); break;
     case "simple-toggle": commit(st => st.settings = { ...st.settings, simple: !isSimple() }); break;
-    case "auth": closeSheet(); if (UI.sbUser) go("more", "settings"); else openSheet({ kind:"auth", mode:"in" }); break;
-    case "auth-mode": if (UI.sheet){ UI.sheet.mode = v; UI.sheet.msg = null; UI.sheet.err = null; renderSheet(); } break;
-    case "auth-out": await signOutAccount(); break;
-    case "sync-now": await pushAccount(); toast(UI.syncState === "ok" ? L("Account mein save ho gaya","Saved to your account") : L("Save nahi ho saka. Internet check karein.","Couldn't save. Check your internet.")); break;
     case "price-clear": commit(st => { const pr = { ...st.prices }; delete pr[el.dataset.s]; st.prices = pr; }); toast(L(`${el.dataset.s} wapas demo qeemat par`, `${el.dataset.s} is back on the demo price`)); break;
     case "mic-start": startMic(); break;
     case "mic-stop": stopMic(); render(); break;
@@ -3144,7 +3174,7 @@ document.addEventListener("click", async (ev) => {
       break; }
     case "etype": readForm(); UI.entry.draft.type = v; UI.entry.dup = null; UI.entry.dupAck = false; render(); break;
     case "new-tx": closeSheet(); UI.route = "add"; UI.entry = { mode:"manual", draft:{ type: el.dataset.type, date:todayISO(), symbol: el.dataset.s || "", qty:"", price: el.dataset.s && el.dataset.type !== "DIVIDEND" ? quote(el.dataset.s)?.price ?? "" : "", fees:"", amount:"", note:"" } }; render(); window.scrollTo({top:0}); break;
-    case "edit-tx": { const t = S.txs.find(x => x.id === el.dataset.id); if (!t) break; closeSheet(); UI.route = "add"; UI.entry = { mode:"manual", editId:t.id, at:t.at, draft:{ type:t.type, date:t.date, symbol:t.symbol||"", qty:t.qty||"", price:t.price||"", fees:t.fees, amount:t.amount||"", note:t.note||"" } }; render(); window.scrollTo({top:0}); break; }
+    case "edit-tx": { if (FAMILY && UI.readOnly){ toast(L(`Ye entry ${memberName(UI.fam.viewing)} ki hai. Sirf woh badal sakte hain.`, `This entry belongs to ${memberName(UI.fam.viewing)}. Only they can change it.`)); break; } const t = S.txs.find(x => x.id === el.dataset.id); if (!t) break; closeSheet(); UI.route = "add"; UI.entry = { mode:"manual", editId:t.id, at:t.at, draft:{ type:t.type, date:t.date, symbol:t.symbol||"", qty:t.qty||"", price:t.price||"", fees:t.fees, amount:t.amount||"", note:t.note||"" } }; render(); window.scrollTo({top:0}); break; }
     case "del-tx": openSheet({kind:"confirm", v:"del-tx", id: el.dataset.id}); break;
     case "confirm": openSheet({kind:"confirm", v}); break;
     case "confirm-yes": {
@@ -3241,7 +3271,6 @@ document.addEventListener("submit", async (ev) => {
   const f = ev.target; ev.preventDefault();
   if (f.id === "entry-form"){ submitEntry(); return; }
   const k = f.dataset.form;
-  if (k === "auth"){ await submitAuth(ev); return; }
   if (k === "prices"){ submitPrices(); return; }
   if (k === "custom-sym"){ submitCustomSym(); return; }
   if (k === "rem-add"){ const text = $("#rem-t").value.trim(); const date = $("#rem-d").value; if (!text){ $("#rem-err").textContent = L("Kaam likhein.","Write the task."); $("#rem-t").focus(); return; } if (!date){ $("#rem-err").textContent = L("Tareekh chunein.","Pick a date."); return; }
@@ -3378,26 +3407,29 @@ function priceState(holdings){
 }
 function priceTag(holdings){
   const p = priceState(holdings);
+  if (FAMILY){ if (!p.all) return L("Abhi koi share nahi","No shares yet"); if (p.demo === 0) return L(`Qeematein · ${fmtDate(p.latest)}`, `Prices · ${fmtDate(p.latest)}`); return L(`${p.user}/${p.all} qeematein darj · baaqi lagat par`, `${p.user} of ${p.all} priced · rest at cost`); }
   if (!p.all || p.user === 0) return L(`Demo prices · ${fmtDate(AS_OF)}`, `Demo prices · ${fmtDate(AS_OF)}`);
   if (p.demo === 0) return L(`Aap ki qeematein · ${fmtDate(p.latest)}`, `Your prices · ${fmtDate(p.latest)}`);
   return L(`${p.user}/${p.all} aap ki qeematein, baaqi demo`, `${p.user} of ${p.all} your prices, rest demo`);
 }
 function pPrices(sn){
-  const pr = S.prices || {}; const p = priceState(sn.holdings);
+  const pr = pricesSrc() || {}; const p = priceState(sn.holdings);
   const secs = [...new Set(SYMBOLS.map(x => x.sec))].filter(x => x !== "Other").sort();
-  const rows = sn.holdings.map(h => { const u = pr[h.s]; const d = demoClose(h.s);
+  const list = FAMILY ? famHeldSymbols().map(s0 => ({ s: s0 })) : sn.holdings;
+  const rows = list.map(h => { const u = pr[h.s]; const d = FAMILY ? null : demoClose(h.s);
     return `<div class="li" style="flex-wrap:wrap;gap:10px 12px">
       <div class="logo">${logoMark(h.s)}</div>
-      <div class="mid"><div class="main-t">${esc(h.s)}</div><div class="sub-t">${u ? L(`Aap ki qeemat · ${fmtDate(u.d)}`, `Your price · ${fmtDate(u.d)}`) : L(`Abhi demo: ${d != null ? rs(d, 2) : "—"}`, `Now demo: ${d != null ? rs(d, 2) : "—"}`)}</div></div>
+      <div class="mid"><div class="main-t">${esc(h.s)}</div><div class="sub-t">${u ? (FAMILY ? `${fmtDate(u.d)}${u.by ? " · " + esc(memberName(u.by)) : ""}` : L(`Aap ki qeemat · ${fmtDate(u.d)}`, `Your price · ${fmtDate(u.d)}`)) : FAMILY ? L("Abhi qeemat nahi","No price yet") : L(`Abhi demo: ${d != null ? rs(d, 2) : "—"}`, `Now demo: ${d != null ? rs(d, 2) : "—"}`)}</div></div>
       <div style="flex:none;width:132px"><div class="input-wrap"><span class="pre">Rs</span><input class="input num" style="min-height:42px;text-align:right" id="pr-${esc(h.s)}" data-pr="${esc(h.s)}" inputmode="decimal" value="${u ? u.p : ""}" placeholder="${L("Aaj ki","Today's")}" aria-label="${esc(h.s)} ${L("ki aaj ki qeemat","today's price")}"></div>
-        ${u ? `<button type="button" class="link tiny" style="margin-top:4px" data-act="price-clear" data-s="${esc(h.s)}">${L("Demo par wapas","Back to demo")}</button>` : ""}</div>
+        ${u && !FAMILY ? `<button type="button" class="link tiny" style="margin-top:4px" data-act="price-clear" data-s="${esc(h.s)}">${L("Demo par wapas","Back to demo")}</button>` : ""}</div>
     </div>`; }).join("");
   return `<form class="card pad stack" data-form="prices" novalidate>
     <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><h2 class="h-sec">${L("Apne shares ki asli qeematein","Real prices for your shares")}</h2>${p.all ? `<span class="pill ${p.demo ? "demo" : "ok"} num">${p.user}/${p.all} ${L("asli","real")}</span>` : ""}</div>
     <p class="small muted">${L("Apni broker app mein har share ki maujooda qeemat dekh kar yahan likhein. Jis share ki qeemat likhi hogi, us ka hisaab demo ki jagah isi qeemat se hoga, aur portfolio ki value asli ho jayegi.","Look up each share's current price in your broker app and type it here. Wherever you enter a price, your portfolio uses it instead of the demo price, so the value becomes real.")}</p>
-    ${sn.holdings.length ? `<div class="list">${rows}</div>` : `<div class="empty">${L("Pehle shares ki entry karein.","Add your shares first.")}</div>`}
+    ${FAMILY ? `<p class="small" style="color:var(--gold)">${L("Ye qeematein teeno ke liye ek hi hain. Koi bhi ek banda daal de, sab ka hisaab update ho jayega.","These prices are shared by all three. Anyone can enter them and everyone's numbers update.")}</p>` : ""}
+    ${list.length ? `<div class="list">${rows}</div>` : `<div class="empty">${L("Pehle shares ki entry karein.","Add your shares first.")}</div>`}
     <span class="err" id="pr-err"></span>
-    ${sn.holdings.length ? `<button class="btn primary" type="submit">${ic("check",17,2.4)} ${L("Qeematein save karein","Save prices")}</button>` : ""}
+    ${list.length ? `<button class="btn primary" type="submit">${ic("check",17,2.4)} ${L("Qeematein save karein","Save prices")}</button>` : ""}
     <p class="tiny faint">${L("Asli, authorised PSX data feed ke baghair app khud qeematein nahi la sakti. Roz ya hafte mein ek dafa update kar dein; jo qeemat likhi ho us ki tareekh saath dikhti hai.","Without an authorised PSX data feed the app can't fetch prices itself. Update them daily or weekly; each price shows the date you entered it.")}</p>
   </form>
   <form class="card pad stack" data-form="custom-sym" novalidate>
@@ -3414,6 +3446,11 @@ function pPrices(sn){
   </form>`;
 }
 function submitPrices(){
+  if (FAMILY){ const upd = {}; let bad = null;
+    document.querySelectorAll("[data-pr]").forEach(inp => { const v = inp.value.trim(); if (v === "") return; const n = parseNum(v); if (!(n > 0 && n < 1e6)) bad = bad || inp.dataset.pr; else upd[inp.dataset.pr] = round2(n); });
+    const err = $("#pr-err"); if (bad){ err.textContent = L(`${bad} ki qeemat theek likhein.`, `Enter a valid price for ${bad}.`); return; }
+    if (!Object.keys(upd).length){ err.textContent = L("Kam az kam ek share ki qeemat likhein.","Enter at least one share's price."); return; }
+    famPrices(upd).then(ok => ok && toast(L(`${Object.keys(upd).length} qeematein teeno ke liye save ho gayin`, `Saved ${Object.keys(upd).length} price(s) for everyone`))); return; }
   const t0 = todayISO(); const upd = {}; let bad = null;
   document.querySelectorAll("[data-pr]").forEach(inp => { const v = inp.value.trim(); if (v === "") return; const n = parseNum(v); if (!(n > 0 && n < 1e6)) bad = bad || inp.dataset.pr; else upd[inp.dataset.pr] = round2(n); });
   const err = $("#pr-err");
@@ -3438,128 +3475,225 @@ function submitCustomSym(){
 }
 
 /* =========================================================================
-   Account (Supabase) — used on the public website. Inside claude.ai the page
-   keeps using Claude's own private per-person storage instead.
+   Family competition. On the website, Zahid, Tahira and Javeria share one space
+   opened by a secret link (no login). Each person edits only their own portfolio;
+   current prices are shared. Inside claude.ai the page stays a one-person app.
    ========================================================================= */
 const SB_URL = "https://qhhifruqhystrsmssbyi.supabase.co";
-const SB_KEY = "sb_publishable_5U91VVYnxCQckyR-81RE1Q_psNUUF5q";   // publishable key: safe in the page, data is protected by row-level security
-let sbSaveTimer = null;
-async function connectAccount(){
-  if (inClaude()) return;
-  try { await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"); }
-  catch { UI.accountFailed = true; render(); return; }
-  const sb = window.supabase?.createClient?.(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
-  if (!sb){ UI.accountFailed = true; render(); return; }
-  UI.sb = sb; UI.accountReady = true;
-  sb.auth.onAuthStateChange((event, session) => {
-    // Supabase advises not awaiting other client calls inside this callback, so hand off.
-    setTimeout(() => { if (event === "PASSWORD_RECOVERY") openSheet({ kind:"auth", mode:"newpass" }); handleSession(session); }, 0);
-  });
-  render();
+const SB_KEY = "sb_publishable_5U91VVYnxCQckyR-81RE1Q_psNUUF5q";   // publishable key; the database only answers to the secret family link
+const SB_LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js";
+const FAMILY = !inClaude();
+const MEMBERS = [{ id:"zahid", name:"Zahid", hue:205 }, { id:"tahira", name:"Tahira", hue:330 }, { id:"javeria", name:"Javeria", hue:40 }];
+const MEM = Object.fromEntries(MEMBERS.map(m => [m.id, m]));
+const FK = { key:"psx-family:key", me:"psx-family:me", cache:"psx-family:cache", lang:"psx-family:lang", theme:"psx-family:theme" };
+const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
+const lsSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
+let famSaveTimer = null;
+UI.fam = { status: FAMILY ? "loading" : "off", states:{}, updated:{}, shared:{ prices:{}, log:{} }, me: null, viewing: null, net: "ok", dirty: false };
+UI.devLang = lsGet(FK.lang) || "en"; UI.devTheme = lsGet(FK.theme) || null;
+
+function emptyMember(){ const st = emptyState(UI.devLang); st.demo = false; st.langChosen = true; return st; }
+function pricesSrc(){ return FAMILY ? UI.fam.shared.prices : S?.prices; }
+/** Latest shared price for a share on or before a date (from the price log), else null. */
+function famPriceOn(sym, iso){
+  const log = UI.fam.shared.log || {}; let best = null, bd = "";
+  for (const d in log){ if (d <= iso && d >= bd && log[d][sym] > 0){ best = log[d][sym]; bd = d; } }
+  if (best == null){ const u = UI.fam.shared.prices[sym]; if (u && u.p > 0 && u.d <= iso) best = u.p; }
+  return best;
 }
-async function handleSession(session){
-  const u = session?.user || null; const was = UI.sbUser?.id;
-  if (!u){ UI.sbUser = null; if (UI.storage === "account") UI.storage = "local"; render(); return; }
-  UI.sbUser = { id: u.id, email: u.email };
-  if (was === u.id) return;
-  UI.storage = "account"; UI.syncState = "syncing"; render();
+const memberName = id => MEM[id]?.name || "—";
+const avatar = (id, size = 34) => `<span class="ava" style="--h:${MEM[id]?.hue ?? 160};width:${size}px;height:${size}px;font-size:${Math.round(size * .42)}px" aria-hidden="true">${esc(memberName(id).slice(0, 1))}</span>`;
+
+async function famBoot(){
+  if (!FAMILY) return;
+  const url = new URL(location.href); const k = url.searchParams.get("k");
+  if (k){ lsSet(FK.key, k); url.searchParams.delete("k"); try { window.history.replaceState(null, "", url.pathname + (url.search || "") + url.hash); } catch {} }
+  UI.fam.key = lsGet(FK.key); UI.fam.me = MEM[lsGet(FK.me)] ? lsGet(FK.me) : null;
+  if (!UI.fam.key){ UI.fam.status = "nokey"; render(); return; }
+  try { const c = JSON.parse(lsGet(FK.cache) || "null"); if (c?.states){ UI.fam.dirty = !!UI.fam.me && c.dirty === UI.fam.me; applyFamily(c, true); } } catch {}
+  render();
+  try { await loadScript(SB_LIB); } catch {}
+  if (!window.supabase?.createClient){ UI.fam.net = "offline"; if (UI.fam.status !== "ready") UI.fam.status = "offline"; render(); return; }
+  UI.sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+  await famRefresh();
+  if (UI.fam.dirty) famPush();   // edits that never reached the server last time
+  if (UI.fam.status === "ready" && !UI.fam.me) openSheet({ kind:"who" });
+  // Leaving the page: send anything still waiting.
+  addEventListener("pagehide", () => { if (UI.fam.dirty){ clearTimeout(famSaveTimer); famPush(); } });
+  setInterval(() => { if (document.visibilityState === "visible") famRefresh(); }, 60000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") famRefresh(); else if (UI.fam.dirty){ clearTimeout(famSaveTimer); famPush(); } });
+}
+async function famRefresh(){
+  if (!UI.sb) return;
   try {
-    const { data, error } = await UI.sb.from("user_state").select("state, updated_at").eq("user_id", u.id).maybeSingle();
+    const { data, error } = await UI.sb.rpc("psx_load", { p_key: UI.fam.key });
     if (error) throw error;
-    if (data?.state && Array.isArray(data.state.txs)){
-      // The account copy wins. Keep this browser's own entries aside in case they differ.
-      if (S.txs.some(t => !t.demo) && JSON.stringify(S.txs) !== JSON.stringify(data.state.txs)){ try { localStorage.setItem(LS_KEY + ":before-sign-in", JSON.stringify(S)); } catch {} }
-      S = migrate(data.state); try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch {}
-      UI.syncState = "ok"; UI.syncedAt = Date.now();
-    } else {
-      await pushAccount();
-    }
-  } catch { UI.syncState = "error"; }
-  render();
+    applyFamily(data, false); UI.fam.net = UI.fam.dirty ? "saving" : "ok";
+  } catch (e){
+    if (/not_found/.test(String(e?.message || ""))){ UI.fam.status = "badkey"; lsSet(FK.key, null); lsSet(FK.cache, null); render(); return; }
+    UI.fam.net = "offline"; if (UI.fam.status !== "ready") UI.fam.status = "offline";
+  }
+  if (!UI.sheet || UI.sheet.kind === "share") render(); else refreshSyncLines();
 }
-async function pushAccount(){
-  if (!UI.sb || !UI.sbUser) return;
-  clearTimeout(sbSaveTimer); UI.syncState = "syncing"; refreshSyncLines();
+function applyFamily(data, fromCache){
+  const st = data.states || {};
+  UI.fam.shared = { prices:{}, log:{}, ...(st._shared?.state || {}) };
+  for (const m of MEMBERS){
+    if (m.id === UI.fam.me && UI.fam.dirty && UI.fam.states[m.id]) continue;   // keep my unsaved edits
+    const r = st[m.id]; const base = r?.state && Array.isArray(r.state.txs) ? r.state : emptyMember();
+    UI.fam.states[m.id] = migrate(JSON.parse(JSON.stringify(base)));
+    UI.fam.updated[m.id] = r?.updated_at || null;
+  }
+  MEMBERS.forEach(m => (UI.fam.states[m.id].customSyms || []).forEach(registerCustom));
+  UI.fam.status = "ready";
+  if (!fromCache) cacheFamily();
+  famSelect(UI.fam.viewing || UI.fam.me);
+}
+function cacheFamily(){
+  const states = { _shared: { state: UI.fam.shared } };
+  MEMBERS.forEach(m => { if (UI.fam.states[m.id]) states[m.id] = { state: UI.fam.states[m.id], updated_at: UI.fam.updated[m.id] }; });
+  lsSet(FK.cache, JSON.stringify({ states, dirty: UI.fam.dirty ? UI.fam.me : null }));
+}
+function famSelect(id){
+  const v = MEM[id] ? id : (UI.fam.me || MEMBERS[0].id);
+  UI.fam.viewing = v; const st = UI.fam.states[v];
+  if (st){ S = st; S.lang = UI.devLang; S.theme = UI.devTheme; }
+  UI.readOnly = !!(UI.fam.me && v !== UI.fam.me) || !UI.fam.me;
+}
+function famQueueSave(){
+  if (!FAMILY || UI.fam.status !== "ready" || !UI.fam.me || S !== UI.fam.states[UI.fam.me]) return;
+  UI.fam.dirty = true; UI.fam.net = "saving"; cacheFamily(); refreshSyncLines();
+  clearTimeout(famSaveTimer); famSaveTimer = setTimeout(famPush, 250);
+}
+async function famPush(){
+  if (!UI.sb || !UI.fam.me) return;
+  const me = UI.fam.me; const snapshotJson = JSON.stringify(UI.fam.states[me]);
   try {
-    const { error } = await UI.sb.from("user_state").upsert({ user_id: UI.sbUser.id, state: S, updated_at: new Date().toISOString() });
-    UI.syncState = error ? "error" : "ok"; if (!error) UI.syncedAt = Date.now();
-  } catch { UI.syncState = "error"; }
+    const { data, error } = await UI.sb.rpc("psx_save", { p_key: UI.fam.key, p_member: me, p_state: JSON.parse(snapshotJson) });
+    if (error) throw error;
+    UI.fam.updated[me] = data;
+    if (JSON.stringify(UI.fam.states[me]) === snapshotJson){ UI.fam.dirty = false; UI.fam.net = "ok"; } // otherwise another save is already queued
+    cacheFamily();
+  } catch { UI.fam.net = "offline"; clearTimeout(famSaveTimer); famSaveTimer = setTimeout(famPush, 15000); }
   refreshSyncLines();
 }
-function refreshSyncLines(){ ["sync-line", "sync-line2"].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = syncLine(); }); }
-function syncLine(){
-  if (UI.storage === "cloud") return ic("lock",13) + " " + L("Data aap ke Claude account mein private save hai","Data saved privately to your Claude account");
-  if (UI.sbUser){ const st = UI.syncState;
-    return ic("lock",13) + " " + (st === "error" ? L("Account mein save nahi ho saka — internet check karein","Couldn't save to your account — check your internet") : st === "syncing" || st === "pending" ? L("Account mein save ho raha hai…","Saving to your account…") : L("Account mein mehfooz hai","Safe in your account")); }
-  return L("Data sirf is browser mein save hai","Data saved in this browser only") + (UI.accountReady ? ` · <button class="link" data-act="auth" style="font-size:inherit">${L("Account banayein","Create account")}</button>` : "");
-}
-function accountCard(){
-  if (inClaude()) return "";
-  const head = `<h2 class="h-sec">${L("Mera account","My account")}</h2>`;
-  if (!UI.accountReady) return `<div class="card pad stack">${head}<p class="small muted">${UI.accountFailed ? L("Account service se rabta nahi ho saka. Internet check kar ke page dobara kholein.","Couldn't reach the account service. Check your internet and reload the page.") : L("Account service load ho rahi hai…","Loading the account service…")}</p></div>`;
-  if (!UI.sbUser) return `<div class="card pad stack">${head}<p class="small muted">${L("Muft account banayein. Phir aap ka portfolio har phone aur laptop par sign in karte hi mil jayega, aur browser saaf hone se bhi gum nahi hoga.","Create a free account. Your portfolio then appears on every phone and laptop you sign in on, and clearing the browser won't lose it.")}</p><div class="row" style="flex-wrap:wrap"><button class="btn primary sm" data-act="auth">${ic("lock",15)} ${L("Sign in / Account banayein","Sign in / Create account")}</button></div></div>`;
-  return `<div class="card pad stack">${head}<div class="kv"><span class="k">Email</span><span class="v" style="overflow-wrap:anywhere">${esc(UI.sbUser.email || "")}</span></div>
-    <div class="small muted" id="sync-line2">${syncLine()}</div>
-    <div class="row" style="flex-wrap:wrap"><button class="btn line sm" data-act="sync-now">${ic("upload",15)} ${L("Abhi save karein","Save now")}</button><button class="btn ghost sm" data-act="auth-out">${L("Sign out","Sign out")}</button></div>
-    <p class="tiny faint">${L("Sign out karne par is device se aap ka data hata diya jata hai; dobara sign in karne par wapas aa jata hai.","Signing out removes your data from this device; it comes back when you sign in again.")}</p></div>`;
-}
-UPDATE_SHEETS.auth = (s) => {
-  if (!UI.sb) return { title: L("Account","Account"), body: `<div class="notice red">${ic("alert",18)}<div>${L("Account service se rabta nahi ho saka. Internet check kar ke page dobara kholein.","Couldn't reach the account service. Check your internet and reload the page.")}</div></div>` };
-  const mode = s.mode || "in";
-  const T = { in: L("Sign in","Sign in"), up: L("Muft account banayein","Create a free account"), reset: L("Password bhool gaye?","Forgot your password?"), newpass: L("Naya password rakhein","Set a new password") };
-  const B = { in: L("Sign in","Sign in"), up: L("Account banayein","Create account"), reset: L("Link bhejein","Send link"), newpass: L("Password save karein","Save password") };
-  const needEmail = mode !== "newpass", needPass = mode !== "reset";
-  return { title: T[mode], body: `<form class="stack" data-form="auth" novalidate>
-    ${s.msg ? `<div class="notice green">${ic("check",18)}<div class="small">${esc(s.msg)}</div></div>` : ""}
-    ${s.err ? `<div class="notice red">${ic("alert",18)}<div class="small">${esc(s.err)}</div></div>` : ""}
-    ${mode === "up" ? `<p class="small muted">${L("Aap ka portfolio aap ke account mein mehfooz rahega aur har device par mil jayega.","Your portfolio is kept safe in your account and available on every device.")}</p>` : ""}
-    ${needEmail ? `<div class="field"><label for="au-e">Email</label><input class="input" type="email" id="au-e" autocomplete="email" value="${esc(s.email || "")}" required></div>` : ""}
-    ${needPass ? `<div class="field"><label for="au-p">${mode === "newpass" ? L("Naya password","New password") : L("Password","Password")}</label><input class="input" type="password" id="au-p" autocomplete="${mode === "in" ? "current-password" : "new-password"}" minlength="8" required>${mode !== "in" ? `<span class="hint">${L("Kam az kam 8 haroof","At least 8 characters")}</span>` : ""}</div>` : ""}
-    <button class="btn primary" type="submit" ${s.busy ? "disabled" : ""}>${s.busy ? `<span class="spin"></span>` : ""} ${B[mode]}</button>
-    ${mode === "in" ? `<div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><button type="button" class="link" data-act="auth-mode" data-v="up">${L("Naya account banayein","Create a new account")}</button><button type="button" class="link" data-act="auth-mode" data-v="reset">${L("Password bhool gaye?","Forgot password?")}</button></div>`
-      : mode !== "newpass" ? `<button type="button" class="link" data-act="auth-mode" data-v="in">${L("Pehle se account hai? Sign in karein","Already have an account? Sign in")}</button>` : ""}
-    <p class="tiny faint">${L("Aap ka data sirf aap ke account se khulta hai. Hum aap ka password nahi dekh sakte.","Your data opens only with your account. We can't see your password.")} <a class="link tiny" href="/privacy.html" target="_blank" rel="noopener">${L("Privacy","Privacy")}</a></p>
-  </form>` };
-};
-function authErr(e){
-  const m = String(e?.message || "").toLowerCase();
-  if (m.includes("invalid login")) return L("Email ya password ghalat hai.","Wrong email or password.");
-  if (m.includes("not confirmed")) return L("Pehle apni email mein bheja gaya confirmation link dabayein.","Confirm your email first using the link we sent.");
-  if (m.includes("already registered") || m.includes("already been registered") || m.includes("already exists")) return L("Is email ka account pehle se hai. Sign in karein.","An account with this email already exists. Sign in instead.");
-  if (m.includes("rate") || m.includes("too many") || m.includes("security purposes")) return L("Bohat zyada koshishein ho gayin. Thori dair baad dobara karein.","Too many attempts. Try again in a little while.");
-  if (m.includes("password")) return L("Ye password nahi chal sakta. Lamba aur mushkil password rakhein.","That password can't be used. Choose a longer, harder one.");
-  if (m.includes("fetch") || m.includes("network")) return L("Internet se rabta nahi ho saka.","Couldn't reach the internet.");
-  return L("Kuch masla hua. Dobara koshish karein.","Something went wrong. Please try again.");
-}
-async function submitAuth(){
-  const s = UI.sheet; if (!s || !UI.sb) return; const mode = s.mode || "in";
-  const email = ($("#au-e")?.value || "").trim(); const pass = $("#au-p")?.value || "";
-  s.email = email || s.email; s.err = null; s.msg = null;
-  if (mode !== "newpass" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ s.err = L("Sahi email likhein.","Enter a valid email address."); renderSheet(); return; }
-  if (mode !== "reset" && pass.length < 8){ s.err = L("Password kam az kam 8 haroof ka ho.","The password must be at least 8 characters."); renderSheet(); return; }
-  s.busy = true; renderSheet();
+async function famPrices(upd){
+  const t0 = todayISO(); const patch = { prices:{}, log:{} };
+  for (const [k, p] of Object.entries(upd)){
+    const old = UI.fam.shared.prices[k]; if (old && old.p === p && old.d === t0) continue;
+    patch.prices[k] = { p, d: t0, prev: old ? (old.d === t0 ? old.prev : old.p) : null, by: UI.fam.me || null }; patch.log[k] = p;
+  }
+  if (!Object.keys(patch.prices).length) return true;
+  Object.assign(UI.fam.shared.prices, patch.prices); UI.fam.shared.log = { ...UI.fam.shared.log, [t0]: { ...(UI.fam.shared.log[t0] || {}), ...patch.log } }; cacheFamily(); render();
   try {
-    if (mode === "in"){ const { error } = await UI.sb.auth.signInWithPassword({ email, password: pass }); if (error) throw error; closeSheet(); toast(L("Sign in ho gaya","Signed in")); return; }
-    if (mode === "up"){
-      const { data, error } = await UI.sb.auth.signUp({ email, password: pass, options: { emailRedirectTo: location.origin + "/" } }); if (error) throw error;
-      if (data.session){ closeSheet(); toast(L("Account ban gaya","Account created")); return; }
-      s.mode = "in"; s.msg = L(`${email} par confirmation email bheji hai. Email mein link dabayein, phir yahan sign in karein.`, `We've emailed a confirmation link to ${email}. Open it, then sign in here.`);
-    }
-    if (mode === "reset"){ const { error } = await UI.sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + "/" }); if (error) throw error;
-      s.msg = L("Agar is email ka account hai to password badalne ka link bhej diya gaya hai.","If an account exists for this email, a reset link is on its way."); }
-    if (mode === "newpass"){ const { error } = await UI.sb.auth.updateUser({ password: pass }); if (error) throw error; closeSheet(); toast(L("Naya password lag gaya","New password saved")); return; }
-  } catch (e){ s.err = authErr(e); }
-  s.busy = false; if (UI.sheet === s) renderSheet();
+    const { data, error } = await UI.sb.rpc("psx_prices", { p_key: UI.fam.key, p_prices: patch, p_date: t0 });
+    if (error) throw error; UI.fam.shared = { prices:{}, log:{}, ...data }; cacheFamily(); render(); return true;
+  } catch { toast(L("Qeematein abhi sirf is device par hain. Internet aane par dobara save karein.","Prices are only on this device for now. Save again when you're online.")); return false; }
 }
-async function signOutAccount(){
-  if (!UI.sb) return;
-  await pushAccount();
-  try { await UI.sb.auth.signOut(); } catch {}
-  UI.sbUser = null; UI.storage = "local"; closeSheet();
-  const lang = S.lang; S = emptyState(lang); S.langChosen = true; S = migrate(S); try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch {}
-  toast(L("Sign out ho gaya. Is device se data hata diya gaya; sign in karne par wapas aa jayega.","Signed out. Your data was removed from this device and returns when you sign in."));
-  go("home");
+function refreshSyncLines(){ ["sync-line"].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = syncLine(); }); }
+function syncLine(){
+  if (!FAMILY) return UI.storage === "cloud" ? ic("lock",13) + " " + L("Data aap ke Claude account mein private save hai","Data saved privately to your Claude account") : L("Data sirf is browser mein save hai","Data saved in this browser only");
+  const n = UI.fam.net;
+  return ic("lock",13) + " " + (n === "offline" ? L("Internet nahi — tabdeeliyan is device par hain, baad mein save hongi","Offline — changes are kept on this device and saved later") : n === "saving" ? L("Save ho raha hai…","Saving…") : L("Family ke liye save hai","Saved for the family"));
 }
+
+/* ---------- returns ---------- */
+/** Total profit (unrealised + booked + dividends − charges entries) as of a date, using shared prices known on that date. */
+function plAt(txs, iso){
+  const L0 = replay(txs, iso); let unreal = 0, realized = 0, div = 0, bought = 0;
+  for (const [s, p] of L0.pos){ realized += p.realized; div += p.div; bought += p.bought; if (p.q > 0){ const px = famPriceOn(s, iso); if (px != null) unreal += p.q * px - p.cost; } }
+  const fee = txs.filter(t => t.type === "FEE" && t.date <= iso).reduce((a, t) => a + t.amount, 0);
+  return { pl: unreal + realized + div - fee, bought };
+}
+function memberStats(id){
+  const st = UI.fam.states[id]; const txs = st?.txs || []; const sn = snapshot(txs); const t0 = todayISO();
+  const pct = sn.bought ? sn.totalPL / sn.bought : 0;
+  const mStart = addDays(t0.slice(0, 8) + "01", -1); const a = plAt(txs, mStart);
+  const monthPL = sn.totalPL - a.pl; const monthPct = sn.bought ? monthPL / sn.bought : 0;
+  const best = [...sn.holdings].filter(h => h.userPrice).sort((x, y) => y.plPct - x.plPct)[0] || null;
+  const yr = fyOf(t0); const divYear = txs.filter(t => t.type === "DIVIDEND" && fyOf(t.date) === yr).reduce((s, t) => s + t.amount, 0);
+  return { id, sn, pct, monthPL, monthPct, dayPct: sn.dayPct, day: sn.day, best, divYear, entries: txs.length, hasData: txs.some(t => t.type === "BUY" || t.type === "BONUS") };
+}
+function raceSeries(){
+  const dates = Object.keys(UI.fam.shared.log || {}).sort(); if (!dates.includes(todayISO())) dates.push(todayISO());
+  return MEMBERS.map(m => { const txs = UI.fam.states[m.id]?.txs || []; return { id: m.id, pts: dates.map(d => { const r = plAt(txs, d); return r.bought ? r.pl / r.bought : null; }) }; }).concat([{ dates }]);
+}
+function raceChart(){
+  const all = raceSeries(); const dates = all.pop().dates;
+  if (dates.length < 2) return `<p class="small muted">${L("Ye chart tab banega jab do alag dinon ki qeematein darj ho jayengi. Har kuch din baad Portfolio → Prices mein qeematein daalte rahein.","This chart appears once prices have been entered on two different days. Keep adding prices in Portfolio → Prices every few days.")}</p>`;
+  const W = 640, H = 230, pl = 52, pr = 12, pt = 14, pb = 30;
+  const vals = all.flatMap(s => s.pts).filter(v => v != null); let mn = Math.min(0, ...vals), mx = Math.max(0, ...vals); if (mx - mn < .02){ mx += .01; mn -= .01; }
+  const t0d = Date.parse(dates[0]), span = Math.max(1, Date.parse(dates[dates.length - 1]) - t0d);
+  const x = i => pl + (Date.parse(dates[i]) - t0d) / span * (W - pl - pr); const y = v => pt + (mx - v) / (mx - mn) * (H - pt - pb);
+  const ticks = [mn, (mn + mx) / 2, mx, 0].filter((v, i, a) => a.findIndex(w => Math.abs(w - v) < 1e-9) === i);
+  const grid = ticks.map(v => `<line x1="${pl}" x2="${W - pr}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="var(--line${v === 0 ? "-2" : ""})" ${v === 0 ? "" : 'stroke-dasharray="3 4"'}/><text x="${pl - 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end" font-size="13" fill="var(--ink-3)">${pct(v, 0, true)}</text>`).join("");
+  const xl = [0, dates.length - 1].map(i => `<text x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="${i ? "end" : "start"}" font-size="13" fill="var(--ink-3)">${fmtDate(dates[i])}</text>`).join("");
+  const lines = all.map(s => { const pts = s.pts.map((v, i) => v == null ? null : [x(i), y(v)]).filter(Boolean); if (pts.length < 1) return "";
+    const col = `hsl(${MEM[s.id].hue} 70% 62%)`; const last = pts[pts.length - 1];
+    return `<path d="${pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ")}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="4" fill="${col}"/>`; }).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${L("Teeno ka munafa % waqt ke saath","Everyone's return over time")}" style="display:block;max-width:100%">${grid}${xl}${lines}</svg>
+    <div class="row" style="gap:16px;flex-wrap:wrap;margin-top:6px">${MEMBERS.map(m => `<span class="row tiny" style="gap:6px"><i style="width:14px;height:3px;border-radius:2px;background:hsl(${m.hue} 70% 62%);display:inline-block"></i>${esc(m.name)}</span>`).join("")}</div>`;
+}
+
+/* ---------- screens ---------- */
+function famGateView(){
+  const s = UI.fam.status;
+  const box = (icon, title, body, extra = "") => `<div class="card pad stack" style="max-width:520px;margin:8vh auto 0;text-align:center;align-items:center"><div class="quick-btn" style="padding:0;border:0;background:none"><span class="qi" style="width:56px;height:56px;border-radius:16px">${ic(icon,26)}</span></div><h1 class="h-page" style="font-size:30px">${title}</h1><p class="muted">${body}</p>${extra}</div>`;
+  if (s === "loading") return box("clock", L("Family ka hisaab aa raha hai…","Loading the family accounts…"), L("Bas ek pal.","Just a moment."), `<span class="spin" style="color:var(--emerald)"></span>`);
+  if (s === "nokey") return box("lock", L("Ye family ki private website hai","This is a private family website"), L("Isse kholne ke liye apna khaas family link istemal karein. Link Javeria se lein.","Open it with your family's special link. Ask Javeria for it."));
+  if (s === "badkey") return box("alert", L("Ye link kaam nahi kar raha","This link doesn't work"), L("Link purana ya adhoora hai. Javeria se poora link dobara lein.","The link is old or incomplete. Ask Javeria for the full link again."));
+  return box("alert", L("Internet nahi","You're offline"), L("Family ka data laane ke liye internet chahiye. Rabta bahal hone par dobara kholein.","The family data needs an internet connection. Try again once you're online."), `<button class="btn primary" data-act="fam-retry">${L("Dobara koshish karein","Try again")}</button>`);
+}
+function famBanner(){
+  if (!FAMILY || UI.fam.status !== "ready" || UI.route === "home") return "";
+  if (!UI.fam.me) return `<div class="notice gold">${ic("info",18)}<div>${L("Pehle batayein aap kaun hain, phir apni entries kar sakte hain.","First tell us who you are, then you can add your entries.")} <button class="link" data-act="fam-who">${L("Chunein","Choose")}</button></div></div>`;
+  if (!UI.readOnly) return "";
+  return `<div class="notice info" style="align-items:center">${avatar(UI.fam.viewing, 28)}<div style="flex:1;min-width:0">${L(`Aap <b>${esc(memberName(UI.fam.viewing))}</b> ka portfolio dekh rahe hain. Isme sirf ${esc(memberName(UI.fam.viewing))} entry kar sakte hain.`, `You're viewing <b>${esc(memberName(UI.fam.viewing))}</b>'s portfolio. Only ${esc(memberName(UI.fam.viewing))} can add entries here.`)}</div><button class="btn sm line" data-act="fam-view" data-v="${UI.fam.me}">${L("Mera portfolio","My portfolio")}</button></div>`;
+}
+function viewBoard(){
+  const stats = MEMBERS.map(m => memberStats(m.id)).sort((a, b) => (b.hasData - a.hasData) || (b.pct - a.pct));
+  const t0 = todayISO(); const medal = ["🥇","🥈","🥉"];
+  const held = famHeldSymbols(); const missing = held.filter(s => !UI.fam.shared.prices[s]);
+  const stale = held.filter(s => UI.fam.shared.prices[s] && UI.fam.shared.prices[s].d < t0);
+  const leader = stats[0]?.hasData ? stats[0] : null;
+  const awards = [];
+  const withData = stats.filter(s => s.hasData);
+  if (withData.length){
+    const mw = [...withData].sort((a, b) => b.monthPct - a.monthPct)[0]; awards.push(["trend", L("Is mahine aage","Leading this month"), mw.id, `${pct(mw.monthPct, 1, true)} · ${rsS(mw.monthPL)}`]);
+    const bp = withData.map(s => s.best && { id: s.id, h: s.best }).filter(Boolean).sort((a, b) => b.h.plPct - a.h.plPct)[0]; if (bp) awards.push(["star", L("Sab se acha share","Best pick"), bp.id, `${bp.h.s} ${pct(bp.h.plPct, 1, true)}`]);
+    const dk = [...withData].sort((a, b) => b.divYear - a.divYear)[0]; if (dk.divYear > 0) awards.push(["coin", L(`Dividend king (${fyOf(t0)})`, `Dividend king (${fyOf(t0)})`), dk.id, rs(dk.divYear)]);
+    const dw = [...withData].sort((a, b) => b.dayPct - a.dayPct)[0]; if (Math.abs(dw.day) > 0.5) awards.push(["spark", L("Aaj ka winner","Today's winner"), dw.id, `${pct(dw.dayPct, 2, true)} · ${rsS(dw.day)}`]);
+  }
+  return `
+  <div class="page-head"><div style="min-width:0"><div class="eyebrow">${L("Family muqabla","Family league")} · ${fmtDate(t0)}</div><h1 class="h-page">${leader ? L(`${esc(memberName(leader.id))} aage hain`, `${esc(memberName(leader.id))} is ahead`) : L("Kaun aage hai?","Who's ahead?")}</h1></div>
+    ${UI.fam.me ? `<button class="btn primary sm" data-go="add">${ic("plus",16,2.2)} ${L("Meri entry","My entry")}</button>` : ""}</div>
+  ${missing.length || stale.length ? `<div class="notice gold" style="align-items:center">${ic("info",18)}<div style="flex:1;min-width:0">${missing.length ? L(`${missing.length} shares ki qeemat abhi darj nahi, is liye un ka munafa 0 gina ja raha hai.`, `${missing.length} share(s) have no price yet, so they count as no gain or loss.`) : L(`${stale.length} shares ki qeemat aaj ki nahi.`, `${stale.length} share(s) don't have today's price.`)} ${L("Ranking theek rakhne ke liye aaj ki qeematein daal dein.","Add today's prices to keep the ranking fair.")}</div><button class="btn sm primary" data-go="portfolio" data-sub="prices">${L("Qeematein","Prices")}</button></div>` : ""}
+  <section class="podium" aria-label="${L("Ranking","Ranking")}">${stats.map((s, i) => {
+    const m = MEM[s.id]; const me = s.id === UI.fam.me;
+    return `<article class="pod ${i === 0 && s.hasData ? "first" : ""}" style="--h:${m.hue}">
+      <div class="row" style="gap:10px"><span class="medal" aria-label="${i + 1}">${s.hasData ? medal[i] : "·"}</span>${avatar(s.id, 38)}<div style="min-width:0"><b class="pod-name">${esc(m.name)}</b>${me ? `<span class="pill soft" style="margin-left:6px">${L("Aap","You")}</span>` : ""}<div class="tiny faint">${s.entries} ${s.entries === 1 ? L("entry","entry") : L("entries","entries")}</div></div></div>
+      ${s.hasData ? `<div class="pod-pct num ${tone(s.pct)}">${pct(s.pct, 1, true)}</div><div class="num small ${tone(s.sn.totalPL)}" style="font-weight:600">${rsS(s.sn.totalPL)} ${L("kul munafa","total profit")}</div>
+      <div class="pod-grid num">
+        <div><span>${L("Lagaya","Invested")}</span><b>${rs(s.sn.cost)}</b></div>
+        <div><span>${L("Value","Value")}</span><b>${rs(s.sn.mv)}</b></div>
+        <div><span>${L("Is mahine","This month")}</span><b class="${tone(s.monthPct)}">${pct(s.monthPct, 1, true)}</b></div>
+        <div><span>${L("Aaj","Today")}</span><b class="${tone(s.dayPct)}">${pct(s.dayPct, 2, true)}</b></div>
+      </div>` : `<p class="small muted" style="margin:14px 0 6px">${L("Abhi koi share nahi. Pehli entry karte hi muqable mein aa jayenge.","No shares yet. The first entry puts them in the race.")}</p>`}
+      <button class="btn sm ${me ? "primary" : "line"} block" data-act="fam-view" data-v="${s.id}">${me ? L("Mera portfolio","My portfolio") : L(`${esc(m.name)} ka portfolio`, `${esc(m.name)}'s portfolio`)} ${ic("chev",14,2.2)}</button>
+    </article>`; }).join("")}</section>
+  <div class="grid2" style="align-items:start">
+    <section class="card pad stack"><div class="row" style="justify-content:space-between"><h2 class="h-sec">${L("Kaun aage, waqt ke saath","The race over time")}</h2><span class="tiny faint">${L("kul munafa %","total return %")}</span></div>${raceChart()}</section>
+    <section class="card pad stack"><h2 class="h-sec">${L("Awards","Awards")}</h2>
+      ${awards.length ? `<div class="awards">${awards.map(([icn, t, id, v]) => `<div class="award" style="--h:${MEM[id].hue}"><span class="qi">${ic(icn,18)}</span><div style="min-width:0"><div class="tiny faint">${esc(t)}</div><div class="row" style="gap:6px;margin-top:2px">${avatar(id, 20)}<b>${esc(memberName(id))}</b></div><div class="small num muted">${esc(v)}</div></div></div>`).join("")}</div>` : `<p class="small muted">${L("Pehli entries aur qeematein aate hi awards yahan nazar aayenge.","Awards show up once the first entries and prices are in.")}</p>`}
+    </section>
+  </div>
+  <p class="footer-note">${L("Ranking kul munafa % par hai: (abhi ki value − lagat + bechne ka munafa + dividend) ÷ jitne ke shares khareede. Is tarah kam ya zyada paisa lagane wale ka muqabla barabar hota hai. Investment ka mashwara nahi.","Ranking uses total return %: (current value − cost + booked profit + dividends) ÷ total bought. That keeps it fair whatever each person invested. Not investment advice.")}</p>`;
+}
+function famHeldSymbols(){ const set = new Set(); MEMBERS.forEach(m => { for (const [s, p] of replay(UI.fam.states[m.id]?.txs || []).pos) if (p.q > 0) set.add(s); }); return [...set].sort(); }
+UPDATE_SHEETS.who = () => ({ title: L("Aap kaun hain?","Who are you?"), body: `<div class="stack">
+  <p class="small muted">${L("Is device par yaad rakha jayega. Aap sirf apne naam par entry kar sakte hain; doosron ka portfolio dekh sakte hain.","This device will remember it. You can add entries only under your own name; you can view the others.")}</p>
+  ${MEMBERS.map(m => `<button class="big-opt" data-act="fam-me" data-v="${m.id}" style="--h:${m.hue}">${avatar(m.id, 46)}<div><b>${esc(m.name)}</b><span>${UI.fam.me === m.id ? L("Abhi chuna hua","Currently selected") : L("Main hoon","That's me")}</span></div><div class="arrow">${ic("chev",22)}</div></button>`).join("")}
+</div>` });
 
 function afterRender(){ liveCalc(); liveEntry(); const c = $("#chat"); if (c) c.scrollTop = c.scrollHeight; }
 
@@ -3580,7 +3714,7 @@ const h0 = location.hash.slice(1); if (["home","portfolio","add","updates","more
 render();
 connectCloud();
 connectExtras();
-connectAccount();
+famBoot();
 registerSW();
 window.matchMedia?.("(prefers-color-scheme: dark)").addEventListener?.("change", () => { if (!S.theme) renderShell(); });
 })();
