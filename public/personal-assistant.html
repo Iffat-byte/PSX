@@ -284,6 +284,15 @@ button.li:hover{background:color-mix(in srgb,var(--surface-2) 70%,transparent)}
 .li .right .d{font-size:12.5px;font-weight:560}
 .li .mid{min-width:0;flex:1}
 .hspark{flex:none;width:72px;height:28px;display:none}
+.logo{position:relative}
+.mono{position:absolute;inset:0;border-radius:inherit;display:grid;place-items:center;background:hsl(var(--h) 46% 93%);color:hsl(var(--h) 58% 27%);box-shadow:inset 0 0 0 1px hsl(var(--h) 36% 84%)}
+.mono b{font-weight:680;font-size:10.5px;letter-spacing:.02em}
+.mono i{position:absolute;right:-5px;bottom:-5px;width:19px;height:19px;border-radius:7px;display:grid;place-items:center;background:hsl(var(--h) 52% 33%);color:#fff;box-shadow:0 0 0 2px var(--surface)}
+.mono i svg{width:11px;height:11px}
+.logo[style*="52px"] .mono b{font-size:13px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mono{background:hsl(var(--h) 26% 17%);color:hsl(var(--h) 62% 78%);box-shadow:inset 0 0 0 1px hsl(var(--h) 24% 27%)} :root:not([data-theme="light"]) .mono i{background:hsl(var(--h) 44% 46%)}}
+:root[data-theme="dark"] .mono{background:hsl(var(--h) 26% 17%);color:hsl(var(--h) 62% 78%);box-shadow:inset 0 0 0 1px hsl(var(--h) 24% 27%)}
+:root[data-theme="dark"] .mono i{background:hsl(var(--h) 44% 46%)}
 @media (min-width:420px){.hspark{display:block}}
 
 /* bars */
@@ -1234,6 +1243,27 @@ const EVENT_LABEL = () => ({board:L("Board meeting","Board meeting"), results:L(
 const snap = () => snapshot(S.txs);
 const nameOf = s => SYM[s]?.n || s;
 const logoTxt = s => s.length > 4 ? s.slice(0,4) : s;
+/* Company badge: ticker on the company's own tint, with a small sector icon (original marks, not company logos). */
+const SEC_ICON = {
+  "Oil & Gas":'<path d="M12 3.5s5.5 6 5.5 10.2a5.5 5.5 0 0 1-11 0C6.5 9.5 12 3.5 12 3.5Z"/>',
+  "Oil Marketing":'<path d="M5 20V5.5A1.5 1.5 0 0 1 6.5 4h6A1.5 1.5 0 0 1 14 5.5V20M4 20h11M7.5 8h4M14 9l3 2.5v5a1.5 1.5 0 0 0 3 0V9l-2-2"/>',
+  "Banks":'<path d="M3 9.5 12 4.5l9 5M5.5 10.5v7M10 10.5v7M14 10.5v7M18.5 10.5v7M3.5 20h17"/>',
+  "Cement":'<path d="M3.5 20.5V10l5 3v-3l5 3V7l7 3.5v10h-17Z"/>',
+  "Fertilizer":'<path d="M5.5 19.5C5.5 11 11 5 20 5c0 9-6 15-14.5 14.5ZM5.5 19.5l7-7"/>',
+  "Conglomerate":'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  "Power":'<path d="M13 3 5.5 13H11l-1 8 7.5-10H12l1-8Z"/>',
+  "Technology":'<rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 3.5V7M14 3.5V7M10 17v3.5M14 17v3.5M3.5 10H7M3.5 14H7M17 10h3.5M17 14h3.5"/>',
+  "Autos":'<path d="M4.5 16v-4l2.2-5h10.6l2.2 5v4h-15ZM7 16v2.5M17 16v2.5M4.5 12h15"/>',
+  "Pharma":'<path d="M10.6 4.4a5 5 0 0 1 7 7l-6.2 6.2a5 5 0 0 1-7-7l6.2-6.2ZM7.5 7.5l9 9"/>',
+  "Food":'<path d="M6 9h12l-1.2 10a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 9ZM9 9V6.5a3 3 0 0 1 6 0V9"/>',
+  "Refinery":'<path d="M12 3c1 3.2 5 5.2 5 10a5 5 0 0 1-10 0c0-2.2 1-3.7 2-4.7 0 2 1 3.2 2 3.2 0-3-1-6 1-8.5Z"/>'
+};
+const SYM_HUE = { OGDC:24, PPL:38, MARI:12, POL:52, PSO:2, HBL:168, MCB:212, UBL:228, MEBL:146, BAHL:190, NBP:132, LUCK:262, DGKC:282, MLCF:300, FFC:96, EFERT:76, ENGROH:320, HUBC:200, SYS:248, TRG:338, INDU:352, SEARL:180, NESTLE:220, ATRL:30 };
+function logoMark(s){
+  if (!s || !SYM[s] && !/^[A-Z0-9]/.test(s)) return esc(s || "?");
+  const h = SYM_HUE[s] ?? (hash(s) % 360); const ico = SEC_ICON[SYM[s]?.sec];
+  return `<span class="mono" style="--h:${h}"><b>${esc(logoTxt(s))}</b>${ico ? `<i title="${esc(SYM[s].sec)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico}</svg></i>` : ""}</span>`;
+}
 function monthlyAccount(){
   const m = new Map();
   for (const t of S.txs){
@@ -1417,7 +1447,7 @@ function viewHome(){
 function holdingRow(h){
   const hs = history(h.s).slice(-30).map(p => p.c);
   return `<button class="li" data-act="share" data-s="${h.s}">
-    <div class="logo">${esc(logoTxt(h.s))}</div>
+    <div class="logo">${logoMark(h.s)}</div>
     <div class="mid"><div class="main-t">${esc(h.s)}</div><div class="sub-t num">${num(h.q)} · ${L("avg","avg")} ${rs(h.avg,2)}</div></div>
     <span title="${L("Pichle 30 din ki demo qeemat","Last 30 days, demo price")}" style="display:contents">${sparkSVG(hs, { w: 72, h: 28, stroke: "var(--ink-3)", fill: "#86918C", cls: "hspark", dot: false })}</span>
     <div class="right"><div class="v num">${rs(h.value)}</div><div class="d num ${tone(h.pl)}">${pct(h.plPct,1,true)}</div></div>
@@ -1489,7 +1519,7 @@ function pHistory(){
   return Object.entries(groups).map(([m, list]) => `<div class="card pad"><div class="eyebrow" style="margin-bottom:4px">${fmtMonth(m)}</div><div class="list">${list.map(t => {
     const amt = t.type === "BUY" ? -(t.qty*t.price+t.fees) : t.type === "SELL" ? t.qty*t.price - t.fees : ["DEPOSIT","DIVIDEND"].includes(t.type) ? t.amount : t.type === "BONUS" ? 0 : -t.amount;
     return `<button class="li" data-act="edit-tx" data-id="${t.id}">
-      <div class="logo" style="background:${t.type==="SELL"?"var(--gold-bg)":t.type==="BUY"?"var(--info-bg)":"var(--mint)"}">${t.symbol ? esc(logoTxt(t.symbol)) : ic("coin",20)}</div>
+      <div class="logo" style="background:${t.type==="SELL"?"var(--gold-bg)":t.type==="BUY"?"var(--info-bg)":"var(--mint)"}">${t.symbol ? logoMark(t.symbol) : ic("coin",20)}</div>
       <div class="mid"><div class="main-t">${esc(TL[t.type])} ${t.symbol ? esc(t.symbol) : ""}</div><div class="sub-t">${fmtDate(t.date)}${t.qty ? ` · ${num(t.qty)} × ${rs(t.price,2)}` : ""}${t.fees ? ` · ${L("charges","charges")} ${rs(t.fees)}` : ""}</div></div>
       <div class="right"><div class="v num ${amt>0?"gain":""}">${amt ? rsS(amt) : "—"}</div><div class="tiny faint">${t.src === "screenshot" ? L("Screenshot se","From screenshot") : t.src === "voice" ? L("Bol kar","Spoken") : ""}${t.demo ? (t.src && t.src !== "manual" ? " · " : "") + "Demo" : ""}</div></div></button>`; }).join("")}</div></div>`).join("") +
     `<p class="footer-note">${L("Kisi entry par tap kar ke badlein ya mitayein.","Tap an entry to edit or delete it.")}</p>`;
@@ -1500,7 +1530,7 @@ function pDividends(sn){
   return `<div class="grid2" style="align-items:start">
     <div class="card pad stack">
       <div class="row" style="justify-content:space-between"><h2 class="h-sec">${L("Mujhe kitna dividend mila?","How much dividend did I get?")}</h2><button class="btn sm ghost" data-act="new-tx" data-type="DIVIDEND">${ic("plus",15)} ${L("Dividend add","Add dividend")}</button></div>
-      ${recs.length ? `<div class="list">${recs.map(t => `<button class="li" data-act="edit-tx" data-id="${t.id}"><div class="logo">${esc(logoTxt(t.symbol))}</div><div class="mid"><div class="main-t">${esc(t.symbol)}</div><div class="sub-t">${fmtDate(t.date)}${t.demo?" · Demo":""}</div></div><div class="right"><div class="v num gain">${rs(t.amount)}</div></div></button>`).join("")}</div>` : `<div class="empty">${L("Abhi koi dividend record nahi.","No dividend records yet.")}</div>`}
+      ${recs.length ? `<div class="list">${recs.map(t => `<button class="li" data-act="edit-tx" data-id="${t.id}"><div class="logo">${logoMark(t.symbol)}</div><div class="mid"><div class="main-t">${esc(t.symbol)}</div><div class="sub-t">${fmtDate(t.date)}${t.demo?" · Demo":""}</div></div><div class="right"><div class="v num gain">${rs(t.amount)}</div></div></button>`).join("")}</div>` : `<div class="empty">${L("Abhi koi dividend record nahi.","No dividend records yet.")}</div>`}
     </div>
     <div class="card pad stack">
       <h2 class="h-sec">${L("Har saal ka dividend","Dividend per year")}</h2>
@@ -1870,7 +1900,7 @@ function viewSaved(){
     <div class="row" style="flex-wrap:wrap;justify-content:center;gap:6px">${SRC ? `<span class="pill ${SRC.pill}">${esc(SRC.label)}</span>` : ""}${e.demo ? `<span class="pill demo">${L("Demo entries","Demo entries")}</span>` : ""}${e.skipped ? `<span class="pill soft">${L(`${e.skipped} chhor di gayin`, `${e.skipped} skipped`)}</span>` : ""}</div>
   </div>
   <div class="card pad stack"><h2 class="h-sec">${L("Kya save hua","What was saved")}</h2>
-    <div class="list">${e.txs.map(t => `<div class="li"><div class="logo">${t.symbol ? esc(logoTxt(t.symbol)) : ic("coin",20)}</div><div class="mid"><div class="main-t">${esc(TL[t.type])} ${esc(t.symbol || "")}</div><div class="sub-t">${fmtDate(t.date)}${t.qty ? ` · ${num(t.qty)} × ${rs(t.price,2)}` : ""}${t.fees ? ` · ${L("charges","charges")} ${rs(t.fees,2)}` : ""}</div></div><div class="right"><div class="v num">${t.qty && t.price ? rs(t.qty*t.price,2) : rs(t.amount,2)}</div></div></div>`).join("")}</div></div>
+    <div class="list">${e.txs.map(t => `<div class="li"><div class="logo">${t.symbol ? logoMark(t.symbol) : ic("coin",20)}</div><div class="mid"><div class="main-t">${esc(TL[t.type])} ${esc(t.symbol || "")}</div><div class="sub-t">${fmtDate(t.date)}${t.qty ? ` · ${num(t.qty)} × ${rs(t.price,2)}` : ""}${t.fees ? ` · ${L("charges","charges")} ${rs(t.fees,2)}` : ""}</div></div><div class="right"><div class="v num">${t.qty && t.price ? rs(t.qty*t.price,2) : rs(t.amount,2)}</div></div></div>`).join("")}</div></div>
   ${e.impact.length ? `<div class="card scroll-x"><table class="t num"><thead><tr><th>${L("Share","Share")}</th><th class="r">${L("Shares pehle → ab","Shares before → now")}</th><th class="r">${L("Average pehle → ab","Average before → now")}</th><th class="r">${L("Is farokht ka munafa","Profit from these sales")}</th></tr></thead><tbody>
     ${e.impact.map(x => `<tr><td><b>${esc(x.s)}</b></td><td class="r">${num(x.bq)} → <b>${num(x.aq)}</b></td><td class="r">${x.bq ? rs(x.ba,2) : "—"} → <b>${x.aq ? rs(x.aa,2) : "—"}</b></td><td class="r ${tone(x.realized)}">${Math.abs(x.realized) > 0.004 ? rsS(x.realized,2) : "—"}</td></tr>`).join("")}</tbody></table></div>` : ""}
   <div class="row" style="flex-wrap:wrap"><button class="btn primary" style="flex:1" data-go="portfolio" data-sub="history">${L("Portfolio mein dekhein","See in portfolio")}</button><button class="btn ghost" style="flex:1" data-act="entry-back">${L("Ek aur entry","Another entry")}</button></div>`;
@@ -2202,7 +2232,7 @@ function uDividend(){
     <div class="row" style="justify-content:space-between;flex-wrap:wrap"><h2 class="h-sec">${L("Mujhe kaunsa dividend aane wala hai?","Which dividends are coming to me?")}</h2><button class="btn sm primary" data-act="div-new">${ic("plus",15)} ${L("Record banayein","Add record")}</button></div>
     ${upcoming.length ? upcoming.map(r => { const net = r.dps * r.qty * (1 - tax/100); const pos = r.book && r.book <= t0 ? posAsOf(r.symbol, addDays(r.book, -1)) : posAsOf(r.symbol, t0); const mismatch = pos.q !== r.qty;
       return `<div class="task" style="box-shadow:none">
-        <div class="logo">${esc(logoTxt(r.symbol))}</div>
+        <div class="logo">${logoMark(r.symbol)}</div>
         <div style="flex:1;min-width:0">
           <div class="row" style="gap:6px;flex-wrap:wrap"><b>${esc(r.symbol)}</b><span class="pill ${ST[r.status][1]}">${ST[r.status][0]}</span>${r.sample ? SAMPLE_PILL() : ""}${r.demo ? `<span class="pill soft">Demo</span>` : ""}</div>
           <p class="small muted num">Rs ${num(r.dps,2)} × ${num(r.qty)} ${L("shares","shares")} = ${rs(r.dps*r.qty)} · ${L("tax ke baad","after tax")} <b style="color:var(--ink)">${rs(net)}</b></p>
@@ -2214,7 +2244,7 @@ function uDividend(){
 
   ${suggest.length ? `<section class="card pad stack"><div class="row" style="gap:8px;flex-wrap:wrap"><h2 class="h-sec">${L("Aap ke shares ke dividend announcements","Dividend announcements for your shares")}</h2>${SAMPLE_PILL()}</div>
     <p class="small muted">${L("Yeh sample announcements hain. Asli feed lagne ke baad yahan asli elaan aayenge.","These are sample announcements. Real ones will appear after a live feed is connected.")}</p>
-    ${suggest.map(a => { const e = eligibleQty(a); const m = corporateMath(a, e.q, e.avg, quote(a.symbol)?.price, tax); return `<div class="li"><div class="logo">${esc(logoTxt(a.symbol))}</div><div class="mid"><div class="main-t">${esc(annTitle(a))}</div><div class="sub-t">${L("Book closure","Book closure")} ${fmtDate(a.bookFrom)} · ${L("aap ko","you get")} ~${rs(m.net)}</div></div><div class="right" style="display:flex;gap:6px;flex-direction:column;align-items:flex-end"><button class="btn sm primary" data-act="div-from-ann" data-v="${a.id}">${L("Record banayein","Add record")}</button><button class="link" data-act="ann-open" data-v="${a.id}">${L("Samjhao","Explain")}</button></div></div>`; }).join("")}</section>` : ""}
+    ${suggest.map(a => { const e = eligibleQty(a); const m = corporateMath(a, e.q, e.avg, quote(a.symbol)?.price, tax); return `<div class="li"><div class="logo">${logoMark(a.symbol)}</div><div class="mid"><div class="main-t">${esc(annTitle(a))}</div><div class="sub-t">${L("Book closure","Book closure")} ${fmtDate(a.bookFrom)} · ${L("aap ko","you get")} ~${rs(m.net)}</div></div><div class="right" style="display:flex;gap:6px;flex-direction:column;align-items:flex-end"><button class="btn sm primary" data-act="div-from-ann" data-v="${a.id}">${L("Record banayein","Add record")}</button><button class="link" data-act="ann-open" data-v="${a.id}">${L("Samjhao","Explain")}</button></div></div>`; }).join("")}</section>` : ""}
 
   <section class="card pad stack"><h2 class="h-sec">${L("Har mahine kitna dividend aaya?","Dividend by month")}</h2>
     <div class="mbars" role="img" aria-label="${L("Mahana dividend","Monthly dividend")}">${mv.map(x => `<div class="c" title="${fmtMonth(x.m)}: ${rs(x.got)}${x.exp ? " + " + rs(x.exp) + " " + L("andaazan","est.") : ""}"><div style="width:100%;max-width:30px;display:flex;flex-direction:column;justify-content:flex-end;height:100px">${x.exp ? `<div class="b" style="height:${Math.max(3,x.exp/mx*96)}px;background:color-mix(in srgb,var(--emerald) 35%,transparent);border-radius:8px 8px 0 0"></div>` : ""}<div class="b" style="height:${x.got ? Math.max(3,x.got/mx*96) : 0}px;${x.exp ? "border-radius:0 0 4px 4px" : ""}"></div></div><div class="m">${MONTHS_EN[Number(x.m.slice(5))-1].slice(0,1)}</div></div>`).join("")}</div>
@@ -2256,7 +2286,7 @@ function uNews(){
     <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><h2 class="h-sec">${L("Announcements","Announcements")}${unreadMine ? ` <span class="pill info">${unreadMine} ${L("nayi","new")}</span>` : ""}</h2>
       <div class="seg"><button data-act="ann-scope" data-v="mine" aria-pressed="${scope==="mine"}">${L("Mere shares","My shares")}</button><button data-act="ann-scope" data-v="all" aria-pressed="${scope==="all"}">${L("Sab companies","All companies")}</button></div></div>
     <div class="card pad">${list.length ? `<div class="list">${list.map(a => { const K = KIND()[a.kind]; const isNew = !S.readAnn?.[a.id];
-      return `<button class="li" data-act="ann-open" data-v="${a.id}"><div class="logo" style="position:relative">${esc(logoTxt(a.symbol))}${isNew && held.has(a.symbol) ? `<span style="position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--emerald);border:2px solid var(--surface)"></span>` : ""}</div><div class="mid"><div class="main-t" style="white-space:normal;${isNew ? "" : "font-weight:600"}">${esc(annTitle(a))}</div><div class="sub-t">${fmtDate(a.date)} · ${esc(K[0])} · ${held.has(a.symbol) ? L("aap ke paas hai","you own this") : esc(SYM[a.symbol]?.n || "")}</div></div><div class="right">${SAMPLE_PILL()}</div></button>`; }).join("")}</div>` : `<div class="empty"><b>${L("Aap ke shares ki koi announcement nahi","No announcements for your shares")}</b>${L("\"Sab companies\" dekh sakte hain.","You can view \"All companies\".")}</div>`}</div>
+      return `<button class="li" data-act="ann-open" data-v="${a.id}"><div class="logo" style="position:relative">${logoMark(a.symbol)}${isNew && held.has(a.symbol) ? `<span style="position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--emerald);border:2px solid var(--surface)"></span>` : ""}</div><div class="mid"><div class="main-t" style="white-space:normal;${isNew ? "" : "font-weight:600"}">${esc(annTitle(a))}</div><div class="sub-t">${fmtDate(a.date)} · ${esc(K[0])} · ${held.has(a.symbol) ? L("aap ke paas hai","you own this") : esc(SYM[a.symbol]?.n || "")}</div></div><div class="right">${SAMPLE_PILL()}</div></button>`; }).join("")}</div>` : `<div class="empty"><b>${L("Aap ke shares ki koi announcement nahi","No announcements for your shares")}</b>${L("\"Sab companies\" dekh sakte hain.","You can view \"All companies\".")}</div>`}</div>
   </section>
   <section class="card pad stack">
     <div class="row" style="justify-content:space-between;flex-wrap:wrap"><h2 class="h-sec">${L("Aane wali ahem tareekhein","Upcoming important dates")}</h2><button class="btn sm ghost" data-act="ev-new">${ic("plus",15)} ${L("Apni tareekh","Add my own")}</button></div>
@@ -2335,7 +2365,7 @@ function annExplainer(){
   const G = GLOSSARY();
   const recExists = S.divRecords.some(r => r.annId === a.id);
   return `<button class="back" data-act="ann-close">${ic("back",18)} ${L("Sab announcements","All announcements")}</button>
-  <div class="row" style="gap:12px;align-items:flex-start"><div class="logo" style="width:52px;height:52px">${esc(logoTxt(a.symbol || "?"))}</div><div style="min-width:0"><div class="row" style="gap:6px;flex-wrap:wrap"><span class="pill ${K[1]}">${esc(K[0])}</span>${custom ? `<span class="pill info">${L("Aap ka text · app ne rules se parha","Your text · read by app rules")}</span>` : SAMPLE_PILL()}${custom && a.isSample ? SAMPLE_PILL() : ""}</div><h1 class="h-page" style="font-size:22px;margin-top:4px">${esc(annTitle(a))}</h1><p class="small muted">${esc(co)}${a.date ? " · " + fmtDate(a.date) : ""}</p></div></div>
+  <div class="row" style="gap:12px;align-items:flex-start"><div class="logo" style="width:52px;height:52px">${logoMark(a.symbol || "?")}</div><div style="min-width:0"><div class="row" style="gap:6px;flex-wrap:wrap"><span class="pill ${K[1]}">${esc(K[0])}</span>${custom ? `<span class="pill info">${L("Aap ka text · app ne rules se parha","Your text · read by app rules")}</span>` : SAMPLE_PILL()}${custom && a.isSample ? SAMPLE_PILL() : ""}</div><h1 class="h-page" style="font-size:22px;margin-top:4px">${esc(annTitle(a))}</h1><p class="small muted">${esc(co)}${a.date ? " · " + fmtDate(a.date) : ""}</p></div></div>
   ${!custom ? `<div class="notice gold">${ic("info",18)}<div class="small">${L("SAMPLE: yeh farzi announcement hai, sirf yeh dikhane ke liye ke app aap ke shares ke hisaab se kaise samjhati hai.","SAMPLE: this is a fictional announcement, only to show how the app explains things for your shares.")}</div></div>` : `<div class="notice info">${ic("info",18)}<div class="small">${L("App ne aap ke text se yeh baatein rules ke zariye parhi hain. Ghalti ho sakti hai — ahem faisle se pehle asal announcement zaroor parhein.","The app read these facts from your text using rules. It can make mistakes — read the original before important decisions.")}</div></div>`}
   <section class="card pad stack"><h2 class="h-sec">${L("Kya hua?","What happened?")}</h2>${what.map(x => `<p>${esc(x)}</p>`).join("")}</section>
   ${mine.length ? `<section class="card pad stack" style="border-color:color-mix(in srgb,var(--emerald) 35%,var(--line))"><h2 class="h-sec">${L("Aap ke liye is ka matlab","What it means for you")}</h2>${held ? `<span class="pill ok">${L(`Aap ke ${num(e.q)} ${a.symbol} shares ke hisaab se`, `Based on your ${num(e.q)} ${a.symbol} shares`)}</span>` : ""}${mine.map(x => `<p>${esc(x)}</p>`).join("")}
@@ -2416,7 +2446,7 @@ function uShariah(){
   const rec = s => [...S.shariah].filter(r => r.symbol === s).sort((a,b) => a.published < b.published ? 1 : -1)[0];
   return `<div class="notice info">${ic("shield",18)}<div>${L("Hum khud kisi share ko Shariah compliant qarar nahi dete. Status sirf tab dikhta hai jab aap kisi official list (tareekh ke saath) se darj karein.","We never declare a share Shariah-compliant ourselves. A status only shows when you record it from an official list, with its date.")}</div></div>
   <div class="card pad stack"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><h2 class="h-sec">${L("Kya mere shares Shariah ke mutabiq hain?","Are my shares Shariah-compliant?")}</h2><button class="btn sm primary" data-act="sh-new">${ic("plus",15)} ${L("Official status darj","Record official status")}</button></div>
-    <div class="list">${held.map(s => { const r = rec(s); return `<div class="li"><div class="logo">${esc(logoTxt(s))}</div><div class="mid"><div class="main-t">${esc(s)}</div><div class="sub-t">${r ? `${esc(r.source)} · ${fmtDate(r.published)}` : L("Kisi official list se darj nahi","Not recorded from an official list")}</div></div><div class="right">${r ? `<span class="pill ${r.status==="ok"?"ok":"bad"}">${r.status==="ok" ? L("Compliant · aap ne darj kiya","Compliant · entered by you") : L("Non-compliant · aap ne darj kiya","Non-compliant · entered by you")}</span>` : `<span class="pill soft">${L("Status Not Verified","Status Not Verified")}</span>`}</div></div>`; }).join("") || `<p class="muted small">—</p>`}</div></div>
+    <div class="list">${held.map(s => { const r = rec(s); return `<div class="li"><div class="logo">${logoMark(s)}</div><div class="mid"><div class="main-t">${esc(s)}</div><div class="sub-t">${r ? `${esc(r.source)} · ${fmtDate(r.published)}` : L("Kisi official list se darj nahi","Not recorded from an official list")}</div></div><div class="right">${r ? `<span class="pill ${r.status==="ok"?"ok":"bad"}">${r.status==="ok" ? L("Compliant · aap ne darj kiya","Compliant · entered by you") : L("Non-compliant · aap ne darj kiya","Non-compliant · entered by you")}</span>` : `<span class="pill soft">${L("Status Not Verified","Status Not Verified")}</span>`}</div></div>`; }).join("") || `<p class="muted small">—</p>`}</div></div>
   <form class="card pad stack" data-form="sh-paste">
     <h2 class="h-sec">${L("Official list paste karein — app khud milayegi","Paste the official list — the app matches it")}</h2>
     <p class="small muted">${L("Kisi official Shariah-compliant list ka text (jaise PSX ki KMI All Share index ki list, ya aap ke Islamic broker ki shaya-shuda list) copy kar ke yahan paste karein. App aap ke shares us mein dhoond kar status darj kar degi.","Copy the text of an official Shariah-compliant list (e.g. PSX's KMI All Share index constituents, or your Islamic broker's published list) and paste it here. The app finds your shares in it and records their status.")}</p>
@@ -2807,7 +2837,7 @@ function toolCharges(){
   <div class="notice info">${ic("info",18)}<div>${L(`Khareed aur farokht dono ke charges ke baad, munafa shuru hone ke liye share ko kam az kam ${pct(be, 2)} barhna chahiye.`, `After charges on both buying and selling, a share must rise at least ${pct(be, 2)} before you make any profit.`)}</div></div>
   <section class="card pad stack"><h2 class="h-sec">${L("Kin trades mein farq hai?","Which trades differ?")}</h2>
     ${!set ? `<p class="muted small">${L("Rate likhne ke baad yahan nazar aayega.","Shows once your rates are set.")}</p>` : a.over.length + a.under.length === 0 ? `<div class="notice green">${ic("check",18)}<div>${L("Har trade ke charges aap ke rate ke mutabiq hain (Rs 1 ya 2% tak ka farq nazar-andaaz).","Every trade's charges match your rates (differences up to Rs 1 or 2% ignored).")}</div></div>` :
-      `<div class="list">${[...a.over, ...a.under].map(r => `<button class="li" data-act="edit-tx" data-id="${r.id}"><div class="logo">${esc(logoTxt(r.symbol))}</div><div class="mid"><div class="main-t">${esc(TYPE_LABEL()[r.type])} ${esc(r.symbol)} · ${fmtDate(r.date)}</div><div class="sub-t num">${num(r.qty)} × ${rs(r.price,2)} · ${L("diye","paid")} ${rs(r.actual,2)} · ${L("hone chahiye","expected")} ${rs(r.expected,2)}</div></div><div class="right"><span class="pill ${r.flag === "over" ? "bad" : "info"}">${r.flag === "over" ? L("Zyada kaate","Over-charged") : L("Kam darj","Recorded lower")} ${rsS(r.diff,2)}</span></div></button>`).join("")}</div>
+      `<div class="list">${[...a.over, ...a.under].map(r => `<button class="li" data-act="edit-tx" data-id="${r.id}"><div class="logo">${logoMark(r.symbol)}</div><div class="mid"><div class="main-t">${esc(TYPE_LABEL()[r.type])} ${esc(r.symbol)} · ${fmtDate(r.date)}</div><div class="sub-t num">${num(r.qty)} × ${rs(r.price,2)} · ${L("diye","paid")} ${rs(r.actual,2)} · ${L("hone chahiye","expected")} ${rs(r.expected,2)}</div></div><div class="right"><span class="pill ${r.flag === "over" ? "bad" : "info"}">${r.flag === "over" ? L("Zyada kaate","Over-charged") : L("Kam darj","Recorded lower")} ${rsS(r.diff,2)}</span></div></button>`).join("")}</div>
       <p class="tiny faint">${L("\"Zyada kaate\" ka matlab ya to broker ne zyada liya, ya entry mein ghalti hai. Contract note se mila kar dekhein; tap kar ke entry theek kar sakte hain.","\"Over-charged\" means the broker took more, or the entry has a mistake. Compare with the contract note; tap to fix the entry.")}</p>`}
   </section>
   <section class="card pad stack"><h2 class="h-sec">${L("Ek contract note check karein","Check one contract note")}</h2>
@@ -2858,7 +2888,7 @@ function reconView(){
   <section class="card pad stack"><h2 class="h-sec">${L("3. Nateeja","3. Result")}</h2>
     ${R.checked === 0 ? `<p class="muted small">${L("Upar broker ke numbers daalein.","Enter the broker's numbers above.")}</p>` : R.allMatch ? `<div class="notice green">${ic("check",18)}<div><b>${L("Sab kuch match ho gaya!","Everything matches!")}</b><div class="small">${L(`${fmtDate(b.asOf)} ki statement aap ke record se poori milti hai.`, `The ${fmtDate(b.asOf)} statement fully matches your records.`)}</div></div></div>` :
       `<div class="notice gold">${ic("alert",18)}<div><b>${L(`${R.diffs} jagah farq`, `${R.diffs} difference(s)`)}</b><div class="small">${L(`${R.checked} cheezein check huin.`, `${R.checked} items checked.`)}</div></div></div>
-      ${R.rows.filter(r => r.status === "diff").map(r => `<div class="task" style="box-shadow:none"><div class="logo">${esc(logoTxt(r.symbol))}</div><div style="flex:1;min-width:0"><b>${esc(r.symbol)}: ${L("hamare record mein","our records")} ${num(r.ours)}, ${L("broker ke paas","broker")} ${num(r.theirs)}</b><p class="small muted">${esc(CAUSE[r.cause])}</p><div class="acts">
+      ${R.rows.filter(r => r.status === "diff").map(r => `<div class="task" style="box-shadow:none"><div class="logo">${logoMark(r.symbol)}</div><div style="flex:1;min-width:0"><b>${esc(r.symbol)}: ${L("hamare record mein","our records")} ${num(r.ours)}, ${L("broker ke paas","broker")} ${num(r.theirs)}</b><p class="small muted">${esc(CAUSE[r.cause])}</p><div class="acts">
         ${r.diff > 0 ? `<button class="btn sm primary" data-act="rc-fix" data-k="BUY" data-s="${r.symbol}" data-q="${r.diff}">${L(`Khareed entry (${num(r.diff)})`, `Buy entry (${num(r.diff)})`)}</button><button class="btn sm ghost" data-act="rc-fix" data-k="BONUS" data-s="${r.symbol}" data-q="${r.diff}">${L(`Bonus entry (${num(r.diff)})`, `Bonus entry (${num(r.diff)})`)}</button>` : `<button class="btn sm primary" data-act="rc-fix" data-k="SELL" data-s="${r.symbol}" data-q="${-r.diff}">${L(`Farokht entry (${num(-r.diff)})`, `Sell entry (${num(-r.diff)})`)}</button><button class="btn sm ghost" data-act="share" data-s="${r.symbol}">${L("History dekhein","See history")}</button>`}
       </div></div></div>`).join("")}
       ${R.cash.status === "diff" ? `<div class="task" style="box-shadow:none"><div class="logo">${ic("coin",20)}</div><div style="flex:1;min-width:0"><b>${L(`Cash: hamare record mein ${rs(R.cash.ours,2)}, broker ke paas ${rs(R.cash.theirs,2)}`, `Cash: our records ${rs(R.cash.ours,2)}, broker ${rs(R.cash.theirs,2)}`)}</b>
