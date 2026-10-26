@@ -4,3 +4,18 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Next.js runtime: always install it so server pages, headers and rewrites deploy.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# PSX Personal Assistant (static page in /public)
+[[redirects]]
+  from = "/personal"
+  to = "/personal-assistant.html"
+  status = 200
+
+[[headers]]
+  for = "/personal-assistant.html"
+  [headers.values]
+    Permissions-Policy = "camera=(), microphone=(self), geolocation=()"
