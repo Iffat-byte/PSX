@@ -3766,7 +3766,7 @@ function viewBoard(){
     const dw = [...withData].sort((a, b) => b.dayPct - a.dayPct)[0]; if (Math.abs(dw.day) > 0.5) awards.push(["spark", L("Aaj ka winner","Today's winner"), dw.id, `${pct(dw.dayPct, 2, true)} · ${rsS(dw.day)}`]);
   }
   return `
-  <div class="page-head"><div style="min-width:0"><div class="eyebrow">${L("Family muqabla","Family league")} · ${fmtDate(t0)}</div><h1 class="h-page">${leader ? L(`${esc(memberName(leader.id))} aage hain`, `${esc(memberName(leader.id))} is ahead`) : L("Kaun aage hai?","Who's ahead?")}</h1></div>
+  <div class="page-head"><div style="min-width:0"><div class="eyebrow">Family portfolio · ${fmtDate(t0)}</div><h1 class="h-page">Family investments at a glance</h1></div>
     ${UI.fam.me ? `<button class="btn primary sm" data-go="add">${ic("plus",16,2.2)} ${L("Meri entry","My entry")}</button>` : ""}</div>
   ${missing.length || stale.length ? `<div class="notice gold" style="align-items:center">${ic("info",18)}<div style="flex:1;min-width:0">${missing.length ? L(`${missing.length} shares ki qeemat abhi darj nahi, is liye un ka munafa 0 gina ja raha hai.`, `${missing.length} share(s) have no price yet, so they count as no gain or loss.`) : L(`${stale.length} shares ki qeemat aaj ki nahi.`, `${stale.length} share(s) don't have today's price.`)} ${L("Ranking theek rakhne ke liye aaj ki qeematein daal dein.","Add today's prices to keep the ranking fair.")}</div><button class="btn sm primary" data-go="portfolio" data-sub="prices">${L("Qeematein","Prices")}</button></div>` : ""}
   <section class="podium" aria-label="${L("Ranking","Ranking")}">${stats.map((s, i) => {
@@ -3783,7 +3783,7 @@ function viewBoard(){
       <button class="btn sm ${me ? "primary" : "line"} block" data-act="fam-view" data-v="${s.id}">${me ? L("Mera portfolio","My portfolio") : L(`${esc(m.name)} ka portfolio`, `${esc(m.name)}'s portfolio`)} ${ic("chev",14,2.2)}</button>
     </article>`; }).join("")}</section>
   <div class="grid2" style="align-items:start">
-    <section class="card pad stack"><div class="row" style="justify-content:space-between"><h2 class="h-sec">${L("Kaun aage, waqt ke saath","The race over time")}</h2><span class="tiny faint">${L("kul munafa %","total return %")}</span></div>${raceChart()}</section>
+    <section class="card pad stack"><div class="row" style="justify-content:space-between"><h2 class="h-sec">${"Our journey"}</h2><span class="tiny faint">${L("kul munafa %","total return %")}</span></div>${raceChart()}</section>
     <section class="card pad stack"><h2 class="h-sec">${L("Awards","Awards")}</h2>
       ${awards.length ? `<div class="awards">${awards.map(([icn, t, id, v]) => `<div class="award" style="--h:${MEM[id].hue}"><span class="qi">${ic(icn,18)}</span><div style="min-width:0"><div class="tiny faint">${esc(t)}</div><div class="row" style="gap:6px;margin-top:2px">${avatar(id, 20)}<b>${esc(memberName(id))}</b></div><div class="small num muted">${esc(v)}</div></div></div>`).join("")}</div>` : `<p class="small muted">${L("Pehli entries aur qeematein aate hi awards yahan nazar aayenge.","Awards show up once the first entries and prices are in.")}</p>`}
     </section>
