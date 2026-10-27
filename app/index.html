@@ -477,6 +477,27 @@ button.hrow:hover{background:rgba(214,178,110,.05)}
   .hrow.foot .hc:not(.hs):not(.hpl){display:none}
   .hrow.foot .hpl{grid-column:2;grid-row:1}
 }
+
+/* ---------- history table ---------- */
+.ttable .hrow{grid-template-columns:minmax(0,1fr) minmax(0,.8fr) minmax(0,1.5fr) repeat(3,minmax(0,1fr)) minmax(0,1fr)}
+.ttable .hrow .hd,.ttable .hrow .ht{text-align:left;justify-items:start}
+.ttable .hrow.head > div:nth-child(-n+3){text-align:left}
+.ttable .hrow.head > div:nth-child(3){text-align:left}
+.ttable .hrow .hs{justify-content:flex-start}
+.hmonth{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);background:rgba(255,255,255,.025);border-bottom:1px solid var(--line)}
+.hmonth span:first-child{color:var(--gold-ink, var(--emerald-ink))}
+@media (max-width:759px){
+  .ttable .hrow{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ttable .hrow .hs{grid-column:1 / 3;grid-row:1}
+  .ttable .hrow .ht{grid-column:3;grid-row:1;justify-items:end;text-align:right;padding:0!important;background:none!important;box-shadow:none!important}
+  .ttable .hrow.nopl .hpl{display:none!important}
+  .ttable .hrow .hc .hv{font-size:13.5px}
+  .ttable .hrow .hd{grid-column:1 / 4;grid-row:2;padding:0!important;background:none!important;box-shadow:none!important}
+  .ttable .hrow .hd .hk{display:none}
+  .ttable .hrow .hd .hv{font-size:12.5px;color:var(--ink-3);font-weight:500}
+  .ttable .hrow .hpl{grid-column:1 / 4;grid-row:auto;flex-direction:row;display:flex!important;justify-content:space-between;align-items:baseline;gap:8px;padding-top:2px}
+  .ttable .hrow .hpl .hk{margin-right:auto}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1720,15 +1741,37 @@ function pWhere(sn){
 }
 function pHistory(){
   const txs = sortTx(S.txs).reverse(); const TL = TYPE_LABEL();
-  if (!txs.length) return `<div class="card"><div class="empty"><b>${L("Koi entry nahi","No entries yet")}</b></div></div>`;
-  const groups = {}; txs.forEach(t => { (groups[t.date.slice(0,7)] ||= []).push(t); });
-  return Object.entries(groups).map(([m, list]) => `<div class="card pad"><div class="eyebrow" style="margin-bottom:4px">${fmtMonth(m)}</div><div class="list">${list.map(t => {
-    const amt = t.type === "BUY" ? -(t.qty*t.price+t.fees) : t.type === "SELL" ? t.qty*t.price - t.fees : ["DEPOSIT","DIVIDEND"].includes(t.type) ? t.amount : t.type === "BONUS" ? 0 : -t.amount;
-    return `<button class="li" data-act="edit-tx" data-id="${t.id}">
-      <div class="logo" style="background:${t.type==="SELL"?"var(--gold-bg)":t.type==="BUY"?"var(--info-bg)":"var(--mint)"}">${t.symbol ? logoMark(t.symbol) : ic("coin",20)}</div>
-      <div class="mid"><div class="main-t">${esc(TL[t.type])} ${t.symbol ? esc(t.symbol) : ""}</div><div class="sub-t">${fmtDate(t.date)}${t.qty ? ` · ${num(t.qty)} × ${rs(t.price,2)}` : ""}${t.fees ? ` · ${L("charges","charges")} ${rs(t.fees)}` : ""}</div></div>
-      <div class="right"><div class="v num ${amt>0?"gain":""}">${amt ? rsS(amt) : "—"}</div><div class="tiny faint">${t.src === "screenshot" ? L("Screenshot se","From screenshot") : t.src === "voice" ? L("Bol kar","Spoken") : ""}${t.demo ? (t.src && t.src !== "manual" ? " · " : "") + "Demo" : ""}</div></div></button>`; }).join("")}</div></div>`).join("") +
-    `<p class="footer-note">${L("Kisi entry par tap kar ke badlein ya mitayein.","Tap an entry to edit or delete it.")}</p>`;
+  if (!txs.length) return `<div class="card"><div class="empty"><b>No entries yet</b>Your purchases and sales will be listed here.</div></div>`;
+  const ev = Object.fromEntries(replay(S.txs).events.map(e => [e.id, e]));
+  const buys = S.txs.filter(t => t.type === "BUY"), sells = S.txs.filter(t => t.type === "SELL");
+  const spent = buys.reduce((a, t) => a + t.qty * t.price + t.fees, 0), got = sells.reduce((a, t) => a + t.qty * t.price - t.fees, 0);
+  const booked = Object.values(ev).reduce((a, e) => a + e.pl, 0);
+  const groups = {}; txs.forEach(t => { (groups[t.date.slice(0, 7)] ||= []).push(t); });
+  const cell = (k, v, cls = "") => `<div class="hc ${cls}"><span class="hk">${k}</span><span class="hv num">${v}</span></div>`;
+  const kind = t => t.type === "BUY" ? ["Bought", "info"] : t.type === "SELL" ? ["Sold", "demo"] : [TL[t.type] || t.type, "ok"];
+  return `<div class="card pad stats">
+      <div><div class="lbl">Bought</div><div class="sv num">${rs(spent)}</div><div class="tiny faint">${buys.length} purchase${buys.length === 1 ? "" : "s"}</div></div>
+      <div><div class="lbl">Sold</div><div class="sv num">${rs(got)}</div><div class="tiny faint">${sells.length} sale${sells.length === 1 ? "" : "s"}</div></div>
+      <div><div class="lbl">Profit from sales</div><div class="sv num ${tone(booked)}">${sells.length ? rsS(booked) : "—"}</div><div class="tiny faint">booked when you sold</div></div>
+    </div>
+    <div class="card htable-card">
+    <div class="htable ttable" role="table" aria-label="Buy and sell history">
+      <div class="hrow head" role="row"><div>Date</div><div>Type</div><div>Share</div><div>Shares</div><div>Price</div><div>Amount</div><div>Profit</div></div>
+      ${Object.entries(groups).map(([m, list]) => `<div class="hmonth" role="row"><span>${fmtMonth(m)}</span><span class="num">${list.length} entr${list.length === 1 ? "y" : "ies"}</span></div>
+        ${list.map(t => { const [lbl, tn] = kind(t); const e = ev[t.id]; const trade = t.type === "BUY" || t.type === "SELL";
+          const amt = t.type === "BUY" ? t.qty * t.price + t.fees : t.type === "SELL" ? t.qty * t.price - t.fees : t.amount;
+          return `<button class="hrow ${e ? "" : "nopl"}" role="row" data-act="edit-tx" data-id="${t.id}">
+            <div class="hc hd"><span class="hk">Date</span><span class="hv num">${fmtDate(t.date)}</span></div>
+            <div class="hc ht"><span class="pill ${tn}">${esc(lbl)}</span></div>
+            <div class="hc hs">${t.symbol ? `<span class="logo">${logoMark(t.symbol)}</span><span style="min-width:0"><b>${esc(t.symbol)}</b><span class="hn">${esc(SYM[t.symbol]?.n || "")}</span></span>` : `<b>—</b>`}</div>
+            ${cell("Shares", t.qty ? num(t.qty) : "—")}
+            ${cell("Price", trade ? rs(t.price, 2) : "—")}
+            ${cell(t.type === "SELL" ? "Received" : t.type === "BUY" ? "Paid" : "Amount", amt ? rs(amt) : "—")}
+            <div class="hc hpl"><span class="hk">Profit</span><span class="hv num ${e ? tone(e.pl) : "faint"}">${e ? rsS(e.pl) : "—"}</span>${e ? `<span class="hp num ${tone(e.pl)}">${pct(e.removed ? e.pl / e.removed : 0, 1, true)}</span>` : ""}</div>
+          </button>`; }).join("")}`).join("")}
+    </div>
+    <p class="tiny faint" style="margin:12px 20px 16px">Profit is shown on sales: what you received minus your average cost for those shares. Tap an entry to edit or delete it.</p>
+    </div>`;
 }
 function pDividends(sn){
   const recs = S.txs.filter(t => t.type === "DIVIDEND").sort((a,b) => a.date < b.date ? 1 : -1);
