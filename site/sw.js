@@ -1,7 +1,7 @@
 // Service worker for PSX Personal Assistant: makes the app installable and lets it open offline.
 // Pages: network first (always the newest app when online), cached copy when offline.
 // Other same-origin files: cached copy straight away, refreshed in the background.
-const CACHE = "psx-assistant-7f93c15e0fb4";
+const CACHE = "psx-assistant-282e5dd07b2b";
 const SHELL = ["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png"];
 
 self.addEventListener("install", (event) => {

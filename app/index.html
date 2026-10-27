@@ -605,6 +605,61 @@ select.input option{background:var(--surface);color:var(--ink)}
 .auto-line{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--up) 9%,transparent);border:1px solid color-mix(in srgb,var(--up) 28%,transparent);color:var(--ink-2)}
 .auto-line > svg{color:var(--up);flex:none}
 .auto-line b{color:var(--ink)}
+
+/* ---------- portfolio (premium, phone first) ---------- */
+.pf-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 14px}
+.pf-head .h-page{font-size:clamp(28px,7vw,40px);margin:0}
+.pf-ib{width:42px;height:42px}
+.pf-hero{position:relative;overflow:hidden;isolation:isolate;border-radius:24px;padding:20px 20px 18px;margin-bottom:16px;
+  background:radial-gradient(120% 90% at 100% 0%,rgba(214,178,110,.20),transparent 55%),linear-gradient(160deg,#17140D 0%,#0E0E10 55%,#0C0D10 100%);
+  border:1px solid rgba(214,178,110,.30);box-shadow:0 30px 70px -36px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.06)}
+:root[data-theme="light"] .pf-value{background:linear-gradient(135deg,#B8893A 0%,#8A6420 60%,#6E4E17 100%);-webkit-background-clip:text;background-clip:text}
+:root[data-theme="light"] .pf-hero{background:radial-gradient(120% 90% at 100% 0%,rgba(214,178,110,.28),transparent 55%),linear-gradient(160deg,#FFFDF8,#F7F0E2);box-shadow:0 24px 50px -30px rgba(80,60,20,.35)}
+.pf-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pf-date{font-size:11.5px;color:var(--ink-3);font-weight:560}
+.pf-value{font-family:var(--f-display,serif);font-weight:500;font-size:clamp(38px,11vw,54px);line-height:1.05;margin:8px 0 12px;letter-spacing:-.01em;
+  background:linear-gradient(135deg,#F7E4B7 0%,#D9B571 45%,#A47C39 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pf-chips{display:flex;flex-wrap:wrap;gap:8px}
+.pf-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:99px;font-size:13px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.pf-chip.gain{color:var(--up);background:color-mix(in srgb,var(--up) 12%,transparent);border-color:color-mix(in srgb,var(--up) 30%,transparent)}
+.pf-chip.loss{color:var(--loss);background:color-mix(in srgb,var(--loss) 12%,transparent);border-color:color-mix(in srgb,var(--loss) 30%,transparent)}
+.pf-chip.soft{background:rgba(255,255,255,.035);border-color:var(--line)}
+.pf-chip b{font-weight:650}
+.pf-chart-wrap{margin:16px -6px 0}
+.pf-dot{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:#F7E4B7;box-shadow:0 0 0 4px rgba(214,178,110,.25);pointer-events:none}
+.pf-chart-wrap .pf-dot{transform:translateY(0)}
+.pf-chart{display:block;width:100%;height:92px}
+.pf-axis{display:flex;justify-content:space-between;padding:2px 6px 0}
+.pf-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(214,178,110,.16)}
+.pf-stats > div{display:grid;gap:3px;min-width:0}
+.pf-stats .k{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.pf-stats b{font-size:15px;font-weight:620;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-alloc{display:flex;gap:3px;height:8px;margin-top:16px;border-radius:99px;overflow:hidden}
+.pf-alloc i{display:block;min-width:3px}
+.pf-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:12px;color:var(--ink-2)}
+.pf-legend span{display:inline-flex;align-items:center;gap:6px}
+.pf-legend i{width:8px;height:8px;border-radius:3px;display:inline-block}
+.pf-legend b{font-weight:600;color:var(--ink)}
+.pf-tabs{position:relative;margin-bottom:14px}
+.pf-sec-h{display:flex;justify-content:space-between;align-items:baseline;margin:2px 4px 8px}
+.hlist{display:grid;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
+.hl{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:14px 14px 14px 12px;text-align:left;color:var(--ink);background:none;border:0;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s}
+.hl:last-child{border-bottom:0}
+.hl:hover,.hl:active{background:rgba(214,178,110,.06)}
+.hl .logo{width:42px;height:42px;border-radius:13px}
+.hl-mid{display:grid;gap:3px;min-width:0}
+.hl-mid b{font-size:15.5px;font-weight:650;letter-spacing:.01em}
+.hl-sub{font-size:12px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hl-bar{display:block;height:3px;border-radius:99px;background:var(--line);margin-top:4px;overflow:hidden;max-width:120px}
+.hl-bar i{display:block;height:100%;border-radius:99px}
+.hl-right{display:grid;justify-items:end;gap:2px;text-align:right}
+.hl-right b{font-size:15px;font-weight:650}
+.hl-right > span{font-size:12.5px;font-weight:560;white-space:nowrap}
+.hl-avg{font-size:11.5px;color:var(--ink-3);opacity:.8}
+.hl-pl{font-size:13px!important;font-weight:600!important}
+.hl-pct{font-size:11.5px!important;font-weight:600!important;padding:1px 7px;border-radius:99px;background:color-mix(in srgb,currentColor 12%,transparent)}
+@media (min-width:760px){ .hlist{display:none} .pf-sec-h{display:none} .pf-hero{padding:26px 28px} }
+@media (max-width:759px){ .pf-desk{display:none} }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1733,6 +1788,57 @@ function issuesNotice(sn){
   return `<div class="notice red">${ic("alert",18)}<div><b>${L("Kuch entries mein masla hai","Some entries have a problem")}</b>
     ${sn.issues.map(i => `<div class="small" style="margin-top:6px">${L(`${fmtDate(i.date)}: ${num(i.qty)} ${esc(i.symbol)} beche, magar us waqt aap ke paas sirf ${num(i.held)} thay. Yeh farokht hisaab mein shamil nahi ki gayi.`, `${fmtDate(i.date)}: sold ${num(i.qty)} ${esc(i.symbol)}, but you held only ${num(i.held)} then. This sale is left out of the totals.`)} <button class="link" data-act="edit-tx" data-id="${i.id}">${L("Theek karein","Fix it")}</button></div>`).join("")}</div></div>`;
 }
+const PF_COLORS = ["#E8C98C","#62D6A4","#7FB2FF","#F29B76","#C59BFF","#5FD3E0","#F2D06B","#FF8FB1","#9FD86B","#B8B0A2"];
+/** Portfolio value on each day prices were logged, for the hero chart. */
+function pfSeries(){
+  const log = FAMILY ? (UI.fam.shared.log || {}) : {}; const first = sortTx(S.txs)[0]?.date; if (!first) return [];
+  const days = Object.keys(log).filter(d => d >= first).sort().slice(-120);
+  return days.map(d => { const L0 = replay(S.txs, d); let v = 0, c = 0; for (const [sym, p] of L0.pos){ if (p.q <= 0) continue; c += p.cost; const px = closeOn(sym, d); v += px != null ? p.q * px : p.cost; } return { d, v, c }; }).filter(x => x.c > 0);
+}
+function pfChart(series){
+  if (series.length < 2) return "";
+  const W = 320, H = 86, P = 4; const vs = series.map(x => x.v); const lo = Math.min(...vs), hi = Math.max(...vs); const span = hi - lo || 1;
+  const pts = series.map((x, i) => [P + i * (W - 2 * P) / (series.length - 1), P + (H - 2 * P) * (1 - (x.v - lo) / span)]);
+  const line = pts.map((q, i) => `${i ? "L" : "M"}${q[0].toFixed(1)} ${q[1].toFixed(1)}`).join(" ");
+  const last = pts[pts.length - 1];
+  return `<svg class="pf-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Portfolio value from ${fmtDate(series[0].d)} to ${fmtDate(series[series.length - 1].d)}">
+    <defs><linearGradient id="pfg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D6B26E" stop-opacity=".38"/><stop offset="1" stop-color="#D6B26E" stop-opacity="0"/></linearGradient></defs>
+    <path d="${line} L${last[0].toFixed(1)} ${H} L${pts[0][0].toFixed(1)} ${H} Z" fill="url(#pfg)"/>
+    <path d="${line}" fill="none" stroke="#E8C98C" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>
+    </svg><span class="pf-dot" style="left:${(last[0] / W * 100).toFixed(2)}%;top:${(last[1] / H * 100).toFixed(2)}%"></span>`;
+}
+function pfHero(sn){
+  const pr = pricesSrc() || {}; let move = 0, moveBase = 0, lastD = "";
+  sn.holdings.forEach(h => { const u = pr[h.s]; if (u && u.p > 0){ if (u.d > lastD) lastD = u.d; if (u.prev > 0){ move += h.q * (u.p - u.prev); moveBase += h.q * u.prev; } } });
+  const plPct = sn.cost ? (sn.mv - sn.cost) / sn.cost : 0; const unreal = sn.mv - sn.cost;
+  const series = pfSeries(); const chart = pfChart(series);
+  const alloc = sn.holdings.slice().sort((a, b) => b.value - a.value);
+  return `<section class="pf-hero" aria-label="Portfolio summary">
+    <div class="pf-top"><span class="eyebrow">Portfolio value</span>${lastD ? `<span class="pf-date">Closing · ${fmtDate(lastD)}</span>` : ""}</div>
+    <div class="pf-value num">${rs(sn.mv)}</div>
+    <div class="pf-chips">
+      <span class="pf-chip ${tone(unreal)}">${ic(unreal >= 0 ? "trend" : "down", 14, 2.4)} <b class="num">${rsS(unreal)}</b> <span class="num">${pct(plPct, 1, true)}</span></span>
+      ${moveBase ? `<span class="pf-chip soft ${tone(move)}"><span class="faint">Last day</span> <b class="num">${rsS(move)}</b> <span class="num">${pct(move / moveBase, 2, true)}</span></span>` : ""}
+    </div>
+    ${chart ? `<div class="pf-chart-wrap"><div style="position:relative">${chart}</div><div class="pf-axis tiny faint"><span>${fmtDate(series[0].d)}</span><span>${fmtDate(series[series.length - 1].d)}</span></div></div>` : ""}
+    <div class="pf-stats">
+      <div><span class="k">Invested</span><b class="num">${rs(sn.cost)}</b></div>
+      <div><span class="k">Booked</span><b class="num ${tone(sn.realized)}">${rsS(sn.realized)}</b></div>
+      <div><span class="k">Dividends</span><b class="num">${rs(sn.dividends)}</b></div>
+    </div>
+    ${alloc.length > 1 ? `<div class="pf-alloc" aria-label="Where your money is">${alloc.map((h, i) => `<i style="flex:${Math.max(h.weight, 0.004)};background:${PF_COLORS[i % PF_COLORS.length]}" title="${esc(h.s)} ${pct(h.weight, 0)}"></i>`).join("")}</div>
+      <div class="pf-legend">${alloc.map((h, i) => `<span><i style="background:${PF_COLORS[i % PF_COLORS.length]}"></i>${esc(h.s)} <b class="num">${pct(h.weight, 0)}</b></span>`).join("")}</div>` : ""}
+  </section>`;
+}
+/** Phone list of holdings: one clean row per share. */
+function holdingsList(sn){
+  const rows = sn.holdings.slice().sort((a, b) => b.value - a.value);
+  return `<div class="hlist" role="list">${rows.map((h, i) => `<button class="hl" role="listitem" data-act="share" data-s="${h.s}">
+      <span class="logo">${logoMark(h.s)}</span>
+      <span class="hl-mid"><b>${esc(h.s)}</b><span class="hl-sub num">${num(h.q)} × ${h.userPrice ? rs(h.price, 2) : "—"}</span><span class="hl-avg num">Avg ${rs(h.avg, 2)}</span></span>
+      <span class="hl-right"><b class="num">${rs(h.value)}</b>${h.userPrice ? `<span class="hl-pl num ${tone(h.pl)}">${rsS(h.pl)}</span><span class="hl-pct num ${tone(h.pl)}">${pct(h.plPct, 1, true)}</span>` : `<span class="faint">no price</span>`}</span>
+    </button>`).join("")}</div>`;
+}
 function viewPortfolio(){
   if (UI.sub.portfolio === "broker") UI.sub.portfolio = "shares";
   const sub = UI.sub.portfolio || "shares";
@@ -1742,18 +1848,13 @@ function viewPortfolio(){
     ["dividends", L("Dividends","Dividends")], ["monthly", L("Mahana hisaab","Monthly account")], ["calc", L("Calculators","Calculators")]
   ].filter(([k]) => !isSimple() || ["shares","daily","prices","history",sub].includes(k));
   return `
-  <div class="page-head">
-    <div style="min-width:0"><div class="eyebrow">${L(`${sn.holdings.length} companies`, `${sn.holdings.length} companies`)}</div><h1 class="h-page">${L("Mera Portfolio","My Portfolio")}</h1><p class="muted small" style="margin-top:4px">${L("Aap ke shares, hisaab aur munafa — sab ek jagah","Your shares, accounts and profit — all in one place")}</p></div>
-    <div class="row" style="gap:8px"><button class="btn line sm" data-act="export-open">${ic("download",16,2.1)} Download</button><button class="btn primary sm" data-go="add">${ic("plus",16,2.2)} ${L("Nayi entry","New entry")}</button></div>
+  <div class="pf-head">
+    <div style="min-width:0"><h1 class="h-page">${FAMILY && UI.readOnly ? `${esc(memberName(UI.fam.viewing))}'s portfolio` : L("Mera Portfolio","My Portfolio")}</h1><div class="tiny faint">${sn.holdings.length} ${sn.holdings.length === 1 ? "company" : "companies"}</div></div>
+    <div class="row" style="gap:8px"><button class="icon-btn pf-ib" data-act="export-open" aria-label="Download portfolio" title="Download">${ic("download",19,2.1)}</button><button class="btn primary sm" data-go="add">${ic("plus",16,2.2)} ${L("Nayi entry","New entry")}</button></div>
   </div>
   ${issuesNotice(sn)}
-  <div class="card pad stats">
-    <div><div class="lbl">${L("Lagaya (abhi ke shares)","Invested (current shares)")}</div><div class="sv num">${rs(sn.cost)}</div></div>
-    <div><div class="lbl">${L("Abhi value","Value now")}</div><div class="sv num">${rs(sn.mv)}</div><div class="tiny faint">${esc(priceTag(sn.holdings))}</div></div>
-    <div><div class="lbl">${L("Munafa / nuqsan (sab mila kar)","Total profit / loss")}</div><div class="sv num ${tone(sn.totalPL)}">${rsS(sn.totalPL)}</div>
-      <div class="tiny faint num">${L("Bechne ka munafa","Booked")} ${rsS(sn.realized)} · ${L("Dividend","Dividend")} ${rs(sn.dividends)}</div></div>
-  </div>
-  <div class="seg" role="tablist">${tabs.map(([k,l]) => `<button role="tab" data-act="psub" data-v="${k}" aria-pressed="${sub===k}">${esc(l)}</button>`).join("")}${moreTabsBtn()}</div>
+  ${sn.holdings.length ? pfHero(sn) : ""}
+  <div class="seg pf-tabs" role="tablist">${tabs.map(([k,l]) => `<button role="tab" data-act="psub" data-v="${k}" aria-pressed="${sub===k}">${esc(l)}</button>`).join("")}${moreTabsBtn()}</div>
   ${sub === "shares" ? pShares(sn) : sub === "daily" ? pDaily() : sub === "prices" ? pPrices(sn) : sub === "where" ? pWhere(sn) : sub === "history" ? pHistory() : sub === "dividends" ? pDividends(sn) : sub === "monthly" ? monthlyView() : sub === "calc" ? pCalc(sn) : pShares(sn)}`;
 }
 function holdingsTable(sn){
@@ -1785,7 +1886,7 @@ function closedSection(){
 }
 function pShares(sn){
   if (!sn.holdings.length) return closedSection() + `<div class="card"><div class="empty"><b>${L("Aap ke paas abhi koi share nahi","You don't own any shares yet")}</b><p>${L("Pehli khareed ki entry karein.","Add your first purchase.")}</p><button class="btn primary" style="margin-top:14px" data-go="add">${L("Entry karein","Add entry")}</button></div></div>`;
-  return `<div class="card htable-card">${holdingsTable(sn)}
+  return `<div class="pf-sec-h"><h2 class="h-sec">Holdings</h2><span class="tiny faint">tap a share for its history</span></div>${holdingsList(sn)}<div class="card htable-card pf-desk">${holdingsTable(sn)}
     <p class="tiny faint" style="margin:12px 20px 16px">Tap a share to see every purchase and sale. ${FAMILY ? "Value uses the prices entered in Prices." : "Average price includes broker charges."}</p></div>
   ${closedSection()}`;
 }
