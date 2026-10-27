@@ -1,13 +1,13 @@
 # PSX Personal Assistant
 
-*Shares Aapke. Hisaab Hamara.* A personal record-keeper for Pakistan Stock Exchange investors, in English and Roman Urdu.
+*Your shares. Our accounts.* A personal record-keeper for Pakistan Stock Exchange investors.
 
 Live: https://psx-pilot.netlify.app
 
 ## What it does
 
 - Portfolio with weighted-average cost, profit/loss, dividends and cash
-- Entries by typing or by voice (in-app mic)
+- Entries through a simple form
 - Your own current prices per share, so the portfolio value is real; demo prices fill in only where you haven't entered one
 - Dividend assistant, reminders (exportable to your phone calendar), monthly account, tax-year report, broker statement match, charges check, WhatsApp tip checker
 - Family league: three people, one private link, ranking by total return %, race chart and awards

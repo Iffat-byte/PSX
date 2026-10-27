@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place — in English or Roman Urdu. Free."><meta name="theme-color" content="#08090B"><link rel="icon" href="/icon-192.png" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><link rel="canonical" href="https://psx-pilot.netlify.app/"><meta property="og:type" content="website"><meta property="og:site_name" content="PSX Personal Assistant"><meta property="og:title" content="PSX Personal Assistant — your shares, our accounts"><meta property="og:description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place — in English or Roman Urdu. Free."><meta property="og:url" content="https://psx-pilot.netlify.app/"><meta property="og:image" content="https://psx-pilot.netlify.app/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="PSX Personal Assistant"><meta name="twitter:description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place — in English or Roman Urdu. Free."><meta name="twitter:image" content="https://psx-pilot.netlify.app/og.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place. A private family league with rankings and awards."><meta name="theme-color" content="#08090B"><link rel="icon" href="/icon-192.png" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><link rel="canonical" href="https://psx-pilot.netlify.app/"><meta property="og:type" content="website"><meta property="og:site_name" content="PSX Personal Assistant"><meta property="og:title" content="PSX Personal Assistant — your shares, our accounts"><meta property="og:description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place. A private family league with rankings and awards."><meta property="og:url" content="https://psx-pilot.netlify.app/"><meta property="og:image" content="https://psx-pilot.netlify.app/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="PSX Personal Assistant"><meta name="twitter:description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place. A private family league with rankings and awards."><meta name="twitter:image" content="https://psx-pilot.netlify.app/og.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>PSX Personal Assistant</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1342,7 +1342,7 @@ async function connectExtras(){
 /* =========================================================================
    Language helper — Roman Urdu default, English switch
    ========================================================================= */
-const L = (ur, en) => S.lang === "en" ? en : ur;
+const L = (ur, en) => en;   // the app is English-only; Roman Urdu strings stay in the code but are never shown
 const TYPE_LABEL = () => ({BUY:L("Khareede","Bought"), SELL:L("Beche","Sold"), DIVIDEND:L("Dividend mila","Dividend"), DEPOSIT:L("Paise jama","Cash added"), WITHDRAWAL:L("Paise nikale","Cash withdrawn"), BONUS:L("Bonus shares","Bonus shares"), FEE:L("Charges","Charges")});
 const EVENT_LABEL = () => ({board:L("Board meeting","Board meeting"), results:L("Results ka elaan","Results announcement"), book:L("Book closure (dividend ke liye)","Book closure (for dividend)"), agm:L("Salana meeting (AGM)","Annual meeting (AGM)"), dividend:L("Dividend ka elaan","Dividend announcement"), other:L("Doosri khabar","Other")});
 
@@ -1441,7 +1441,7 @@ const NAV = () => [
   {r:"updates", label:L("Meri Updates","My Updates"), icon:"bell", badge: unreadToday()},
   {r:"more", label:L("More Tools","More Tools"), icon:"grid"}
 ];
-function brandHTML(){ return `<div class="brand"><div class="mark">${MARK}</div><div style="min-width:0"><div class="brand-t">PSX Personal Assistant</div><div class="brand-s">Shares Aapke. Hisaab Hamara.</div></div></div>`; }
+function brandHTML(){ return `<div class="brand"><div class="mark">${MARK}</div><div style="min-width:0"><div class="brand-t">PSX Personal Assistant</div><div class="brand-s">Your shares. Our accounts.</div></div></div>`; }
 function renderShell(){
   const nav = NAV();
   $("#rail").innerHTML = `${brandHTML()}
@@ -1455,10 +1455,6 @@ function renderShell(){
   $("#topbar-in").innerHTML = `${brandHTML()}
     <div class="top-actions">
       ${FAMILY && UI.fam.status === "ready" ? `<button class="who" data-act="fam-who" aria-label="${L("Aap kaun hain? Badlein","Who are you? Change")}">${UI.fam.me ? avatar(UI.fam.me, 26) + `<span>${esc(memberName(UI.fam.me))}</span>` : `<span>${L("Aap kaun?","Who are you?")}</span>`}</button>` : ""}
-      <div class="lang" role="group" aria-label="Language">
-        <button data-act="lang" data-v="ur" aria-pressed="${S.lang!=="en"}" aria-label="Roman Urdu"><span class="full">Urdu</span><span class="short">UR</span></button>
-        <button data-act="lang" data-v="en" aria-pressed="${S.lang==="en"}" aria-label="English"><span class="full">English</span><span class="short">EN</span></button>
-      </div>
       <button class="icon-btn" data-act="theme" aria-label="${L("Theme badlein","Change theme")}">${ic(isDark() ? "sun" : "moon", 19)}</button>
     </div>`;
   $("#tabbar").innerHTML = `<div class="tabbar-in">${nav.map(n => n.r === "add"
@@ -1466,7 +1462,7 @@ function renderShell(){
     : `<a href="#${n.r}" class="tab" data-go="${n.r}" ${UI.route===n.r?'aria-current="page"':''}>${ic(n.icon)}${n.badge ? `<span class="nbadge num" aria-label="${n.badge} ${L("nayi","new")}">${n.badge}</span>` : ""}<span>${esc(n.label)}</span></a>`).join("")}</div>`;
 }
 function isDark(){ return S.theme !== "light"; }
-function applyTheme(){ if (S.theme) document.documentElement.setAttribute("data-theme", S.theme); else document.documentElement.removeAttribute("data-theme"); document.documentElement.lang = S.lang === "en" ? "en" : "ur-Latn"; }
+function applyTheme(){ S.lang = "en"; if (S.theme) document.documentElement.setAttribute("data-theme", S.theme); else document.documentElement.removeAttribute("data-theme"); document.documentElement.lang = S.lang === "en" ? "en" : "ur-Latn"; }
 
 function render(){
   const ae = document.activeElement; const fid = ae && ae.id && ae !== document.body ? ae.id : null; let ss = null, se = null; try { ss = ae.selectionStart; se = ae.selectionEnd; } catch {}
@@ -1534,11 +1530,7 @@ function viewHome(){
     </div>
   </section>
 
-  <section aria-label="${L("Nayi entry","New entry")}" class="quick">
-    <button class="quick-btn" data-act="entry" data-v="shot"><span class="qi">${ic("camera",19)}</span><span class="qt"><b>${L("Screenshot se","From screenshot")}</b><span class="qs">${L("Broker app ki tasveer","Broker app picture")}</span></span></button>
-    <button class="quick-btn" data-act="entry" data-v="voice"><span class="qi">${ic("mic",19)}</span><span class="qt"><b>${L("Bol kar","By voice")}</b><span class="qs">${L("\"100 OGDC 210 par\"","\"100 OGDC at 210\"")}</span></span></button>
-    <button class="quick-btn" data-act="entry" data-v="manual"><span class="qi">${ic("pen",19)}</span><span class="qt"><b>${L("Khud likhein","Type it")}</b><span class="qs">${L("Aasaan form","Simple form")}</span></span></button>
-  </section>
+  <button class="btn primary block" data-go="add" style="min-height:52px">${ic("plus",18,2.4)} Add entry</button>
 
   <div class="grid2" style="align-items:start">
     <section class="card pad" aria-labelledby="today-h">
@@ -1744,18 +1736,11 @@ function capabilityLine(images){
 function viewAdd(){
   const e = UI.entry;
   if (e?.mode === "manual") return entryForm();
-  if (e?.mode === "shot") return viewShot();
-  if (e?.mode === "voice") return viewVoice();
   if (e?.mode === "review") return viewReview();
   if (e?.mode === "holdings") return viewHoldingsFound();
   if (e?.mode === "saved") return viewSaved();
-  return `<div><h1 class="h-page">${L("Nayi entry kaise karna chahenge?","How would you like to add an entry?")}</h1><p class="muted small">${L("Jo aasaan lage woh chunein. Save karne se pehle hum aap se har detail confirm karenge.","Pick what's easiest. We'll confirm every detail with you before saving.")}</p></div>
-  <div class="stack">
-    <button class="big-opt" data-act="entry" data-v="shot"><div class="ti">${ic("camera",28)}</div><div><b>${L("Screenshot Bhejein","Send a Screenshot")}</b><span>${L("Broker app ya confirmation ki tasveer se details nikaalein","Pull details from a broker app or confirmation picture")}</span><div style="margin-top:6px">${capabilityLine(true)}</div></div><div class="arrow">${ic("chev",22)}</div></button>
-    <button class="big-opt" data-act="entry" data-v="voice"><div class="ti">${ic("mic",28)}</div><div><b>${L("Bol Kar Entry Karein","Speak Your Entry")}</b><span>${L("Jaise: \"Aaj 100 OGDC 210 rupay par khareede\"","Like: \"Bought 100 OGDC at 210 today\"")}</span><div style="margin-top:6px"><span class="pill info">${ic("check",13,2.6)} ${L("Asli extraction · app ke andar","Real extraction · in-app")}</span></div></div><div class="arrow">${ic("chev",22)}</div></button>
-    <button class="big-opt" data-act="entry" data-v="manual"><div class="ti">${ic("pen",28)}</div><div><b>${L("Khud Entry Karein","Enter It Yourself")}</b><span>${L("Aasaan form, qadam ba qadam","A simple, step-by-step form")}</span></div><div class="arrow">${ic("chev",22)}</div></button>
-  </div>
-  <div class="notice info">${ic("lock",18)}<div>${L("Hum kabhi aap ka broker password nahi maangte. Sirf woh details save hoti hain jo aap confirm karein. Duplicate entries pehle hi pakar li jati hain.","We never ask for your broker password. Only details you confirm are saved. Duplicate entries are caught before saving.")}</div></div>`;
+  UI.entry = { mode:"manual", draft:{ type:"BUY", date:todayISO(), symbol:"", qty:"", price:"", fees:"", amount:"", note:"" } };
+  return entryForm();
 }
 
 /* ---------------- Screenshot ---------------- */
@@ -2045,8 +2030,8 @@ function entryForm(){
   const total = isTrade ? (Number(d.qty)||0)*(Number(d.price)||0) : Number(d.amount)||0;
   const types = [["BUY","trend",L("Shares khareede","Bought shares")],["SELL","down",L("Shares beche","Sold shares")],["DIVIDEND","coin",L("Dividend mila","Got dividend")],["DEPOSIT","upload",L("Broker mein paise daale","Added cash")],["WITHDRAWAL","download",L("Paise nikale","Withdrew cash")],["BONUS","star",L("Bonus shares mile","Got bonus shares")]];
   const TL = TYPE_LABEL();
-  return `${backBtn()}
-  <div><h1 class="h-page">${e.editId ? L("Entry badlein","Edit entry") : L("Khud entry karein","Enter it yourself")}</h1>
+  return `${e.editId ? `<button class="back" data-go="portfolio" data-sub="history">${ic("back",18)} Back</button>` : ""}
+  <div><h1 class="h-page">${e.editId ? "Edit entry" : "New entry"}</h1>
   <p class="muted small">${L("Bas yeh batayein ke kya hua. Hisaab hum laga denge.","Just tell us what happened. We'll do the maths.")}</p></div>
   <form class="card pad stack" id="entry-form" novalidate>
     <div><div class="lbl" style="margin-bottom:8px">${L("Kya hua?","What happened?")}</div>
@@ -2692,8 +2677,8 @@ function settingsView(){
     <div class="field"><label for="st-conc">${L("Ek company mein zyada se zyada (%)","Max in one company (%)")}</label><input class="input num" id="st-conc" inputmode="numeric" value="${st.concLimit}"></div></div>
     <button class="btn primary" type="submit">${L("Save karein","Save")}</button>
   </form>
-  <div class="card pad stack"><h2 class="h-sec">${L("Zabaan aur theme","Language and theme")}</h2>
-    <div class="row" style="flex-wrap:wrap"><div class="lang"><button data-act="lang" data-v="ur" aria-pressed="${S.lang!=="en"}">Roman Urdu</button><button data-act="lang" data-v="en" aria-pressed="${S.lang==="en"}">English</button></div>
+  <div class="card pad stack"><h2 class="h-sec">Theme</h2>
+    <div class="row" style="flex-wrap:wrap">
     <div class="lang"><button data-act="theme-set" data-v="" aria-pressed="${!S.theme}">${L("Asal (dark)","Default (dark)")}</button><button data-act="theme-set" data-v="light" aria-pressed="${S.theme==="light"}">${L("Roshan","Light")}</button><button data-act="theme-set" data-v="dark" aria-pressed="${S.theme==="dark"}">${L("Andhera","Dark")}</button></div></div></div>
   <div class="card pad stack"><h2 class="h-sec">${L("Privacy aur aap ka data","Privacy and your data")}</h2>
     <div class="notice ${UI.storage==="cloud"||UI.storage==="account"?"green":"info"}">${ic("lock",18)}<div>${UI.storage === "account" ? L("Aap ka data aap ke account mein mehfooz hai aur har device par sign in karne se mil jata hai.","Your data is saved to your account and appears on any device you sign in on.") : UI.storage === "cloud" ? L("Aap ka data aap ke Claude account mein private save hota hai. Koi aur — is page ka owner bhi — ise nahi dekh sakta.","Your data is saved privately to your Claude account. No one else — not even this page's owner — can see it.") : L("Aap ka data sirf is browser mein save hai. Browser ki history saaf karne se mit sakta hai, is liye backup rakhein.","Your data is saved in this browser only. Clearing browser data can erase it, so keep a backup.")}</div></div>
@@ -3042,7 +3027,7 @@ async function exportPdf(spec, filename){
   const doc = new jsPDF({ unit: "pt", format: "a4" }); const W = doc.internal.pageSize.getWidth(); const M = 40; let y = 0;
   doc.setFillColor(11, 31, 63); doc.rect(0, 0, W, 76, "F");
   doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.text("PSX Personal Assistant", M, 32);
-  doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text("Shares Aapke. Hisaab Hamara.", M, 50); doc.text(pdfSafe(`${L("Banai gayi","Created")}: ${fmtDate(todayISO())}`), W - M, 50, { align: "right" });
+  doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text("Your shares. Our accounts.", M, 50); doc.text(pdfSafe(`${L("Banai gayi","Created")}: ${fmtDate(todayISO())}`), W - M, 50, { align: "right" });
   y = 108; doc.setTextColor(11, 27, 51); doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.text(pdfSafe(spec.title), M, y); y += 18;
   if (spec.subtitle){ doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(71, 87, 122); const l = doc.splitTextToSize(pdfSafe(spec.subtitle), W - 2 * M); doc.text(l, M, y + 4); y += 14 * l.length + 6; }
   const ensure = h => { if (y + h > doc.internal.pageSize.getHeight() - 60){ doc.addPage(); y = 50; } };

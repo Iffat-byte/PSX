@@ -1,7 +1,7 @@
 {
   "name": "PSX Personal Assistant",
   "short_name": "PSX Assistant",
-  "description": "Track your PSX shares, average price, dividends and profit in English or Roman Urdu.",
+  "description": "Track your PSX shares, average price, dividends and profit.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
