@@ -1895,8 +1895,8 @@ function viewPortfolio(){
   const sub = UI.sub.portfolio || "shares";
   const sn = snap();
   const tabs = [
-    ["shares", L("Mere shares","My shares")], ["trading", "Trading"], ["daily", "Daily earnings"], ["where", L("Paisa kahan laga?","Where's my money?")],
-    ["dividends", L("Dividends","Dividends")], ["monthly", L("Mahana hisaab","Monthly account")], ["calc", L("Calculators","Calculators")]
+    ["shares", L("Mere shares","My shares")], ["daily", "Daily earnings"], ["where", L("Paisa kahan laga?","Where's my money?")],
+    ["dividends", L("Dividends","Dividends")], ["monthly", L("Mahana hisaab","Monthly account")], ["trading", "Trading"], ["calc", L("Calculators","Calculators")]
   ].filter(([k]) => !isSimple() || ["shares","trading","daily",sub].includes(k));
   return `
   <div class="pf-head">
