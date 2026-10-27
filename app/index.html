@@ -3552,6 +3552,7 @@ document.addEventListener("click", async (ev) => {
       if (await offerDownload("psx-yaad-dahaniyan.ics", ics, "text/calendar")){ const at = Date.now(); commit(st => st.reminders = st.reminders.map(r => !r.done && r.date && !r.calAt ? { ...r, calAt: at } : r)); toast(L(`${n} yaad-dahaniyan tayyar — file kholein aur "Add" dabayein`, `${n} reminder(s) ready — open the file and tap "Add"`)); }
       break; }
     case "mg-set": mgSave(+v); break;
+    case "fam-key-paste": { try { const t = await navigator.clipboard.readText(); const inp = $("#fam-key-in"); if (inp) inp.value = t || ""; if (famKeyFrom(t)) famUseKey(t); } catch { toast("Press and hold in the box, then tap Paste"); $("#fam-key-in")?.focus(); } break; }
     case "paste-clip": { try { const t = await navigator.clipboard.readText(); if (!t){ toast("Nothing copied yet"); break; } const ta = $("#paste-txt"); ta.value = (ta.value ? ta.value + "\n" : "") + t; UI.paste = { text: ta.value }; pasteRead(); } catch { toast("Press and hold in the box, then tap Paste"); $("#paste-txt")?.focus(); } break; }
     case "paste-read": UI.paste = { text: $("#paste-txt").value }; pasteRead(); break;
     case "paste-clear": UI.paste = null; render(); break;
@@ -3682,6 +3683,7 @@ document.addEventListener("submit", async (ev) => {
   const f = ev.target; ev.preventDefault();
   if (f.id === "entry-form"){ submitEntry(); return; }
   const k = f.dataset.form;
+  if (k === "fam-key"){ famUseKey($("#fam-key-in").value); return; }
   if (k === "prices"){ submitPrices(); return; }
   if (k === "custom-sym"){ submitCustomSym(); return; }
   if (k === "rem-add"){ const text = $("#rem-t").value.trim(); const date = $("#rem-d").value; if (!text){ $("#rem-err").textContent = L("Kaam likhein.","Write the task."); $("#rem-t").focus(); return; } if (!date){ $("#rem-err").textContent = L("Tareekh chunein.","Pick a date."); return; }
@@ -4358,12 +4360,20 @@ function raceChart(){
 }
 
 /* ---------- screens ---------- */
+function famKeyFrom(t){ t = String(t || "").trim(); const m = t.match(/[?&#]k=([A-Za-z0-9_-]{16,})/); if (m) return m[1]; return /^[A-Za-z0-9_-]{16,}$/.test(t) ? t : null; }
+function famUseKey(raw){ const k = famKeyFrom(raw); const err = $("#fam-key-err"); if (!k){ if (err) err.textContent = "That doesn't look like the family link. Paste the full link."; return; } location.replace(location.pathname + "?k=" + encodeURIComponent(k)); }
 function famGateView(){
   const s = UI.fam.status;
   const box = (icon, title, body, extra = "") => `<div class="card pad stack" style="max-width:520px;margin:8vh auto 0;text-align:center;align-items:center"><div class="quick-btn" style="padding:0;border:0;background:none"><span class="qi" style="width:56px;height:56px;border-radius:16px">${ic(icon,26)}</span></div><h1 class="h-page" style="font-size:30px">${title}</h1><p class="muted">${body}</p>${extra}</div>`;
   if (s === "loading") return box("clock", L("Family ka hisaab aa raha hai…","Loading the family accounts…"), L("Bas ek pal.","Just a moment."), `<span class="spin" style="color:var(--emerald)"></span>`);
-  if (s === "nokey") return box("lock", L("Ye family ki private website hai","This is a private family website"), L("Isse kholne ke liye apna khaas family link istemal karein. Link Javeria se lein.","Open it with your family's special link. Ask Javeria for it."));
-  if (s === "badkey") return box("alert", L("Ye link kaam nahi kar raha","This link doesn't work"), L("Link purana ya adhoora hai. Javeria se poora link dobara lein.","The link is old or incomplete. Ask Javeria for the full link again."));
+  const keyForm = `<form class="stack gate-key" data-form="fam-key" novalidate style="width:100%;text-align:left;margin-top:6px">
+      <label class="lbl" for="fam-key-in">Paste your family link</label>
+      <input class="input" id="fam-key-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://psx-pilot.netlify.app/?k=…">
+      <span class="err" id="fam-key-err"></span>
+      <div class="row" style="gap:8px"><button type="button" class="btn line" data-act="fam-key-paste">${ic("copy",16)} Paste</button><button type="submit" class="btn primary" style="flex:1">${ic("lock",16)} Open</button></div>
+      <p class="tiny faint" style="margin:0">Only needed once on this phone. Opened from the home screen icon, the website keeps its own memory, so it needs the link one time too.</p></form>`;
+  if (s === "nokey") return box("lock", L("Ye family ki private website hai","This is a private family website"), "Open it with your family's special link. Ask Javeria for it.", keyForm);
+  if (s === "badkey") return box("alert", L("Ye link kaam nahi kar raha","This link doesn't work"), "The link is old or incomplete. Ask Javeria for the full link again.", keyForm);
   return box("alert", L("Internet nahi","You're offline"), L("Family ka data laane ke liye internet chahiye. Rabta bahal hone par dobara kholein.","The family data needs an internet connection. Try again once you're online."), `<button class="btn primary" data-act="fam-retry">${L("Dobara koshish karein","Try again")}</button>`);
 }
 /** Closing prices arrive by themselves (EODHD, run by the database every weekday evening). */
