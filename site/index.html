@@ -535,6 +535,31 @@ select.input option{background:var(--surface);color:var(--ink)}
 .cpk-t b{font-size:14px;font-weight:620;color:var(--ink)}
 .cpk-t .num{font-size:12px;color:var(--ink-3)}
 .cpk[aria-pressed="true"] .cpk-t .num{color:var(--emerald-ink)}
+
+/* ---------- monthly goal (interactive) ---------- */
+.mg-val{font-family:var(--f-display,serif);font-size:clamp(30px,6vw,40px);font-weight:500;line-height:1.1;margin-top:4px;background:linear-gradient(135deg,#F7E4B7 0%,#D9B571 45%,#A47C39 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mg-num{width:200px;max-width:100%}
+.mg-range{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;cursor:pointer;margin:4px 0 0;touch-action:pan-y}
+.mg-range::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:linear-gradient(90deg,#A47C39,#E8C98C var(--fill),var(--line-2) var(--fill))}
+.mg-range::-moz-range-track{height:8px;border-radius:99px;background:linear-gradient(90deg,#A47C39,#E8C98C var(--fill),var(--line-2) var(--fill))}
+.mg-range::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-10px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFF3D6,#D9B571 55%,#A47C39);border:2px solid #1A1408;box-shadow:0 0 0 4px rgba(214,178,110,.22),0 6px 16px -4px rgba(0,0,0,.6)}
+.mg-range::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFF3D6,#D9B571 55%,#A47C39);border:2px solid #1A1408;box-shadow:0 0 0 4px rgba(214,178,110,.22)}
+.mg-range:focus-visible{outline:none}
+.mg-range:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 6px rgba(214,178,110,.45)}
+.mg-scale{display:flex;justify-content:space-between;margin-top:-4px}
+.mg-quick{display:flex;gap:8px;flex-wrap:wrap}
+.chipb{min-height:36px;padding:0 14px;border-radius:99px;border:1px solid rgba(214,178,110,.3);background:rgba(214,178,110,.07);color:var(--ink);font-weight:560;font-size:13.5px;cursor:pointer}
+.chipb:hover{border-color:#D6B26E}
+.mg-prog{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.mg-prog .bar{flex:1;height:10px}
+.mg-prog .bar i{background:linear-gradient(90deg,#A47C39,#E8C98C)}
+.mbars{position:relative}
+#mg-bars{height:148px;padding-top:28px}
+.mbars .c.hit .b{background:linear-gradient(180deg,#E8C98C,#A47C39)}
+.mbars:has(.mg-line) .c:not(.hit) .b{background:color-mix(in srgb,var(--emerald) 30%,transparent)}
+.mg-line{position:absolute;left:0;right:0;border-top:1.5px dashed rgba(214,178,110,.75);pointer-events:none;z-index:1;transition:bottom .12s}
+.mg-line span{position:absolute;right:0;top:-20px;font-size:11px;font-weight:600;color:var(--emerald-ink);background:var(--surface);padding:0 6px;border-radius:6px}
+.mbars .m{line-height:14px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -3163,6 +3188,29 @@ function toolAsk(){
 
 /* ---------------- Monthly investment accountant ---------------- */
 function monthsWithData(){ const set = new Set(S.txs.map(t => t.date.slice(0, 7))); set.add(todayISO().slice(0, 7)); return [...set].sort(); }
+/** Pieces of the Monthly account that depend on the goal; redrawn live while the goal slider moves. */
+function moGoalParts(goal, ym){
+  const ms = monthsWithData(); const reps = ms.map(m => monthReport(S.txs, m, todayISO(), null));
+  const r = reps[ms.indexOf(ym)] || { bought: 0 };
+  let streak = 0; for (let k = reps.length - 1; k >= 0; k--){ if (goal > 0 && reps[k].bought >= goal) streak++; else if (k === reps.length - 1) continue; else break; }
+  const last12 = reps.slice(-12); const mx = Math.max(1, goal, ...last12.map(x => x.bought));
+  const hit = last12.filter(x => goal > 0 && x.bought >= goal).length;
+  const pctDone = goal > 0 ? Math.min(100, r.bought / goal * 100) : 0;
+  const status = goal <= 0 ? "Set a goal with the slider, or type an amount."
+    : r.bought >= goal ? `Goal met in ${fmtMonth(ym)}: ${rs(r.bought)} invested. Well done!`
+    : `${rs(r.bought)} invested in ${fmtMonth(ym)}, ${rs(goal - r.bought)} to go.`;
+  const live = `<div class="mg-prog"><div class="bar"><i style="width:${pctDone.toFixed(1)}%"></i></div><b class="num">${goal > 0 ? Math.round(pctDone) + "%" : "—"}</b></div>
+    <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><p class="small muted" style="margin:0">${status}</p>
+    <span class="row" style="gap:6px">${streak ? `<span class="pill ok">${streak} month streak</span>` : ""}${goal > 0 ? `<span class="pill info">Met in ${hit} of last ${last12.length}</span>` : ""}</span></div>`;
+  const bars = `${goal > 0 ? `<div class="mg-line" style="bottom:${20 + goal / mx * 100}px"><span>Goal ${rs(goal)}</span></div>` : ""}${last12.map(x => `<button class="c${goal > 0 && x.bought >= goal ? " hit" : ""}" style="background:none" data-act="mo-pick" data-v="${x.ym}" title="${fmtMonth(x.ym)}: ${rs(x.bought)}"><div class="b" style="height:${Math.max(3, x.bought / mx * 100)}px;${x.ym === ym ? "outline:2px solid var(--ink-2);outline-offset:2px" : ""}"></div><div class="m" style="${x.ym === ym ? "color:var(--ink);font-weight:620" : ""}">${MONTHS_EN[+x.ym.slice(5) - 1].slice(0,3)}</div></button>`).join("")}`;
+  return { live, bars, maxBought: Math.max(0, ...reps.map(x => x.bought)) };
+}
+function moGoalLive(goal){
+  const ym = document.getElementById("mo-goal")?.dataset.ym; if (!ym) return;
+  const g = moGoalParts(goal, ym);
+  $("#mg-live").innerHTML = g.live; $("#mg-bars").innerHTML = g.bars; $("#mg-val").textContent = goal > 0 ? rs(goal) : "No goal";
+  const rg = $("#mg-range"); if (rg){ if (goal > +rg.max) rg.max = Math.ceil(goal / 10000) * 10000; rg.style.setProperty("--fill", `${Math.min(100, goal / +rg.max * 100)}%`); }
+}
 function monthlyView(){
   const ms = monthsWithData(); const ym = UI.sub.month && ms.includes(UI.sub.month) ? UI.sub.month : ms[ms.length - 1];
   const r = monthReport(S.txs, ym, todayISO(), (s, d) => closeOn(s, d));
@@ -3192,10 +3240,18 @@ function monthlyView(){
       <details><summary class="small" style="cursor:pointer;font-weight:700">${L("Kaise hisaab lagaya?","How was this worked out?")}</summary><p class="small muted" style="margin-top:6px">${L(`Aakhir ki value (${rs(r.endValue)}) − shuru ki value (${rs(r.startValue)}) − naye paise (${rs(r.netNewMoney)}) = ${rsS(r.marketGain)}. Is mein dividend, charges aur qeemat ka farq sab shamil hai. Qeematein demo hain, is liye yeh hissa asli nahi.`, `End value (${rs(r.endValue)}) − start value (${rs(r.startValue)}) − new money (${rs(r.netNewMoney)}) = ${rsS(r.marketGain)}. Includes dividends, charges and price changes. Prices are demo, so this part isn't real.`)}</p></details>
     </section>
   </div>
-  ${goal > 0 ? `<section class="card pad stack"><div class="row" style="justify-content:space-between;flex-wrap:wrap"><h2 class="h-sec">${L("Mahana target","Monthly goal")}: ${rs(goal)}</h2>${streak ? `<span class="pill ok">${L(`${streak} mahine lagatar poora`, `${streak} month streak`)}</span>` : ""}</div>
-    <div class="bar"><i style="width:${Math.min(100, r.bought / goal * 100).toFixed(1)}%"></i></div><p class="small muted">${r.bought >= goal ? L("Is mahine ka target poora. Shabash!","This month's goal is met. Well done!") : L(`${rs(r.bought)} ho gaye, ${rs(goal - r.bought)} baaqi.`, `${rs(r.bought)} done, ${rs(goal - r.bought)} to go.`)}</p></section>` : ""}
+  ${(() => { const g = moGoalParts(goal, ym); const max = Math.max(200000, Math.ceil(Math.max(goal, g.maxBought) * 1.5 / 10000) * 10000); const ro = FAMILY && UI.readOnly;
+    return `<section class="card pad stack mg" id="mo-goal" data-ym="${ym}">
+    <div class="row" style="justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+      <div><div class="eyebrow">Monthly goal</div><div class="mg-val num" id="mg-val">${goal > 0 ? rs(goal) : "No goal"}</div></div>
+      ${ro ? "" : `<div class="input-wrap mg-num"><span class="pre">Rs</span><input class="input num" id="mg-num" inputmode="numeric" value="${goal || ""}" placeholder="Type amount" aria-label="Monthly goal in rupees"></div>`}
+    </div>
+    ${ro ? "" : `<input type="range" class="mg-range" id="mg-range" min="0" max="${max}" step="1000" value="${goal}" style="--fill:${Math.min(100, goal / max * 100)}%" aria-label="Drag to set monthly goal">
+    <div class="mg-scale tiny faint num"><span>Rs 0</span><span>${rs(max / 2)}</span><span>${rs(max)}</span></div>
+    <div class="mg-quick">${[10000, 25000, 50000, 100000].map(v => `<button type="button" class="chipb" data-act="mg-set" data-v="${v}">${rs(v)}</button>`).join("")}<button type="button" class="chipb" data-act="mg-set" data-v="0">No goal</button></div>`}
+    <div id="mg-live">${g.live}</div></section>`; })()}
   <section class="card pad stack"><h2 class="h-sec">${L("Pichle mahine","Recent months")}</h2>
-    <div class="mbars">${last12.map(x => `<button class="c" style="background:none" data-act="mo-pick" data-v="${x.ym}" title="${fmtMonth(x.ym)}: ${rs(x.bought)}"><div class="b" style="height:${Math.max(3, x.bought / mx * 100)}px;${x.ym === ym ? "background:var(--navy-2)" : ""}"></div><div class="m" style="${x.ym === ym ? "color:var(--ink);font-weight:620" : ""}">${MONTHS_EN[+x.ym.slice(5) - 1].slice(0,3)}</div></button>`).join("")}</div>
+    <div class="mbars" id="mg-bars">${moGoalParts(goal, ym).bars}</div>
     <p class="small muted">${L(`Average ${rs(avg)} har mahine khareed.`, `Average ${rs(avg)} bought per month.`)}</p>
     <div class="scroll-x"><table class="t num"><thead><tr><th>${L("Mahina","Month")}</th><th class="r">${L("Jama","Cash in")}</th><th class="r">${L("Khareeda","Bought")}</th><th class="r">${L("Becha","Sold")}</th><th class="r">Dividend</th><th class="r">${L("Charges","Charges")}</th><th class="r">${L("Bechne ka munafa","Realized")}</th></tr></thead>
     <tbody>${reps.slice().reverse().map(x => `<tr><td>${fmtMonth(x.ym)}</td><td class="r">${x.deposits ? rs(x.deposits) : "—"}</td><td class="r">${x.bought ? rs(x.bought) : "—"}</td><td class="r">${x.sold ? rs(x.sold) : "—"}</td><td class="r gain">${x.dividends ? rs(x.dividends) : "—"}</td><td class="r">${x.fees ? rs(x.fees) : "—"}</td><td class="r ${tone(x.realized)}">${x.realized ? rsS(x.realized) : "—"}</td></tr>`).join("")}</tbody></table></div>
@@ -3432,6 +3488,7 @@ document.addEventListener("click", async (ev) => {
     case "rem-ics": { const { n, ics } = remindersICS(); if (!n) break;
       if (await offerDownload("psx-yaad-dahaniyan.ics", ics, "text/calendar")){ const at = Date.now(); commit(st => st.reminders = st.reminders.map(r => !r.done && r.date && !r.calAt ? { ...r, calAt: at } : r)); toast(L(`${n} yaad-dahaniyan tayyar — file kholein aur "Add" dabayein`, `${n} reminder(s) ready — open the file and tap "Add"`)); }
       break; }
+    case "mg-set": mgSave(+v); break;
     case "calc-pick": { const h = snap().holdings.find(x => x.s === el.dataset.s); if (!h) break; const p = el.dataset.p;
       $(`#${p}-q`).value = h.q; $(`#${p}-a`).value = round2(h.avg); $(`#${p}-p`).value = h.price ?? "";
       el.parentElement.querySelectorAll(".cpk").forEach(b => b.setAttribute("aria-pressed", String(b === el))); liveCalc(); break; }
@@ -3514,6 +3571,7 @@ document.addEventListener("change", async (ev) => {
     catch { toast(L("Yeh PSX Personal Assistant ka backup nahi lagta","This doesn't look like a PSX Personal Assistant backup")); }
     t.value = ""; return;
   }
+  if (t.id === "mg-range" || t.id === "mg-num"){ mgSave(t.id === "mg-range" ? +t.value : parseNum(t.value)); return; }
   if (t.dataset.act === "ca-fill" || t.dataset.act === "cs-fill"){
     const h = snap().holdings.find(x => x.s === t.value); if (!h) return;
     const p = t.dataset.act === "ca-fill" ? "ca" : "cs";
@@ -3532,7 +3590,10 @@ document.addEventListener("input", (ev) => {
   const t = ev.target;
   if (t.closest("[data-live]")) liveCalc();
   if (t.closest("#entry-form")) liveEntry();
+  if (t.id === "mg-range"){ const g = +t.value; const n = $("#mg-num"); if (n) n.value = g || ""; moGoalLive(g); }
+  if (t.id === "mg-num"){ const g = Math.max(0, Math.round(parseNum(t.value) || 0)); const rg = $("#mg-range"); moGoalLive(g); if (rg) rg.value = g; }
 });
+function mgSave(g){ g = Math.max(0, Math.round(g || 0)); if (g === (S.settings.monthlyGoal || 0)) return; commit(s => s.settings = { ...s.settings, monthlyGoal: g }); toast(g ? `Monthly goal set to ${rs(g)}` : "Monthly goal removed"); }
 document.addEventListener("submit", async (ev) => {
   const f = ev.target; ev.preventDefault();
   if (f.id === "entry-form"){ submitEntry(); return; }
