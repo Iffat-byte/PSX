@@ -1891,13 +1891,13 @@ function holdingsList(sn){
     </button>`).join("")}</div>`;
 }
 function viewPortfolio(){
-  if (UI.sub.portfolio === "broker" || UI.sub.portfolio === "prices") UI.sub.portfolio = "shares";
+  if (["broker","prices","history"].includes(UI.sub.portfolio)) UI.sub.portfolio = "shares";
   const sub = UI.sub.portfolio || "shares";
   const sn = snap();
   const tabs = [
-    ["shares", L("Mere shares","My shares")], ["trading", "Trading"], ["daily", "Daily earnings"], ["where", L("Paisa kahan laga?","Where's my money?")], ["history", L("Khareed/farokht","Buy/sell history")],
+    ["shares", L("Mere shares","My shares")], ["trading", "Trading"], ["daily", "Daily earnings"], ["where", L("Paisa kahan laga?","Where's my money?")],
     ["dividends", L("Dividends","Dividends")], ["monthly", L("Mahana hisaab","Monthly account")], ["calc", L("Calculators","Calculators")]
-  ].filter(([k]) => !isSimple() || ["shares","trading","daily","history",sub].includes(k));
+  ].filter(([k]) => !isSimple() || ["shares","trading","daily",sub].includes(k));
   return `
   <div class="pf-head">
     <div style="min-width:0"><h1 class="h-page">${FAMILY && UI.readOnly ? `${esc(memberName(UI.fam.viewing))}'s portfolio` : L("Mera Portfolio","My Portfolio")}</h1><div class="tiny faint">${sn.holdings.length} ${sn.holdings.length === 1 ? "company" : "companies"}</div></div>
