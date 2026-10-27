@@ -448,6 +448,35 @@ body{background:radial-gradient(1100px 620px at 8% -12%,var(--glow-1),transparen
 .award .qi{width:34px;height:34px;flex:none;border-radius:10px;display:grid;place-items:center;background:rgba(214,178,110,.12);color:var(--emerald-ink);box-shadow:inset 0 0 0 1px rgba(214,178,110,.25)}
 .award b{font-size:14px}
 @media (max-width:380px){.awards{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- holdings table ---------- */
+.htable-card{padding:6px 0 0;overflow:hidden}
+.htable{display:flex;flex-direction:column}
+.hrow{display:grid;grid-template-columns:minmax(0,1.7fr) repeat(4,minmax(0,1fr)) minmax(0,1.15fr);align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);text-align:left;width:100%;background:none;color:inherit;font:inherit}
+button.hrow{cursor:pointer;transition:background .15s}
+button.hrow:hover{background:rgba(214,178,110,.05)}
+.hrow.head{padding-block:12px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid rgba(214,178,110,.22)}
+.hrow.head > div:not(:first-child),.hrow .hc:not(.hs){text-align:right;justify-items:end}
+.hrow.foot{border-bottom:0;background:rgba(214,178,110,.06)}
+.hrow.foot .hk{display:none}
+.hc{display:grid;gap:1px;min-width:0}
+.hk{display:none;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.hv{font-weight:600;font-size:14.5px;white-space:nowrap}
+.hp{font-size:12px;font-weight:560}
+.hs{display:flex!important;align-items:center;gap:12px}
+.hs b{display:block;font-size:15px;font-weight:620}
+.hn{display:block;font-size:12px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:759px){
+  .hrow.head{display:none}
+  .hrow{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px;padding:16px 18px}
+  .hrow .hs{grid-column:1 / 2}
+  .hrow .hpl{grid-column:2 / 3;grid-row:1;align-self:center}
+  .hk{display:block}
+  .hrow .hc:not(.hs):not(.hpl){text-align:left;justify-items:start;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 1px var(--line)}
+  .hrow.foot{grid-template-columns:1fr auto}
+  .hrow.foot .hc:not(.hs):not(.hpl){display:none}
+  .hrow.foot .hpl{grid-column:2;grid-row:1}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1597,6 +1626,22 @@ function viewPortfolio(){
   <div class="seg" role="tablist">${tabs.map(([k,l]) => `<button role="tab" data-act="psub" data-v="${k}" aria-pressed="${sub===k}">${esc(l)}</button>`).join("")}${moreTabsBtn()}</div>
   ${sub === "shares" ? pShares(sn) : sub === "daily" ? pDaily() : sub === "prices" ? pPrices(sn) : sub === "where" ? pWhere(sn) : sub === "history" ? pHistory() : sub === "dividends" ? pDividends(sn) : sub === "monthly" ? monthlyView() : sub === "calc" ? pCalc(sn) : reconView()}`;
 }
+function holdingsTable(sn){
+  const tot = sn.holdings.reduce((a, h) => ({ cost: a.cost + h.cost, value: a.value + h.value }), { cost: 0, value: 0 }); const tpl = tot.value - tot.cost;
+  const cell = (k, v, cls = "") => `<div class="hc ${cls}"><span class="hk">${k}</span><span class="hv num">${v}</span></div>`;
+  return `<div class="htable" role="table" aria-label="My shares">
+    <div class="hrow head" role="row"><div>Share</div><div>Shares</div><div>Average</div><div>Current price</div><div>Value</div><div>Profit / loss</div></div>
+    ${sn.holdings.map(h => `<button class="hrow" role="row" data-act="share" data-s="${h.s}">
+      <div class="hc hs"><span class="logo">${logoMark(h.s)}</span><span style="min-width:0"><b>${esc(h.s)}</b><span class="hn">${esc(SYM[h.s]?.n || "")}</span></span></div>
+      ${cell("Shares", num(h.q))}
+      ${cell("Average", rs(h.avg, 2))}
+      ${cell("Current price", h.userPrice ? rs(h.price, 2) : `<span class="faint">Not set</span>`)}
+      ${cell("Value", rs(h.value))}
+      <div class="hc hpl"><span class="hk">Profit / loss</span><span class="hv num ${tone(h.pl)}">${h.userPrice ? rsS(h.pl) : "—"}</span><span class="hp num ${tone(h.pl)}">${h.userPrice ? pct(h.plPct, 1, true) : ""}</span></div>
+    </button>`).join("")}
+    <div class="hrow foot" role="row"><div class="hc hs"><span style="min-width:0"><b>Total</b><span class="hn num">Invested ${rs(tot.cost)}</span></span></div>${cell("", "")}${cell("", "")}${cell("", "")}${cell("Value", rs(tot.value))}<div class="hc hpl"><span class="hk">Profit / loss</span><span class="hv num ${tone(tpl)}">${rsS(tpl)}</span><span class="hp num ${tone(tpl)}">${pct(tot.cost ? tpl / tot.cost : 0, 1, true)}</span></div></div>
+  </div>`;
+}
 function closedRows(){
   const L0 = replay(S.txs); const out = [];
   for (const [sym, p] of L0.pos){ if (p.q > 0 || !(p.bought > 0)) continue; const last = S.txs.filter(t => t.symbol === sym).map(t => t.date).sort().pop();
@@ -1610,8 +1655,8 @@ function closedSection(){
 }
 function pShares(sn){
   if (!sn.holdings.length) return closedSection() + `<div class="card"><div class="empty"><b>${L("Aap ke paas abhi koi share nahi","You don't own any shares yet")}</b><p>${L("Pehli khareed ki entry karein.","Add your first purchase.")}</p><button class="btn primary" style="margin-top:14px" data-go="add">${L("Entry karein","Add entry")}</button></div></div>`;
-  return `<div class="card pad"><div class="list">${sn.holdings.map(holdingRow).join("")}</div>
-    <p class="tiny faint" style="margin-top:10px">Tap a share to see every purchase and sale. ${FAMILY ? "Value uses the prices entered in Prices." : "Average price includes broker charges."}</p></div>
+  return `<div class="card htable-card">${holdingsTable(sn)}
+    <p class="tiny faint" style="margin:12px 20px 16px">Tap a share to see every purchase and sale. ${FAMILY ? "Value uses the prices entered in Prices." : "Average price includes broker charges."}</p></div>
   ${closedSection()}`;
 }
 /** One row per day something happened (a trade, or new prices): profit made that day vs the previous such day. */
