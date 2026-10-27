@@ -588,6 +588,19 @@ select.input option{background:var(--surface);color:var(--ink)}
 .rail-set{display:flex;align-items:center;gap:12px;margin:8px 0 0;padding:11px 14px;border-radius:12px;color:var(--ink-2);text-decoration:none;font-weight:560}
 .rail-set:hover{background:rgba(255,255,255,.04);color:var(--ink)}
 .rail-set[aria-current="page"]{color:var(--ink);background:rgba(214,178,110,.1)}
+
+.shot-drop{position:relative;display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;border:1.5px dashed rgba(214,178,110,.55);background:linear-gradient(160deg,rgba(214,178,110,.12),rgba(214,178,110,.03));color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s}
+.shot-drop:hover{border-color:#D6B26E;background:linear-gradient(160deg,rgba(214,178,110,.18),rgba(214,178,110,.05))}
+.shot-drop:focus-within{outline:2px solid #D6B26E;outline-offset:2px}
+.shot-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.shot-drop > svg{color:var(--emerald-ink);flex:none}
+.shot-drop b{display:block;font-weight:620}
+.shot-drop .tiny{display:block;margin-top:2px}
+.shot-drop.busy{cursor:progress}
+.spin{width:22px;height:22px;flex:none;border-radius:50%;border:2.5px solid rgba(214,178,110,.25);border-top-color:#D6B26E;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.or-line{display:flex;align-items:center;gap:10px;text-transform:uppercase;letter-spacing:.12em}
+.or-line::before,.or-line::after{content:"";flex:1;height:1px;background:var(--line-2)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -3636,6 +3649,7 @@ document.addEventListener("change", async (ev) => {
     catch { toast(L("Yeh PSX Personal Assistant ka backup nahi lagta","This doesn't look like a PSX Personal Assistant backup")); }
     t.value = ""; return;
   }
+  if (t.id === "px-shot" && t.files?.length){ const fs = [...t.files].slice(0, 4); t.value = ""; readShots(fs); return; }
   if (t.id === "mg-range" || t.id === "mg-num"){ mgSave(t.id === "mg-range" ? +t.value : parseNum(t.value)); return; }
   if (t.dataset.act === "ca-fill" || t.dataset.act === "cs-fill"){
     const h = snap().holdings.find(x => x.s === t.value); if (!h) return;
@@ -4035,7 +4049,7 @@ function parsePastedPrices(text, symbols){
     while ((m = re.exec(seg))){
       const pre = seg.slice(Math.max(0, m.index - 14), m.index), post = seg.slice(m.index + m[0].length, m.index + m[0].length + 10);
       if (m[1] || m[4]) continue;                                        // +0.13, -71,434.30, 1.06%
-      if (/[(\d.,]$/.test(pre) || /^[\d]/.test(post)) continue;
+      if (/[(\d.,]$/.test(pre) || /\(\s*[:;]\s*$/.test(pre) || /^[\d]/.test(post)) continue;
       if (/@\s*$/.test(pre) || /shares?\s*@?\s*$/i.test(pre)) continue; // average price
       if (/vol(ume)?\s*[:.]?\s*$/i.test(pre)) continue;                  // Mkt Vol: 9,171,773
       if (/(^|[^A-Za-z])[lhLHI1]\s*[:;]\s*$/.test(pre) || /(low|high)\s*[:.]?\s*$/i.test(pre)) continue; // l: 12.25 h: 12.48
@@ -4052,9 +4066,16 @@ function pastePricesCard(){
   const P = UI.paste || {}; const found = P.found ? Object.entries(P.found) : null;
   const pr = pricesSrc() || {}; const ref = s => pr[s]?.p ?? null;
   return `<section class="card pad stack paste-card">
-    <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><h2 class="h-sec">${ic("copy",18)} Paste prices</h2><span class="pill info">Fastest way</span></div>
-    <p class="small muted" style="margin:0">After the market closes, copy your broker app's list and paste it here. Every share's closing price is read at once${FAMILY ? " and saved for all three of you" : ""}.</p>
-    <details class="paste-how"><summary class="small">How to copy from the broker app</summary>
+    <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><h2 class="h-sec">${ic("camera",18)} Today's prices from a screenshot</h2><span class="pill info">Fastest way</span></div>
+    <p class="small muted" style="margin:0">After the market closes, take a screenshot of your broker app's holdings and upload it here. The website reads every share's closing price itself${FAMILY ? " and saves it for all three of you" : ""}. Nothing to install; the picture stays on your phone.</p>
+    <label class="shot-drop${P.busy ? " busy" : ""}">
+      <input type="file" id="px-shot" accept="image/*" multiple ${P.busy ? "disabled" : ""}>
+      ${P.busy ? `<span class="spin" aria-hidden="true"></span><span><b>Reading screenshot…</b><span class="tiny faint" id="shot-prog">${esc(P.busy)}</span></span>`
+        : `${ic("upload",22)}<span><b>Upload screenshot</b><span class="tiny faint">You can choose 2–3 screenshots if your list is long</span></span>`}
+    </label>
+    ${P.shotErr ? `<p class="small" style="color:var(--loss);margin:0">${esc(P.shotErr)}</p>` : ""}
+    <div class="or-line tiny faint"><span>or paste text</span></div>
+    <details class="paste-how"><summary class="small">How to copy text instead</summary>
       <ol class="small muted"><li><b>iPhone:</b> take a screenshot of your holdings, open it in Photos, press and hold on the text, tap <b>Select All</b>, then <b>Copy</b>.</li>
       <li><b>Android:</b> take a screenshot, open it in Google Photos, tap <b>Lens</b> → <b>Text</b> → <b>Select all</b> → <b>Copy</b>.</li>
       <li>Come back here and tap <b>Paste</b>. You can paste several screenshots one after another.</li></ol></details>
@@ -4102,6 +4123,39 @@ function pPrices(sn){
     <span class="err" id="cs-err"></span>
     <button class="btn line" type="submit">${ic("plus",16)} ${L("Company add karein","Add company")}</button>
   </form>`;
+}
+/** Read text from screenshots inside the browser with Tesseract (free, runs on the device, loaded from jsDelivr on first use). */
+let OCR_LIB = null;
+function loadOcr(){
+  if (window.Tesseract) return Promise.resolve(window.Tesseract);
+  return OCR_LIB ||= new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"; sc.onload = () => res(window.Tesseract); sc.onerror = () => { OCR_LIB = null; rej(new Error("load")); }; document.head.appendChild(sc); });
+}
+async function shotCanvas(file){
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+    const k = Math.min(2, 2400 / img.naturalWidth); const c = document.createElement("canvas");
+    c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+    const g = c.getContext("2d"); g.imageSmoothingQuality = "high"; g.filter = "grayscale(1) contrast(1.15)"; g.drawImage(img, 0, 0, c.width, c.height);
+    return c;
+  } finally { URL.revokeObjectURL(url); }
+}
+async function readShots(files){
+  UI.paste = { ...(UI.paste || {}), busy: "Getting ready (first time takes a few seconds)…", shotErr: null, found: null }; render();
+  const prog = t => { UI.paste.busy = t; const el = document.getElementById("shot-prog"); if (el) el.textContent = t; };
+  let worker;
+  try {
+    const T = await loadOcr();
+    worker = await T.createWorker("eng", 1, { logger: m => { if (m.status === "recognizing text") prog(`${files.length > 1 ? `Screenshot ${UI.paste.n} of ${files.length} · ` : ""}${Math.round((m.progress || 0) * 100)}%`); } });
+    await worker.setParameters({ tessedit_pageseg_mode: "6" });
+    let text = "";
+    for (let i = 0; i < files.length; i++){ UI.paste.n = i + 1; const c = await shotCanvas(files[i]); const r = await worker.recognize(c); text += "\n" + (r?.data?.text || ""); }
+    UI.paste = { text: ((UI.paste.text ? UI.paste.text + "\n" : "") + text.trim()).trim() };
+    pasteRead();
+    if (!Object.keys(UI.paste.found || {}).length) { UI.paste.shotErr = "No share prices found in the screenshot. Try a clearer screenshot of the holdings list."; render(); }
+  } catch (x) {
+    console.error(x); UI.paste = { ...(UI.paste || {}), busy: null, shotErr: navigator.onLine === false ? "You're offline. The screenshot reader needs internet the first time." : "Couldn't read the screenshot. Please try again, or paste the text instead." }; render();
+  } finally { try { await worker?.terminate(); } catch {} }
 }
 function pasteRead(){
   const syms = FAMILY ? famHeldSymbols() : snap().holdings.map(h => h.s);
