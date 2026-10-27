@@ -560,6 +560,18 @@ select.input option{background:var(--surface);color:var(--ink)}
 .mg-line{position:absolute;left:0;right:0;border-top:1.5px dashed rgba(214,178,110,.75);pointer-events:none;z-index:1;transition:bottom .12s}
 .mg-line span{position:absolute;right:0;top:-20px;font-size:11px;font-weight:600;color:var(--emerald-ink);background:var(--surface);padding:0 6px;border-radius:6px}
 .mbars .m{line-height:14px}
+
+/* ---------- download sheet ---------- */
+.exfmt{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.exf{display:flex;align-items:center;gap:12px;text-align:left;padding:12px;border-radius:14px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);cursor:pointer}
+.exf b{display:block;font-weight:620}
+.exf .tiny{display:block;line-height:1.35;margin-top:2px}
+.exf[aria-pressed="true"]{border-color:#D6B26E;background:linear-gradient(160deg,rgba(214,178,110,.18),rgba(214,178,110,.04));box-shadow:0 8px 22px -14px rgba(214,178,110,.8)}
+.exi{flex:none;width:40px;height:46px;border-radius:8px;display:grid;place-items:center;font-size:10.5px;font-weight:800;letter-spacing:.04em;color:#fff}
+.exi.xl{background:linear-gradient(160deg,#21A366,#107C41)}
+.exi.pdf{background:linear-gradient(160deg,#E5574B,#B3261E)}
+.chipb[aria-pressed="true"]{border-color:#D6B26E;background:rgba(214,178,110,.2)}
+@media (max-width:420px){.exfmt{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1698,7 +1710,7 @@ function viewPortfolio(){
   return `
   <div class="page-head">
     <div style="min-width:0"><div class="eyebrow">${L(`${sn.holdings.length} companies`, `${sn.holdings.length} companies`)}</div><h1 class="h-page">${L("Mera Portfolio","My Portfolio")}</h1><p class="muted small" style="margin-top:4px">${L("Aap ke shares, hisaab aur munafa — sab ek jagah","Your shares, accounts and profit — all in one place")}</p></div>
-    <button class="btn primary sm" data-go="add">${ic("plus",16,2.2)} ${L("Nayi entry","New entry")}</button>
+    <div class="row" style="gap:8px"><button class="btn line sm" data-act="export-open">${ic("download",16,2.1)} Download</button><button class="btn primary sm" data-go="add">${ic("plus",16,2.2)} ${L("Nayi entry","New entry")}</button></div>
   </div>
   ${issuesNotice(sn)}
   <div class="card pad stats">
@@ -3021,6 +3033,23 @@ function renderSheet(){
       <h3 class="h-sec" style="margin:20px 0 6px">${L("Is share ki history","History for this share")}</h3>
       <div class="list">${(() => { const ev = Object.fromEntries(replay(S.txs).events.map(e => [e.id, e])); let run = 0; const rows = sortTx(S.txs.filter(t => t.symbol === s.s)).map(t => { if (t.type === "BUY" || t.type === "BONUS") run += t.qty; if (t.type === "SELL" && ev[t.id]) run -= t.qty; return { t, after: run }; }).reverse();
         return rows.map(({ t, after }) => { const e = ev[t.id]; return `<button class="li" data-act="edit-tx" data-id="${t.id}"><span class="pill ${t.type === "SELL" ? "demo" : t.type === "BUY" ? "info" : "ok"}" style="flex:none;min-width:58px;justify-content:center">${t.type === "SELL" ? "Sold" : t.type === "BUY" ? "Bought" : esc(TL[t.type])}</span><div class="mid"><div class="main-t num">${t.qty ? `${num(t.qty)} × ${rs(t.price,2)}` : rs(t.amount)}</div><div class="sub-t">${fmtDate(t.date)}${t.qty ? ` · ${num(after)} left after` : ""}</div></div>${e ? `<div class="right"><div class="v num ${tone(e.pl)}">${rsS(e.pl)}</div><div class="tiny faint">profit</div></div>` : `<span class="faint">${ic("chev",18)}</span>`}</button>`; }).join("") || `<p class="muted small">—</p>`; })()}</div>`;
+  } else if (s.kind === "export"){
+    const first = sortTx(S.txs)[0]?.date || todayISO(); const t0 = todayISO();
+    const ty = t0.slice(5) >= "07-01" ? t0.slice(0, 4) + "-07-01" : (+t0.slice(0, 4) - 1) + "-07-01";
+    const pre = [["This month", t0.slice(0, 8) + "01", t0], ["Last 3 months", addDays(t0, -91), t0], ["This tax year", ty, t0], ["This year", t0.slice(0, 4) + "-01-01", t0], ["All time", first, t0]];
+    const E = UI.exp ||= { from: first, to: t0, fmt: "xlsx" };
+    title = "Download portfolio";
+    body = `<p class="muted small" style="margin-top:-8px;margin-bottom:16px">${FAMILY ? `${esc(memberName(UI.fam.viewing))}'s` : "Your"} shares, buys and sells, profit and daily earnings for the dates you choose.</p>
+      <div class="fgrid two"><div class="field"><label for="ex-from">From</label><input class="input" type="date" id="ex-from" value="${E.from}" max="${t0}"></div>
+      <div class="field"><label for="ex-to">To</label><input class="input" type="date" id="ex-to" value="${E.to}" max="${t0}"></div></div>
+      <div class="mg-quick" style="margin:12px 0 18px">${(() => { let hit = false; return pre.map(([l, f, t]) => { const ff = f < first ? first : f; const on = !hit && E.from === ff && E.to === t; if (on) hit = true; return `<button type="button" class="chipb" data-act="ex-pre" data-f="${ff}" data-t="${t}" aria-pressed="${on}">${l}</button>`; }).join(""); })()}</div>
+      <div class="lbl" style="margin-bottom:8px">Format</div>
+      <div class="exfmt">
+        <button type="button" class="exf" data-act="ex-fmt" data-v="xlsx" aria-pressed="${E.fmt === "xlsx"}"><span class="exi xl">XLS</span><span><b>Excel</b><span class="tiny faint">5 sheets: summary, shares, history, by share, daily</span></span></button>
+        <button type="button" class="exf" data-act="ex-fmt" data-v="pdf" aria-pressed="${E.fmt === "pdf"}"><span class="exi pdf">PDF</span><span><b>PDF</b><span class="tiny faint">A printable report. Choose "Save as PDF"</span></span></button>
+      </div>
+      <p class="tiny" id="ex-err" style="color:var(--loss);min-height:18px;margin:10px 0 0"></p>
+      <button class="btn primary block" data-act="ex-go" style="margin-top:4px">${ic("download",18,2.1)} Download ${E.fmt === "xlsx" ? "Excel" : "PDF"}</button>`;
   } else if (s.kind === "confirm"){
     const M = {"clear-demo":[L("Demo data hatayein?","Remove demo data?"), L("Demo shares, entries aur misaali tareekhein hat jayengi. Aap ki apni entries rahengi.","Demo shares, entries and example dates will be removed. Your own entries stay.")], "load-demo":[L("Demo data laayein?","Load demo data?"), L("Aap ka maujooda data demo se badal jayega. Pehle backup le lein.","Your current data will be replaced with demo data. Take a backup first.")], "erase":[L("Saara data mitayein?","Erase all data?"), L("Yeh wapas nahi ho sakta. Saari entries, dividends aur yaad-dahaniyan mit jayengi.","This can't be undone. All entries, dividends and reminders will be erased.")], "del-tx":[L("Yeh entry mitayein?","Delete this entry?"), L("Hisaab dobara lagaya jayega.","Your accounts will be recalculated.")]}[s.v] || ["",""];
     const breaks = s.v === "del-tx" && replay(S.txs.filter(t => t.id !== s.id)).issues.length > replay(S.txs).issues.length;
@@ -3489,6 +3518,16 @@ document.addEventListener("click", async (ev) => {
       if (await offerDownload("psx-yaad-dahaniyan.ics", ics, "text/calendar")){ const at = Date.now(); commit(st => st.reminders = st.reminders.map(r => !r.done && r.date && !r.calAt ? { ...r, calAt: at } : r)); toast(L(`${n} yaad-dahaniyan tayyar — file kholein aur "Add" dabayein`, `${n} reminder(s) ready — open the file and tap "Add"`)); }
       break; }
     case "mg-set": mgSave(+v); break;
+    case "export-open": UI.exp = null; openSheet({ kind: "export" }); break;
+    case "ex-pre": UI.exp = { ...UI.exp, from: el.dataset.f, to: el.dataset.t }; renderSheet(); break;
+    case "ex-fmt": UI.exp = { ...UI.exp, from: $("#ex-from").value, to: $("#ex-to").value, fmt: v }; renderSheet(); break;
+    case "ex-go": { const f = $("#ex-from").value, t = $("#ex-to").value, err = $("#ex-err");
+      if (!validISO(f) || !validISO(t)){ err.textContent = "Choose both dates."; break; }
+      if (f > t){ err.textContent = "The From date must be before the To date."; break; }
+      const fmt = UI.exp?.fmt || "xlsx";
+      try { if (fmt === "xlsx"){ exportXlsx(f, t); toast("Excel file downloaded"); } else exportPdf(f, t); closeSheet(); }
+      catch (x){ console.error(x); err.textContent = "Couldn't make the file. Please try again."; }
+      break; }
     case "calc-pick": { const h = snap().holdings.find(x => x.s === el.dataset.s); if (!h) break; const p = el.dataset.p;
       $(`#${p}-q`).value = h.q; $(`#${p}-a`).value = round2(h.avg); $(`#${p}-p`).value = h.price ?? "";
       el.parentElement.querySelectorAll(".cpk").forEach(b => b.setAttribute("aria-pressed", String(b === el))); liveCalc(); break; }
@@ -3714,6 +3753,216 @@ function browserDownload(filename, blob){
   a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
+/* =========================================================================
+   Download portfolio: Excel (.xlsx, written here with no library) or PDF (print).
+   ========================================================================= */
+const XZ = (() => {
+  const T = new Uint32Array(256); for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; T[n] = c >>> 0; }
+  const crc = b => { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = T[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+  /** Store-only ZIP: [{name, data:string}] -> Blob */
+  return files => {
+    const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+    const d = new Date(); const dosT = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1); const dosD = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+    for (const f of files){
+      const name = enc.encode(f.name), data = enc.encode(f.data), c = crc(data);
+      const h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true); h.setUint16(10, dosT, true); h.setUint16(12, dosD, true);
+      h.setUint32(14, c, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, name.length, true); h.setUint16(28, 0, true);
+      parts.push(h, name, data);
+      const ce = new DataView(new ArrayBuffer(46));
+      ce.setUint32(0, 0x02014b50, true); ce.setUint16(4, 20, true); ce.setUint16(6, 20, true); ce.setUint16(8, 0x0800, true); ce.setUint16(10, 0, true); ce.setUint16(12, dosT, true); ce.setUint16(14, dosD, true);
+      ce.setUint32(16, c, true); ce.setUint32(20, data.length, true); ce.setUint32(24, data.length, true); ce.setUint16(28, name.length, true); ce.setUint32(42, off, true);
+      central.push(ce, name); off += 30 + name.length + data.length;
+    }
+    const csize = central.reduce((a, x) => a + x.byteLength, 0);
+    const e = new DataView(new ArrayBuffer(22)); e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, csize, true); e.setUint32(16, off, true);
+    return new Blob([...parts, ...central, e], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  };
+})();
+
+/* Style ids (see XL_STYLES): 0 plain · 1 title · 2 subtitle · 3 header · 4 text · 5 int · 6 money2 · 7 signed money · 8 signed % · 9 date · 10 total text · 11 total money · 12 total signed · 13 key label · 14 money0 · 15 total int · 16 pill text (gold) */
+const XL_STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<numFmts count="5"><numFmt numFmtId="164" formatCode="&quot;Rs &quot;#,##0.00"/><numFmt numFmtId="165" formatCode="&quot;+Rs &quot;#,##0;&quot;-Rs &quot;#,##0;&quot;Rs &quot;0"/><numFmt numFmtId="166" formatCode="+0.0%;-0.0%;0.0%"/><numFmt numFmtId="167" formatCode="d mmm yyyy"/><numFmt numFmtId="168" formatCode="&quot;Rs &quot;#,##0"/></numFmts>
+<fonts count="11"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="18"/><color rgb="FF8A6420"/><name val="Calibri"/></font><font><i/><sz val="10"/><color rgb="FF7F7869"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFE8C98C"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font><font><sz val="11"/><color rgb="FF5C5547"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FF8A6420"/><name val="Calibri"/></font><font><sz val="11"/><color rgb="FF11795A"/><name val="Calibri"/></font><font><sz val="11"/><color rgb="FFC0392B"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FF11795A"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFC0392B"/><name val="Calibri"/></font></fonts>
+<fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF15161A"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF7EEDC"/><bgColor indexed="64"/></patternFill></fill></fills>
+<borders count="3"><border><left/><right/><top/><bottom/><diagonal/></border><border><left/><right/><top/><bottom style="thin"><color rgb="FFE6DCC8"/></bottom><diagonal/></border><border><left/><right/><top style="medium"><color rgb="FFD6B26E"/></top><bottom/><diagonal/></border></borders>
+<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+<cellXfs count="24">
+<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+<xf numFmtId="0" fontId="3" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"/>
+<xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>
+<xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>
+<xf numFmtId="165" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>
+<xf numFmtId="166" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>
+<xf numFmtId="167" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left"/></xf>
+<xf numFmtId="0" fontId="4" fillId="3" borderId="2" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/>
+<xf numFmtId="168" fontId="4" fillId="3" borderId="2" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1"/>
+<xf numFmtId="165" fontId="4" fillId="3" borderId="2" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1"/>
+<xf numFmtId="0" fontId="5" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1"/>
+<xf numFmtId="168" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>
+<xf numFmtId="3" fontId="4" fillId="3" borderId="2" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1"/>
+<xf numFmtId="0" fontId="6" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1"/>
+<xf numFmtId="165" fontId="7" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyBorder="1"/>
+<xf numFmtId="165" fontId="8" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyBorder="1"/>
+<xf numFmtId="166" fontId="7" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyBorder="1"/>
+<xf numFmtId="166" fontId="8" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyBorder="1"/>
+<xf numFmtId="165" fontId="9" fillId="3" borderId="2" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1"/>
+<xf numFmtId="165" fontId="10" fillId="3" borderId="2" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1"/>
+<xf numFmtId="0" fontId="3" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+</cellXfs>
+<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
+</styleSheet>`;
+
+const xEsc = v => String(v).replace(/[<>&"]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
+const xCol = i => { let s = ""; i++; while (i){ const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = (i - m - 1) / 26; } return s; };
+const xSerial = iso => { const [y, m, d] = iso.split("-").map(Number); return (Date.UTC(y, m - 1, d) - Date.UTC(1899, 11, 30)) / 86400000; };
+/** cell: null | string | number | {v, s} | {d: iso, s} */
+function xSheet({ rows, cols, freeze, grid = true, filter }){
+  const body = rows.map((r, ri) => `<row r="${ri + 1}"${r.h ? ` ht="${r.h}" customHeight="1"` : ""}>${(r.cells || r).map((c, ci) => {
+    if (c == null || c === "") return "";
+    const ref = xCol(ci) + (ri + 1); const o = typeof c === "object" ? c : { v: c };
+    if (o.d) return `<c r="${ref}" s="${o.s ?? 9}"><v>${xSerial(o.d)}</v></c>`;
+    if (typeof o.v === "number" && isFinite(o.v)){ const sg = { 7: [17, 18], 8: [19, 20], 12: [21, 22] }[o.s]; const st = sg && Math.abs(o.v) >= 0.005 ? sg[o.v > 0 ? 0 : 1] : (o.s ?? 5); return `<c r="${ref}" s="${st}"><v>${Math.round(o.v * 10000) / 10000}</v></c>`; }
+    if (false) return `<c r="${ref}" s="${o.s ?? 5}"><v>${Math.round(o.v * 100) / 100}</v></c>`;
+    if (o.v == null || o.v === "") return o.s ? `<c r="${ref}" s="${o.s}"/>` : "";
+    return `<c r="${ref}" t="inlineStr" s="${o.s ?? 4}"><is><t xml:space="preserve">${xEsc(o.v)}</t></is></c>`;
+  }).join("")}</row>`).join("");
+  const view = `<sheetViews><sheetView workbookViewId="0"${grid ? "" : ` showGridLines="0"`}>${freeze ? `<pane ySplit="${freeze}" topLeftCell="A${freeze + 1}" activePane="bottomLeft" state="frozen"/>` : ""}</sheetView></sheetViews>`;
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${view}<sheetFormatPr defaultRowHeight="18"/><cols>${cols.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join("")}</cols><sheetData>${body}</sheetData>${filter ? `<autoFilter ref="${filter}"/>` : ""}<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/></worksheet>`;
+}
+function xWorkbook(sheets){
+  const files = [
+    { name: "[Content_Types].xml", data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}</Types>` },
+    { name: "_rels/.rels", data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>` },
+    { name: "xl/workbook.xml", data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((s, i) => `<sheet name="${xEsc(s.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}</sheets>${sheets.some(s => s.filter) ? `<definedNames>${sheets.map((s, i) => s.filter ? `<definedName name="_xlnm._FilterDatabase" localSheetId="${i}" hidden="1">'${xEsc(s.name)}'!${s.filter.replace(/([A-Z]+)(\d+)/g, (m, c, r) => "$" + c + "$" + r)}</definedName>` : "").join("")}</definedNames>` : ""}</workbook>` },
+    { name: "xl/_rels/workbook.xml.rels", data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("")}<Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>` },
+    { name: "xl/styles.xml", data: XL_STYLES },
+    ...sheets.map((s, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, data: xSheet(s) }))
+  ];
+  return XZ(files);
+}
+
+/** Everything the report needs for one period, from the portfolio being viewed. */
+function exportData(from, to){
+  const txs = S.txs; const all = sortTx(txs);
+  const who = FAMILY ? memberName(UI.fam.viewing) : (S.name || "My");
+  const priceOn = (sym, d) => closeOn(sym, d);
+  const plOn = d => { const L0 = replay(txs, d); let unreal = 0, realized = 0, div = 0; for (const [s, p] of L0.pos){ realized += p.realized; div += p.div; if (p.q > 0){ const px = priceOn(s, d); if (px != null) unreal += p.q * px - p.cost; } } return unreal + realized + div - txs.filter(t => t.type === "FEE" && t.date <= d).reduce((a, t) => a + t.amount, 0); };
+  const Lend = replay(txs, to); const evAll = {}; replay(txs).events.forEach(e => evAll[e.id] = e);
+  const holdings = [...Lend.pos.entries()].filter(([, p]) => p.q > 0).map(([s, p]) => { const px = priceOn(s, to); const value = px != null ? p.q * px : p.cost; return { s, q: p.q, avg: p.cost / p.q, cost: p.cost, px, value, pl: px != null ? value - p.cost : null, plPct: px != null && p.cost ? (value - p.cost) / p.cost : null }; }).sort((a, b) => b.value - a.value);
+  const inP = all.filter(t => t.date >= from && t.date <= to);
+  const sells = inP.filter(t => t.type === "SELL" && evAll[t.id]);
+  const bySym = {};
+  inP.forEach(t => { if (!t.symbol || !["BUY", "SELL", "BONUS", "DIVIDEND"].includes(t.type)) return; const r = bySym[t.symbol] ||= { s: t.symbol, bq: 0, bc: 0, sq: 0, sv: 0, pl: 0, removed: 0, div: 0 };
+    if (t.type === "BUY"){ r.bq += t.qty; r.bc += t.qty * t.price + t.fees; } if (t.type === "BONUS") r.bq += t.qty;
+    if (t.type === "SELL" && evAll[t.id]){ r.sq += t.qty; r.sv += t.qty * t.price - t.fees; r.pl += evAll[t.id].pl; r.removed += evAll[t.id].removed; }
+    if (t.type === "DIVIDEND") r.div += t.amount; });
+  const byShare = Object.values(bySym).map(r => ({ ...r, left: Lend.pos.get(r.s)?.q || 0 })).sort((a, b) => a.s < b.s ? -1 : 1);
+  const daily = dailyEarnings().filter(x => x.d >= from && x.d <= to).reverse();
+  const sum = k => inP.filter(t => t.type === k);
+  const bought = sum("BUY").reduce((a, t) => a + t.qty * t.price + t.fees, 0), sold = sells.reduce((a, t) => a + t.qty * t.price - t.fees, 0);
+  const booked = sells.reduce((a, t) => a + evAll[t.id].pl, 0), dividends = sum("DIVIDEND").reduce((a, t) => a + t.amount, 0);
+  const charges = inP.filter(t => t.type === "BUY" || t.type === "SELL").reduce((a, t) => a + (t.fees || 0), 0) + sum("FEE").reduce((a, t) => a + t.amount, 0);
+  const cost = holdings.reduce((a, h) => a + h.cost, 0), value = holdings.reduce((a, h) => a + h.value, 0);
+  const priced = holdings.filter(h => h.px != null); const unreal = priced.reduce((a, h) => a + h.pl, 0);
+  const periodPL = plOn(to) - (all[0] && from > all[0].date ? plOn(addDays(from, -1)) : 0);
+  return { who, from, to, holdings, inP, evAll, byShare, daily, bought, sold, booked, dividends, charges, cost, value, unreal, unpriced: holdings.length - priced.length, periodPL, buys: sum("BUY").length, sellsN: sells.length };
+}
+const EXP_TYPE = { BUY: "Bought", SELL: "Sold", DIVIDEND: "Dividend", DEPOSIT: "Cash added", WITHDRAWAL: "Cash withdrawn", FEE: "Charge", BONUS: "Bonus shares" };
+const expRange = (from, to) => `${fmtDate(from)} – ${fmtDate(to)}`;
+const expFile = (D, ext) => `PSX-Portfolio-${D.who.replace(/[^A-Za-z0-9]+/g, "")}-${D.from}-to-${D.to}.${ext}`;
+
+function exportXlsx(from, to){
+  const D = exportData(from, to); const gen = `Made ${fmtDate(todayISO())} · PSX Personal Assistant · for record-keeping, not investment advice`;
+  const head = (title, n) => [[{ v: title, s: 1 }], [{ v: `${D.who} · ${expRange(from, to)}`, s: 2 }], []];
+  const F = row => row.map(c => c == null || c === "" ? { v: "", s: 4 } : c);
+  const H = (a, lefts = [0]) => a.map((v, i) => ({ v, s: lefts.includes(i) ? 3 : 23 }));
+  const summary = { name: "Summary", grid: false, cols: [34, 22, 4, 52], rows: [
+    { h: 30, cells: [{ v: `${D.who}'s PSX portfolio`, s: 1 }] }, [{ v: expRange(from, to), s: 2 }], [],
+    H(["As of " + fmtDate(to), ""], [0, 1]),
+    [{ v: "Invested in current shares", s: 13 }, { v: D.cost, s: 14 }],
+    [{ v: "Value of current shares", s: 13 }, { v: D.value, s: 14 }],
+    [{ v: "Profit / loss on shares held", s: 13 }, { v: D.unreal, s: 7 }, null, D.unpriced ? { v: `${D.unpriced} share(s) have no price yet and count at cost`, s: 2 } : null],
+    [{ v: "Number of companies", s: 13 }, { v: D.holdings.length, s: 5 }], [],
+    H(["During this period", ""], [0, 1]),
+    [{ v: `Bought (${D.buys} purchase${D.buys === 1 ? "" : "s"})`, s: 13 }, { v: D.bought, s: 14 }],
+    [{ v: `Sold (${D.sellsN} sale${D.sellsN === 1 ? "" : "s"})`, s: 13 }, { v: D.sold, s: 14 }],
+    [{ v: "Profit from sales", s: 13 }, { v: D.booked, s: 7 }],
+    [{ v: "Dividends received", s: 13 }, { v: D.dividends, s: 7 }],
+    [{ v: "Broker charges", s: 13 }, { v: D.charges, s: 6 }],
+    [{ v: "Total profit / loss in period", s: 10 }, { v: D.periodPL, s: 12 }, null, { v: "Change in total profit (sales + price moves + dividends − charges)", s: 2 }], [],
+    [{ v: gen, s: 2 }]
+  ] };
+  const hRows = D.holdings.map(h => [{ v: h.s, s: 16 }, h.q, { v: h.avg, s: 6 }, h.px != null ? { v: h.px, s: 6 } : { v: "no price", s: 13 }, { v: h.cost, s: 14 }, { v: h.value, s: 14 }, h.pl != null ? { v: h.pl, s: 7 } : null, h.plPct != null ? { v: h.plPct, s: 8 } : null]);
+  const holdings = { name: "My shares", cols: [12, 11, 15, 15, 16, 16, 16, 11], freeze: 4, rows: [...head(`My shares on ${fmtDate(to)}`), H(["Share", "Shares", "Average", "Price", "Invested", "Value", "Profit / loss", "Return"]), ...hRows.map(F),
+    [{ v: "Total", s: 10 }, { v: "", s: 10 }, { v: "", s: 10 }, { v: "", s: 10 }, { v: D.cost, s: 11 }, { v: D.value, s: 11 }, { v: D.unreal, s: 12 }, { v: "", s: 10 }]] };
+  const tRows = D.inP.map(t => { const e = D.evAll[t.id]; const amt = t.type === "BUY" ? t.qty * t.price + t.fees : t.type === "SELL" ? t.qty * t.price - t.fees : t.amount || 0;
+    return [{ d: t.date }, EXP_TYPE[t.type] || t.type, t.symbol ? { v: t.symbol, s: 16 } : "", t.qty ? t.qty : null, t.price ? { v: t.price, s: 6 } : null, t.fees ? { v: t.fees, s: 6 } : null, amt ? { v: amt, s: 6 } : null, e ? { v: e.pl, s: 7 } : null, t.note || ""]; });
+  const trades = { name: "Buy-sell history", cols: [13, 15, 10, 10, 13, 12, 16, 15, 30], freeze: 4, filter: D.inP.length ? `A4:I${4 + D.inP.length}` : null,
+    rows: [...head("Buy / sell history"), H(["Date", "Type", "Share", "Shares", "Price", "Charges", "Amount", "Profit on sale", "Note"], [0, 1, 2, 8]), ...tRows.map(F)] };
+  const bRows = D.byShare.map(r => [{ v: r.s, s: 16 }, r.bq || null, r.bq ? { v: r.bc / r.bq, s: 6 } : null, r.sq || null, r.sq ? { v: r.sv / r.sq, s: 6 } : null, r.left, r.sq ? { v: r.pl, s: 7 } : { v: "not sold", s: 13 }, r.removed ? { v: r.pl / r.removed, s: 8 } : null, r.div ? { v: r.div, s: 14 } : null]);
+  const byShare = { name: "By share", cols: [12, 11, 15, 11, 15, 10, 16, 11, 14], freeze: 4, rows: [...head("Bought and sold, by share"), H(["Share", "Bought", "Avg buy", "Sold", "Avg sell", "Left", "Profit / loss", "Return", "Dividends"]), ...bRows.map(F)] };
+  const dRows = D.daily.map(x => [{ d: x.d }, { v: x.earn, s: 7 }, x.pctv != null ? { v: x.pctv, s: 8 } : null, x.booked ? { v: x.booked, s: 7 } : null, [...x.bought.map(t => `Bought ${t.qty} ${t.symbol}`), ...x.sold.map(e => `Sold ${e.qty} ${e.symbol}`)].join(", ")]);
+  const dTot = D.daily.reduce((a, x) => a + x.earn, 0);
+  const daily = { name: "Daily earnings", cols: [14, 16, 10, 16, 44], freeze: 4, rows: [...head("Daily earnings"), H(["Date", "Earned", "Change", "From sales", "What happened"], [0, 4]), ...dRows.map(F),
+    ...(D.daily.length ? [[{ v: "Total", s: 10 }, { v: dTot, s: 12 }, { v: "", s: 10 }, { v: "", s: 10 }, { v: "", s: 10 }]] : [[{ v: "No trades or price updates in this period.", s: 2 }]])] };
+  browserDownload(expFile(D, "xlsx"), xWorkbook([summary, holdings, trades, byShare, daily]));
+}
+
+function exportPdf(from, to){
+  const D = exportData(from, to); const R = (n, d = 0) => esc(rs(n, d)), RS = n => esc(rsS(n)), cls = n => n > 0.5 ? "g" : n < -0.5 ? "r" : "";
+  const tbl = (cols, rows, foot, lefts = [0]) => `<table><thead><tr>${cols.map((c, i) => `<th${lefts.includes(i) ? "" : ' class="n"'}>${c}</th>`).join("")}</tr></thead><tbody>${rows.join("") || `<tr><td colspan="${cols.length}" class="muted">Nothing in this period.</td></tr>`}</tbody>${foot ? `<tfoot><tr>${foot}</tr></tfoot>` : ""}</table>`;
+  const td = (v, c = "") => `<td class="n ${c}">${v}</td>`;
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(expFile(D, "pdf").replace(/\.pdf$/, ""))}</title><style>
+@page{size:A4;margin:14mm 12mm}
+*{box-sizing:border-box}body{font:10.5px/1.45 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#1d1b17;margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #C9A25E;padding-bottom:10px;margin-bottom:14px}
+.eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#8A6420;font-weight:700}
+h1{font:500 26px/1.1 "Bodoni Moda",Didot,"Bodoni 72",Georgia,serif;margin:4px 0 0}
+h2{font-size:12.5px;margin:18px 0 6px;color:#8A6420;text-transform:uppercase;letter-spacing:.08em}
+.muted{color:#7f7869}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.card{border:1px solid #E6DCC8;border-radius:8px;padding:8px 10px;background:#FBF7EF}.card .k{font-size:9px;color:#7f7869;text-transform:uppercase;letter-spacing:.06em}.card .v{font-size:14px;font-weight:700;margin-top:2px}
+table{width:100%;border-collapse:collapse;page-break-inside:auto}thead{display:table-header-group}tr{page-break-inside:avoid}
+th{background:#15161A;color:#E8C98C;text-align:left;font-size:9.5px;padding:6px 7px;font-weight:600}td{padding:5px 7px;border-bottom:1px solid #EEE6D6}
+.n{text-align:right;font-variant-numeric:tabular-nums}.g{color:#11795a}.r{color:#c0392b}b.s{color:#8A6420}
+tfoot td{font-weight:700;background:#F7EEDC;border-top:2px solid #C9A25E}
+.foot{margin-top:16px;font-size:9px;color:#7f7869;border-top:1px solid #E6DCC8;padding-top:6px}
+</style></head><body>
+<div class="top"><div><div class="eyebrow">PSX portfolio</div><h1>${esc(D.who)}'s portfolio</h1><div class="muted">${esc(expRange(from, to))}</div></div><div class="muted" style="text-align:right">Made ${esc(fmtDate(todayISO()))}</div></div>
+<div class="cards">
+<div class="card"><div class="k">Invested now</div><div class="v">${R(D.cost)}</div></div>
+<div class="card"><div class="k">Value on ${esc(fmtDate(to))}</div><div class="v">${R(D.value)}</div></div>
+<div class="card"><div class="k">Profit on shares held</div><div class="v ${cls(D.unreal)}">${RS(D.unreal)}</div></div>
+<div class="card"><div class="k">Profit in period</div><div class="v ${cls(D.periodPL)}">${RS(D.periodPL)}</div></div>
+<div class="card"><div class="k">Bought</div><div class="v">${R(D.bought)}</div></div>
+<div class="card"><div class="k">Sold</div><div class="v">${R(D.sold)}</div></div>
+<div class="card"><div class="k">Profit from sales</div><div class="v ${cls(D.booked)}">${RS(D.booked)}</div></div>
+<div class="card"><div class="k">Dividends</div><div class="v">${R(D.dividends)}</div></div>
+</div>
+<h2>My shares on ${esc(fmtDate(to))}</h2>
+${tbl(["Share", "Shares", "Average", "Price", "Invested", "Value", "Profit / loss", "Return"], D.holdings.map(h => `<tr><td><b class="s">${esc(h.s)}</b></td>${td(num(h.q))}${td(R(h.avg, 2))}${td(h.px != null ? R(h.px, 2) : '<span class="muted">no price</span>')}${td(R(h.cost))}${td(R(h.value))}${td(h.pl != null ? RS(h.pl) : "—", cls(h.pl || 0))}${td(h.plPct != null ? esc(pct(h.plPct, 1, true)) : "—", cls(h.pl || 0))}</tr>`),
+  `<td>Total</td><td></td><td></td><td></td>${td(R(D.cost))}${td(R(D.value))}${td(RS(D.unreal), cls(D.unreal))}<td></td>`)}
+${D.unpriced ? `<p class="muted">${D.unpriced} share(s) have no price yet and are counted at cost.</p>` : ""}
+<h2>Bought and sold, by share</h2>
+${tbl(["Share", "Bought", "Avg buy", "Sold", "Avg sell", "Left", "Profit / loss"], D.byShare.map(r => `<tr><td><b class="s">${esc(r.s)}</b></td>${td(r.bq ? num(r.bq) : "—")}${td(r.bq ? R(r.bc / r.bq, 2) : "—")}${td(r.sq ? num(r.sq) : "—")}${td(r.sq ? R(r.sv / r.sq, 2) : "—")}${td(num(r.left))}${td(r.sq ? RS(r.pl) : '<span class="muted">not sold</span>', cls(r.pl))}</tr>`))}
+<h2>Buy / sell history</h2>
+${tbl(["Date", "Type", "Share", "Shares", "Price", "Amount", "Profit on sale"], D.inP.map(t => { const e = D.evAll[t.id]; const amt = t.type === "BUY" ? t.qty * t.price + t.fees : t.type === "SELL" ? t.qty * t.price - t.fees : t.amount || 0;
+  return `<tr><td>${esc(fmtDate(t.date))}</td><td>${esc(EXP_TYPE[t.type] || t.type)}</td><td><b class="s">${esc(t.symbol || "")}</b></td>${td(t.qty ? num(t.qty) : "")}${td(t.price ? R(t.price, 2) : "")}${td(amt ? R(amt) : "")}${td(e ? RS(e.pl) : "", e ? cls(e.pl) : "")}</tr>`; }), "", [0, 1, 2])}
+${D.daily.length ? `<h2>Daily earnings</h2>${tbl(["Date", "Earned", "Change", "What happened"], D.daily.slice().reverse().map(x => `<tr><td>${esc(fmtDate(x.d))}</td>${td(RS(x.earn), cls(x.earn))}${td(x.pctv != null ? esc(pct(x.pctv, 2, true)) : "—", cls(x.earn))}<td class="muted">${esc([...x.bought.map(t => `Bought ${t.qty} ${t.symbol}`), ...x.sold.map(e => `Sold ${e.qty} ${e.symbol}`)].join(", "))}</td></tr>`), "", [0, 3])}` : ""}
+<div class="foot">PSX Personal Assistant · for record-keeping, not investment advice. Profit on shares held uses the latest price entered on or before ${esc(fmtDate(to))}.</div>
+</body></html>`;
+  const old = document.getElementById("print-frame"); old?.remove();
+  const f = document.createElement("iframe"); f.id = "print-frame"; f.setAttribute("aria-hidden", "true");
+  f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
+  document.body.appendChild(f);
+  const w = f.contentWindow; w.document.open(); w.document.write(html); w.document.close();
+  setTimeout(() => { try { w.focus(); w.print(); } catch { const nw = window.open("", "_blank"); if (nw){ nw.document.write(html); nw.document.close(); nw.focus(); nw.print(); } } }, 350);
+}
+
 function registerSW(){
   if (inClaude() || !("serviceWorker" in navigator) || location.protocol !== "https:") return;
   navigator.serviceWorker.register("/sw.js").catch(() => {});
