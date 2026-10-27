@@ -518,6 +518,23 @@ button.hrow:hover{background:rgba(214,178,110,.05)}
   .stable .hrow .hsold:has(.sellbtn){padding:0!important;background:none!important;box-shadow:none!important;align-content:stretch}
   .stable .hrow .hsold .sellbtn{width:100%;height:100%;min-height:56px}
 }
+
+/* ---------- calculator share picker + dark native selects ---------- */
+select.input{appearance:none;-webkit-appearance:none;padding-right:42px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23D6B26E' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 15px center}
+select.input option{background:var(--surface);color:var(--ink)}
+.flabel{display:block;font-size:13px;font-weight:560;color:var(--ink-2);margin-bottom:8px}
+.calcpick{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin;scroll-snap-type:x proximity}
+.cpk{flex:none;display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:14px;border:1px solid rgba(214,178,110,.22);background:linear-gradient(160deg,rgba(214,178,110,.08),rgba(255,255,255,.02));color:var(--ink);cursor:pointer;scroll-snap-align:start;transition:border-color .15s,background .15s,transform .1s}
+.cpk:hover{border-color:rgba(214,178,110,.5)}
+.cpk:active{transform:scale(.98)}
+.cpk:focus-visible{outline:2px solid #D6B26E;outline-offset:2px}
+.cpk[aria-pressed="true"]{border-color:#D6B26E;background:linear-gradient(160deg,rgba(214,178,110,.24),rgba(214,178,110,.07));box-shadow:0 8px 22px -12px rgba(214,178,110,.7)}
+.cpk .logo{width:34px;height:34px;border-radius:10px}
+.cpk-t{display:grid;text-align:left;line-height:1.25}
+.cpk-t b{font-size:14px;font-weight:620;color:var(--ink)}
+.cpk-t .num{font-size:12px;color:var(--ink-3)}
+.cpk[aria-pressed="true"] .cpk-t .num{color:var(--emerald-ink)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1492,7 +1509,7 @@ function buildTasks(sn){
   if (sn.cash < -1) tasks.push({id:"cash", tone:"r", icon:"scale",
     title: L("Cash ka hisaab minus mein hai", "Cash balance is negative"),
     body: L("Shayad koi 'Paise jama' entry reh gayi hai. Broker statement se match kar lein.", "A cash deposit entry may be missing. Match it with your broker statement."),
-    act:{label:L("Broker se match karein","Match with broker"), go:"portfolio", sub:"broker"}});
+    act:{label:L("Entries dekhein","Check entries"), go:"portfolio", sub:"history"}});
   const remDueToday = r => r.date && r.date <= addDays(t0,3) && (!r.done || (r.doneAt && toISO(new Date(r.doneAt)) === t0));
   S.reminders.filter(remDueToday).sort((a,b) => a.date < b.date ? -1 : 1).slice(0, 2).forEach(rem => tasks.push({id:"rem-"+rem.id, rem: rem.id, tone: rem.date < t0 && !rem.done ? "r" : "b", icon:"bell", title: rem.text, body: rem.done ? L("Mukammal","Done") : L(`Yaad-dahani: ${relDay(rem.date)} (${fmtDate(rem.date)})`, `Reminder: ${relDay(rem.date)} (${fmtDate(rem.date)})`), act:{label:L("Yaad-dahaniyan","Reminders"), go:"updates", sub:"reminders"}}));
   const un = unreadToday() - S.reminders.filter(r => !r.done && r.date && r.date <= t0).length;
@@ -1646,11 +1663,12 @@ function issuesNotice(sn){
     ${sn.issues.map(i => `<div class="small" style="margin-top:6px">${L(`${fmtDate(i.date)}: ${num(i.qty)} ${esc(i.symbol)} beche, magar us waqt aap ke paas sirf ${num(i.held)} thay. Yeh farokht hisaab mein shamil nahi ki gayi.`, `${fmtDate(i.date)}: sold ${num(i.qty)} ${esc(i.symbol)}, but you held only ${num(i.held)} then. This sale is left out of the totals.`)} <button class="link" data-act="edit-tx" data-id="${i.id}">${L("Theek karein","Fix it")}</button></div>`).join("")}</div></div>`;
 }
 function viewPortfolio(){
+  if (UI.sub.portfolio === "broker") UI.sub.portfolio = "shares";
   const sub = UI.sub.portfolio || "shares";
   const sn = snap();
   const tabs = [
     ["shares", L("Mere shares","My shares")], ["daily", "Daily earnings"], ["prices", L("Qeematein","Prices")], ["where", L("Paisa kahan laga?","Where's my money?")], ["history", L("Khareed/farokht","Buy/sell history")],
-    ["dividends", L("Dividends","Dividends")], ["monthly", L("Mahana hisaab","Monthly account")], ["calc", L("Calculators","Calculators")], ["broker", L("Broker se match","Broker match")]
+    ["dividends", L("Dividends","Dividends")], ["monthly", L("Mahana hisaab","Monthly account")], ["calc", L("Calculators","Calculators")]
   ].filter(([k]) => !isSimple() || ["shares","daily","prices","history",sub].includes(k));
   return `
   <div class="page-head">
@@ -1665,7 +1683,7 @@ function viewPortfolio(){
       <div class="tiny faint num">${L("Bechne ka munafa","Booked")} ${rsS(sn.realized)} · ${L("Dividend","Dividend")} ${rs(sn.dividends)}</div></div>
   </div>
   <div class="seg" role="tablist">${tabs.map(([k,l]) => `<button role="tab" data-act="psub" data-v="${k}" aria-pressed="${sub===k}">${esc(l)}</button>`).join("")}${moreTabsBtn()}</div>
-  ${sub === "shares" ? pShares(sn) : sub === "daily" ? pDaily() : sub === "prices" ? pPrices(sn) : sub === "where" ? pWhere(sn) : sub === "history" ? pHistory() : sub === "dividends" ? pDividends(sn) : sub === "monthly" ? monthlyView() : sub === "calc" ? pCalc(sn) : reconView()}`;
+  ${sub === "shares" ? pShares(sn) : sub === "daily" ? pDaily() : sub === "prices" ? pPrices(sn) : sub === "where" ? pWhere(sn) : sub === "history" ? pHistory() : sub === "dividends" ? pDividends(sn) : sub === "monthly" ? monthlyView() : sub === "calc" ? pCalc(sn) : pShares(sn)}`;
 }
 function holdingsTable(sn){
   const tot = sn.holdings.reduce((a, h) => ({ cost: a.cost + h.cost, value: a.value + h.value }), { cost: 0, value: 0 }); const tpl = tot.value - tot.cost;
@@ -1846,11 +1864,12 @@ function pDividends(sn){
     </div></div>`;
 }
 function pCalc(sn){
-  const opts = sn.holdings.map(h => `<option value="${h.s}">${h.s} (${num(h.q)})</option>`).join("");
+  const opts = sn.holdings.length ? 1 : 0;
+  const picker = p => `<div class="field"><span class="flabel">Fill from my shares</span><div class="calcpick" role="group" aria-label="Fill from my shares">${sn.holdings.map(h => `<button type="button" class="cpk" data-act="calc-pick" data-p="${p}" data-s="${h.s}" aria-pressed="false"><span class="logo">${logoMark(h.s)}</span><span class="cpk-t"><b>${esc(h.s)}</b><span class="num">${num(h.q)} @ ${rs(h.avg, 2)}</span></span></button>`).join("")}</div></div>`;
   return `<div class="grid2" style="align-items:start">
     <form class="card pad stack" data-live="avg" id="calc-avg" onsubmit="return false">
       <h2 class="h-sec">${L("Aur khareedun to average kitna hoga?","If I buy more, what's my new average?")}</h2>
-      ${opts ? `<div class="field"><label for="ca-s">${L("Mere share se bharein","Fill from my share")}</label><select class="input" id="ca-s" data-act="ca-fill"><option value="">—</option>${opts}</select></div>` : ""}
+      ${opts ? picker("ca") : ""}
       <div class="fgrid two">
         <div class="field"><label for="ca-q">${L("Abhi kitne shares","Shares I have")}</label><input class="input num" id="ca-q" inputmode="numeric" value="500"></div>
         <div class="field"><label for="ca-a">${L("Abhi average qeemat","Current average")}</label><input class="input num" id="ca-a" inputmode="decimal" value="250"></div>
@@ -1862,7 +1881,7 @@ function pCalc(sn){
     </form>
     <form class="card pad stack" data-live="sell" id="calc-sell" onsubmit="return false">
       <h2 class="h-sec">${L("Agar bechun to kitna milega?","If I sell, how much will I get?")}</h2>
-      ${opts ? `<div class="field"><label for="cs-s">${L("Mere share se bharein","Fill from my share")}</label><select class="input" id="cs-s" data-act="cs-fill"><option value="">—</option>${opts}</select></div>` : ""}
+      ${opts ? picker("cs") : ""}
       <div class="fgrid two">
         <div class="field"><label for="cs-q">${L("Kitne shares bechne hain","Shares to sell")}</label><input class="input num" id="cs-q" inputmode="numeric" value="200"></div>
         <div class="field"><label for="cs-a">${L("Meri average qeemat","My average price")}</label><input class="input num" id="cs-a" inputmode="decimal" value="180"></div>
@@ -2841,7 +2860,6 @@ function viewMore(){
     [L("Hisaab kitaab","Accounts"), [
       ["monthly","trend",L("Har mahine maine kitna lagaya?","How much did I invest each month?"), L("Mahana hisaab aur nateeja","Monthly account and result")],
       ["charges","receipt",L("Kya broker ne sahi charges kaate?","Did my broker charge correctly?"), L("Har trade ka charges check","Check every trade's charges")],
-      ["broker","scale",L("Mere broker ka hisaab match karo","Match my broker's statement"), L("Farq aur us ki wajah","Differences and their causes")],
       ["tax","receipt",L("Saal ki tax report banao","Make my annual tax report"), L("1 July – 30 June ka khulasa","1 July – 30 June summary")],
       ["timeline","history",L("Meri investment ki kahani","My investment history"), L("Shuru se ab tak","From the start till now")]]],
     [L("App","App"), [
@@ -3414,6 +3432,9 @@ document.addEventListener("click", async (ev) => {
     case "rem-ics": { const { n, ics } = remindersICS(); if (!n) break;
       if (await offerDownload("psx-yaad-dahaniyan.ics", ics, "text/calendar")){ const at = Date.now(); commit(st => st.reminders = st.reminders.map(r => !r.done && r.date && !r.calAt ? { ...r, calAt: at } : r)); toast(L(`${n} yaad-dahaniyan tayyar — file kholein aur "Add" dabayein`, `${n} reminder(s) ready — open the file and tap "Add"`)); }
       break; }
+    case "calc-pick": { const h = snap().holdings.find(x => x.s === el.dataset.s); if (!h) break; const p = el.dataset.p;
+      $(`#${p}-q`).value = h.q; $(`#${p}-a`).value = round2(h.avg); $(`#${p}-p`).value = h.price ?? "";
+      el.parentElement.querySelectorAll(".cpk").forEach(b => b.setAttribute("aria-pressed", String(b === el))); liveCalc(); break; }
     case "hist-mode": UI.sub.histMode = v; render(); break;
     case "pick-sym": { const i = $("#f-sym"); if (i){ i.value = v; liveEntry(); } break; }
     case "pmode": { readForm(); const d0 = UI.entry.draft; if (v === "total" && d0.qty > 0 && d0.price > 0) d0.total = round2(d0.qty * d0.price); UI.entry.priceMode = v; render(); break; }
