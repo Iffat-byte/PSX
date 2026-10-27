@@ -1929,8 +1929,6 @@ function pDaily(){
 }
 function pWhere(sn){
   if (!sn.holdings.length) return `<div class="card"><div class="empty"><b>${L("Abhi kuch nahi","Nothing yet")}</b></div></div>`;
-  const sectors = {}; sn.holdings.forEach(h => { const k = SYM[h.s]?.sec || L("Doosre","Other"); sectors[k] = (sectors[k]||0) + h.value; });
-  const sec = Object.entries(sectors).sort((a,b) => b[1]-a[1]);
   const c = hhi(sn.holdings.map(h=>h.value));
   const lim = S.settings.concLimit/100;
   return `<div class="grid2">
@@ -1939,10 +1937,6 @@ function pWhere(sn){
       ${sn.holdings.map(h => `<div><div class="row small" style="justify-content:space-between;margin-bottom:6px"><b>${esc(h.s)} <span class="faint" style="font-weight:500">${esc(nameOf(h.s))}</span></b><span class="num"><b>${pct(h.weight,1)}</b> · ${rs(h.value)}</span></div><div class="bar ${h.weight>lim?"warn":""}"><i style="width:${(h.weight*100).toFixed(1)}%"></i></div></div>`).join("")}
     </div>
     <div class="stack">
-      <div class="card pad stack">
-        <h2 class="h-sec">${L("Kin karobar (sectors) mein?","Which industries?")}</h2>
-        ${sec.map(([k,v]) => `<div><div class="row small" style="justify-content:space-between;margin-bottom:6px"><b>${esc(k)}</b><span class="num">${pct(v/sn.mv,1)}</span></div><div class="bar"><i style="width:${(v/sn.mv*100).toFixed(1)}%;background:var(--navy-2)"></i></div></div>`).join("")}
-      </div>
       <div class="notice ${c.top > lim ? "gold" : "green"}">${ic(c.top > lim ? "alert" : "check",18)}<div>${c.top > lim
         ? L(`Aap ka sab se bara share ${pct(c.top,0)} hai, jo aap ki ${S.settings.concLimit}% had se zyada hai. Paisa kuch aur companies mein phailane se ek company ka asar kam hota hai.`, `Your largest holding is ${pct(c.top,0)}, above your ${S.settings.concLimit}% limit. Spreading money across more companies reduces the impact of any one.`)
         : L(`Achi baat: koi bhi company aap ki ${S.settings.concLimit}% had se zyada nahi.`, `Good: no company is above your ${S.settings.concLimit}% limit.`)}
