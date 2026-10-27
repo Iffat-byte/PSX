@@ -1579,9 +1579,9 @@ function viewPortfolio(){
   const sub = UI.sub.portfolio || "shares";
   const sn = snap();
   const tabs = [
-    ["shares", L("Mere shares","My shares")], ["prices", L("Qeematein","Prices")], ["where", L("Paisa kahan laga?","Where's my money?")], ["history", L("Khareed/farokht","Buy/sell history")],
+    ["shares", L("Mere shares","My shares")], ["daily", "Daily earnings"], ["prices", L("Qeematein","Prices")], ["where", L("Paisa kahan laga?","Where's my money?")], ["history", L("Khareed/farokht","Buy/sell history")],
     ["dividends", L("Dividends","Dividends")], ["monthly", L("Mahana hisaab","Monthly account")], ["calc", L("Calculators","Calculators")], ["broker", L("Broker se match","Broker match")]
-  ].filter(([k]) => !isSimple() || ["shares","prices","history","dividends",sub].includes(k));
+  ].filter(([k]) => !isSimple() || ["shares","daily","prices","history",sub].includes(k));
   return `
   <div class="page-head">
     <div style="min-width:0"><div class="eyebrow">${L(`${sn.holdings.length} companies`, `${sn.holdings.length} companies`)}</div><h1 class="h-page">${L("Mera Portfolio","My Portfolio")}</h1><p class="muted small" style="margin-top:4px">${L("Aap ke shares, hisaab aur munafa — sab ek jagah","Your shares, accounts and profit — all in one place")}</p></div>
@@ -1595,13 +1595,61 @@ function viewPortfolio(){
       <div class="tiny faint num">${L("Bechne ka munafa","Booked")} ${rsS(sn.realized)} · ${L("Dividend","Dividend")} ${rs(sn.dividends)}</div></div>
   </div>
   <div class="seg" role="tablist">${tabs.map(([k,l]) => `<button role="tab" data-act="psub" data-v="${k}" aria-pressed="${sub===k}">${esc(l)}</button>`).join("")}${moreTabsBtn()}</div>
-  ${sub === "shares" ? pShares(sn) : sub === "prices" ? pPrices(sn) : sub === "where" ? pWhere(sn) : sub === "history" ? pHistory() : sub === "dividends" ? pDividends(sn) : sub === "monthly" ? monthlyView() : sub === "calc" ? pCalc(sn) : reconView()}`;
+  ${sub === "shares" ? pShares(sn) : sub === "daily" ? pDaily() : sub === "prices" ? pPrices(sn) : sub === "where" ? pWhere(sn) : sub === "history" ? pHistory() : sub === "dividends" ? pDividends(sn) : sub === "monthly" ? monthlyView() : sub === "calc" ? pCalc(sn) : reconView()}`;
+}
+function closedRows(){
+  const L0 = replay(S.txs); const out = [];
+  for (const [sym, p] of L0.pos){ if (p.q > 0 || !(p.bought > 0)) continue; const last = S.txs.filter(t => t.symbol === sym).map(t => t.date).sort().pop();
+    out.push({ s: sym, realized: p.realized + p.div, bought: p.bought, last }); }
+  return out.sort((a, b) => a.last < b.last ? 1 : -1);
+}
+function closedSection(){
+  const rows = closedRows(); if (!rows.length) return "";
+  return `<div class="card pad"><div class="row" style="justify-content:space-between;margin-bottom:4px"><h2 class="h-sec">Sold shares</h2><span class="tiny faint">fully sold · tap for history</span></div>
+    <div class="list">${rows.map(r => `<button class="li" data-act="share" data-s="${r.s}"><div class="logo">${logoMark(r.s)}</div><div class="mid"><div class="main-t">${esc(r.s)}</div><div class="sub-t">Sold out · last ${fmtDate(r.last)}</div></div><div class="right"><div class="v num ${tone(r.realized)}">${rsS(r.realized)}</div><div class="d num ${tone(r.realized)}">${pct(r.bought ? r.realized / r.bought : 0, 1, true)}</div></div></button>`).join("")}</div></div>`;
 }
 function pShares(sn){
-  if (!sn.holdings.length) return `<div class="card"><div class="empty"><b>${L("Aap ke paas abhi koi share nahi","You don't own any shares yet")}</b><p>${L("Pehli khareed ki entry karein.","Add your first purchase.")}</p><button class="btn primary" style="margin-top:14px" data-go="add">${L("Entry karein","Add entry")}</button></div></div>`;
+  if (!sn.holdings.length) return closedSection() + `<div class="card"><div class="empty"><b>${L("Aap ke paas abhi koi share nahi","You don't own any shares yet")}</b><p>${L("Pehli khareed ki entry karein.","Add your first purchase.")}</p><button class="btn primary" style="margin-top:14px" data-go="add">${L("Entry karein","Add entry")}</button></div></div>`;
   return `<div class="card pad"><div class="list">${sn.holdings.map(holdingRow).join("")}</div>
-    <p class="tiny faint" style="margin-top:10px">${L("Average qeemat mein broker charges shamil hain. Value demo prices par hai.","Average price includes broker charges. Value uses demo prices.")}</p></div>
-`;
+    <p class="tiny faint" style="margin-top:10px">Tap a share to see every purchase and sale. ${FAMILY ? "Value uses the prices entered in Prices." : "Average price includes broker charges."}</p></div>
+  ${closedSection()}`;
+}
+/** One row per day something happened (a trade, or new prices): profit made that day vs the previous such day. */
+function dailyEarnings(){
+  const txs = S.txs; const t0 = todayISO();
+  const tradeDays = new Set(txs.filter(t => ["BUY","SELL","DIVIDEND","BONUS"].includes(t.type)).map(t => t.date));
+  const priceDays = new Set(Object.keys(FAMILY ? (UI.fam.shared.log || {}) : {}));
+  const days = [...new Set([...tradeDays, ...priceDays])].filter(d => d <= t0).sort();
+  const out = []; let prev = null, prevPL = 0;
+  for (const d of days){
+    const r = plAt(txs, d); const L0 = replay(txs, d);
+    const earn = r.pl - prevPL;
+    const sold = L0.events.filter(e => e.date === d); const bought = txs.filter(t => t.type === "BUY" && t.date === d);
+    const base = prev ? [...replay(txs, prev).pos.values()].reduce((a, p) => a + (p.q > 0 ? p.cost : 0), 0) : 0;
+    if (Math.abs(earn) >= 0.5 || sold.length || bought.length) out.push({ d, prev, earn, pctv: base ? earn / base : null, sold, bought, booked: sold.reduce((a, e) => a + e.pl, 0) });
+    prev = d; prevPL = r.pl;
+  }
+  return out.reverse();
+}
+function pDaily(){
+  const rows = dailyEarnings(); const t0 = todayISO();
+  const today = rows.find(r => r.d === t0);
+  const month = rows.filter(r => r.d.slice(0, 7) === t0.slice(0, 7)).reduce((a, r) => a + r.earn, 0);
+  const best = [...rows].sort((a, b) => b.earn - a.earn)[0];
+  const gap = r => r.prev && dayDiff(r.d, r.prev) > (new Date(r.d + "T00:00:00").getDay() === 1 ? 3 : 1);
+  return `<div class="card pad stats">
+      <div><div class="lbl">Today</div><div class="sv num ${today ? tone(today.earn) : ""}">${today ? rsS(today.earn) : "—"}</div><div class="tiny faint">${today ? (today.pctv != null ? pct(today.pctv, 2, true) : "") : "No trades or price updates yet today"}</div></div>
+      <div><div class="lbl">This month</div><div class="sv num ${tone(month)}">${rsS(month)}</div><div class="tiny faint">${rows.filter(r => r.d.slice(0, 7) === t0.slice(0, 7)).length} active days</div></div>
+      <div><div class="lbl">Best day</div><div class="sv num ${best ? tone(best.earn) : ""}">${best ? rsS(best.earn) : "—"}</div><div class="tiny faint">${best ? fmtDate(best.d) : ""}</div></div>
+    </div>
+    <div class="card pad"><div class="row" style="justify-content:space-between;margin-bottom:4px"><h2 class="h-sec">Day by day</h2><span class="tiny faint">only days with trades or new prices</span></div>
+    ${rows.length ? `<div class="list">${rows.map(r => `<div class="li" style="align-items:flex-start">
+        <div class="logo" style="flex-direction:column;line-height:1;gap:2px"><span style="font-size:10px;color:var(--ink-3)">${MONTHS_EN[Number(r.d.slice(5,7))-1]}</span><span style="font-size:15px">${Number(r.d.slice(8))}</span></div>
+        <div class="mid"><div class="main-t">${r.d === t0 ? "Today" : fmtDate(r.d)}</div>
+          <div class="sub-t wrap">${[r.bought.length ? `Bought ${r.bought.map(t => `${num(t.qty)} ${t.symbol}`).join(", ")}` : "", r.sold.length ? `Sold ${r.sold.map(e => `${num(e.qty)} ${e.symbol}`).join(", ")} (${rsS(r.booked)} booked)` : "", gap(r) ? `Since ${fmtDate(r.prev)}` : ""].filter(Boolean).join(" · ") || "Price change"}</div></div>
+        <div class="right"><div class="v num ${tone(r.earn)}">${rsS(r.earn)}</div>${r.pctv != null ? `<div class="d num ${tone(r.earn)}">${pct(r.pctv, 2, true)}</div>` : ""}</div></div>`).join("")}</div>`
+      : `<div class="empty"><b>No earnings yet</b>Earnings appear once you've added shares and prices have been entered on more than one day.</div>`}
+    <p class="tiny faint" style="margin-top:10px">A day's earning is how much your total profit changed since the last day with a trade or a price update. Days with no trading and no new prices are left out.</p></div>`;
 }
 function pWhere(sn){
   if (!sn.holdings.length) return `<div class="card"><div class="empty"><b>${L("Abhi kuch nahi","Nothing yet")}</b></div></div>`;
@@ -2024,51 +2072,69 @@ function viewHoldingsFound(){
 /* ---------------- Manual form (with duplicate warning) ---------------- */
 /* ---------------- Simple purchase form: share, how many, at what price → new average ---------------- */
 function simpleEntryForm(){
-  const e = UI.entry; const d = e.draft; const mode = e.priceMode || "each";
+  const e = UI.entry; const d = e.draft; const mode = e.priceMode || "each"; const sell = d.type === "SELL";
+  const others = S.txs.filter(t => t.id !== e.editId);
+  const heldList = [...replay(others).pos.entries()].filter(([, p]) => p.q > 0).map(([k, p]) => ({ s: k, q: p.q }));
   return `${e.editId ? `<button class="back" data-go="portfolio" data-sub="history">${ic("back",18)} Back</button>` : ""}
-  <div><h1 class="h-page">${e.editId ? "Edit purchase" : "New entry"}</h1>
-  <p class="muted small">Which share, how many, and at what price. We'll work out your new average.</p></div>
+  <div><h1 class="h-page">${e.editId ? (sell ? "Edit sale" : "Edit purchase") : "New entry"}</h1>
+  <p class="muted small">${sell ? "Which share you sold, how many, and at what price. We'll show what's left and your profit." : "Which share, how many, and at what price. We'll work out your new average."}</p></div>
   <form class="card pad stack" id="entry-form" data-simple="1" novalidate>
+    <div class="seg" role="group" aria-label="Bought or sold" style="width:100%">
+      <button type="button" data-act="etype" data-v="BUY" aria-pressed="${!sell}" style="flex:1">${ic("trend",15)} Bought</button>
+      <button type="button" data-act="etype" data-v="SELL" aria-pressed="${sell}" style="flex:1">${ic("down",15)} Sold</button>
+    </div>
     <div class="field"><label for="f-sym">Share</label>
-      <input class="input" id="f-sym" list="sym-list" autocomplete="off" value="${esc(d.symbol||"")}" placeholder="Name or symbol, e.g. OGDC">
-      <datalist id="sym-list">${SYMBOLS.map(x => `<option value="${x.s}">${esc(x.n)}</option>`).join("")}</datalist>
-      <span class="hint" id="f-sym-hint">${d.symbol && SYM[(d.symbol||"").toUpperCase()] ? esc(SYM[d.symbol.toUpperCase()].n) : ""}</span><span class="err" id="e-sym"></span></div>
+      <input class="input" id="f-sym" list="sym-list" autocomplete="off" value="${esc(d.symbol||"")}" placeholder="${sell ? "Which share did you sell?" : "Name or symbol, e.g. OGDC"}">
+      <datalist id="sym-list">${(sell ? heldList.map(h => `<option value="${h.s}">${esc(SYM[h.s]?.n || h.s)} · you have ${num(h.q)}</option>`) : SYMBOLS.map(x => `<option value="${x.s}">${esc(x.n)}</option>`)).join("")}</datalist>
+      <span class="hint" id="f-sym-hint">${d.symbol && SYM[(d.symbol||"").toUpperCase()] ? esc(SYM[d.symbol.toUpperCase()].n) : ""}</span><span class="err" id="e-sym"></span>
+      ${sell && heldList.length ? `<div class="row" style="gap:6px;flex-wrap:wrap;margin-top:4px">${heldList.map(h => `<button type="button" class="btn sm ghost" data-act="pick-sym" data-v="${h.s}" style="min-height:30px;padding:4px 10px">${esc(h.s)} · ${num(h.q)}</button>`).join("")}</div>` : ""}</div>
     <div class="fgrid two">
-      <div class="field"><label for="f-qty">How many shares</label><input class="input num" id="f-qty" inputmode="numeric" value="${esc(d.qty ?? "")}" placeholder="100"><span class="err" id="e-qty"></span></div>
+      <div class="field"><label for="f-qty">${sell ? "How many sold" : "How many shares"}</label><input class="input num" id="f-qty" inputmode="numeric" value="${esc(d.qty ?? "")}" placeholder="100"><span class="err" id="e-qty"></span></div>
       <div class="field">
-        <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><label for="${mode === "each" ? "f-price" : "f-total"}">For how much</label>
-          <div class="seg" role="group" aria-label="Price type" style="padding:2px"><button type="button" data-act="pmode" data-v="each" aria-pressed="${mode === "each"}" style="padding:4px 10px;font-size:12.5px">Per share</button><button type="button" data-act="pmode" data-v="total" aria-pressed="${mode === "total"}" style="padding:4px 10px;font-size:12.5px">Total paid</button></div></div>
+        <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><label for="${mode === "each" ? "f-price" : "f-total"}">${sell ? "Sold for" : "For how much"}</label>
+          <div class="seg" role="group" aria-label="Price type" style="padding:2px"><button type="button" data-act="pmode" data-v="each" aria-pressed="${mode === "each"}" style="padding:4px 10px;font-size:12.5px">Per share</button><button type="button" data-act="pmode" data-v="total" aria-pressed="${mode === "total"}" style="padding:4px 10px;font-size:12.5px">${sell ? "Total received" : "Total paid"}</button></div></div>
         ${mode === "each"
           ? `<div class="input-wrap"><span class="pre">Rs</span><input class="input num" id="f-price" inputmode="decimal" value="${esc(d.price ?? "")}" placeholder="210.50"></div>`
           : `<div class="input-wrap"><span class="pre">Rs</span><input class="input num" id="f-total" inputmode="decimal" value="${esc(d.total ?? "")}" placeholder="21,050"></div>`}
         <span class="err" id="e-price"></span></div>
     </div>
-    ${e.editId ? `<div class="field"><label for="f-date">Date</label><input class="input" type="date" id="f-date" max="${todayISO()}" value="${esc(d.date||todayISO())}"><span class="err" id="e-date"></span></div>` : ""}
+    <div class="field"><label for="f-date">Date</label><input class="input" type="date" id="f-date" max="${todayISO()}" value="${esc(d.date||todayISO())}"><span class="err" id="e-date"></span></div>
     <div class="result" id="f-summary">${simpleSummary(d)}</div>
     ${e.dup ? `<div class="notice gold">${ic("copy",18)}<div><b>${e.dup.kind === "exact" ? "This entry already exists" : "A similar entry already exists"}</b><div class="small">${esc(TYPE_LABEL()[e.dup.match.type])} ${esc(e.dup.match.symbol || "")} ${e.dup.match.qty ? num(e.dup.match.qty) + " × " + rs(e.dup.match.price,2) : rs(e.dup.match.amount)} · ${fmtDate(e.dup.match.date)}</div><button type="button" class="btn sm line" style="margin-top:8px" data-act="dup-ack">Yes, it's a new entry — save anyway</button></div></div>` : ""}
     <span class="err" id="e-form"></span>
     <div class="row" style="flex-wrap:wrap">
-      <button type="submit" class="btn primary" style="flex:1">${ic("check",18,2.4)} ${e.editId ? "Save changes" : "Save"}</button>
+      <button type="submit" class="btn primary" style="flex:1">${ic("check",18,2.4)} ${e.editId ? "Save changes" : sell ? "Save sale" : "Save purchase"}</button>
       ${e.editId ? `<button type="button" class="btn danger" data-act="del-tx" data-id="${e.editId}">${ic("trash",17)} Delete</button>` : ""}
     </div>
   </form>`;
 }
 function simpleSummary(d){
-  const sym = (d.symbol || "").toUpperCase(); const q = Number(d.qty) || 0, p = Number(d.price) || 0;
-  if (!sym || !(q > 0) || !(p > 0)) return `<span class="muted small">Enter the share, how many and the price to see your new average.</span>`;
+  const sym = (d.symbol || "").toUpperCase(); const q = Number(d.qty) || 0, p = Number(d.price) || 0; const sell = d.type === "SELL";
   const others = S.txs.filter(t => t.id !== UI.entry?.editId);
-  const P = replay(others, d.date || todayISO()).pos.get(sym); const q0 = P?.q || 0, c0 = P?.cost || 0;
+  const P = sym ? replay(others, d.date || todayISO()).pos.get(sym) : null; const q0 = P?.q || 0, c0 = P?.cost || 0; const a0 = q0 ? c0 / q0 : 0;
+  if (sell && sym && !(q > 0 && p > 0)) return q0 ? `<span class="muted small">You have ${num(q0)} ${esc(sym)} at an average of ${rs(a0, 2)}. Enter how many you sold and the price.</span>` : `<span class="muted small">You had no ${esc(sym)} on this date.</span>`;
+  if (!sym || !(q > 0) || !(p > 0)) return `<span class="muted small">${sell ? "Enter the share, how many you sold and the price." : "Enter the share, how many and the price to see your new average."}</span>`;
   const fee = d.fees !== "" && d.fees != null && isFinite(Number(d.fees)) ? Number(d.fees) : feeEst(q, p);
+  if (sell){
+    if (q > q0 + 1e-9) return `<div class="notice red" style="padding:10px 12px">${ic("alert",17)}<div class="small">On ${fmtDate(d.date || todayISO())} you had only ${num(q0)} ${esc(sym)}, so you can't sell ${num(q)}.</div></div>`;
+    const got = q * p - fee; const pl = got - a0 * q; const left = q0 - q;
+    return `<div class="small muted">Profit on this sale</div><div class="big num ${tone(pl)}">${rsS(pl, 2)} <span class="small" style="font-weight:600">(${pct(a0 ? pl / (a0 * q) : 0, 1, true)})</span></div>
+      <div class="kv"><span class="k">You had</span><span class="v num">${num(q0)} at ${rs(a0, 2)}</span></div>
+      <div class="kv"><span class="k">Sold</span><span class="v num">${num(q)} × ${rs(p, 2)} = ${rs(got, 2)}</span></div>
+      <div class="kv"><span class="k">Left now</span><span class="v num">${left ? `${num(left)} shares` : "None — all sold"}</span></div>
+      ${left ? `<div class="kv"><span class="k">Average</span><span class="v num">${rs(a0, 2)} <span class="faint" style="font-weight:500">stays the same</span></span></div>` : ""}
+      ${fee > 0 ? `<p class="tiny faint">After ${rs(fee, 2)} estimated broker charges from your Settings.</p>` : ""}`;
+  }
   const cost = q * p + fee; const nq = q0 + q; const navg = (c0 + cost) / nq;
   return `<div class="small muted">Your new average for ${esc(sym)}</div><div class="big num">${rs(navg, 2)}</div>
-    <div class="kv"><span class="k">You had</span><span class="v num">${q0 ? `${num(q0)} at ${rs(c0 / q0, 2)}` : "None yet"}</span></div>
+    <div class="kv"><span class="k">You had</span><span class="v num">${q0 ? `${num(q0)} at ${rs(a0, 2)}` : "None yet"}</span></div>
     <div class="kv"><span class="k">Buying now</span><span class="v num">${num(q)} × ${rs(p, 2)} = ${rs(cost, 2)}</span></div>
     <div class="kv"><span class="k">You'll have</span><span class="v num">${num(nq)} shares</span></div>
     ${fee > 0 ? `<p class="tiny faint">Includes ${rs(fee, 2)} estimated broker charges from your Settings.</p>` : ""}`;
 }
 function entryForm(){
   const e = UI.entry; const d = e.draft;
-  if (d.type === "BUY" && !e.full) return simpleEntryForm();
+  if ((d.type === "BUY" || d.type === "SELL") && !e.full) return simpleEntryForm();
   const isTrade = d.type === "BUY" || d.type === "SELL";
   const needSym = isTrade || d.type === "DIVIDEND" || d.type === "BONUS";
   const isCash = ["DEPOSIT","WITHDRAWAL","DIVIDEND"].includes(d.type);
@@ -2764,10 +2830,11 @@ function renderSheet(){
       <div class="kv"><span class="k">${L("Kitna lagaya","Invested")}</span><span class="v num">${rs(h.cost)}</span></div>
       <div class="kv"><span class="k">${L("Portfolio ka hissa","Share of portfolio")}</span><span class="v num">${pct(h.weight,1)}</span></div>
       ${h.div ? `<div class="kv"><span class="k">${L("Dividend mila","Dividends received")}</span><span class="v num gain">${rs(h.div)}</span></div>` : ""}
-      <div class="row" style="margin-top:16px"><button class="btn primary" style="flex:1" data-act="new-tx" data-type="BUY" data-s="${s.s}">${L("Aur khareedein","Buy more")}</button><button class="btn line" style="flex:1" data-act="new-tx" data-type="SELL" data-s="${s.s}">${L("Bechne ki entry","Record sale")}</button></div>`
-      : `<div class="empty">${L("Aap ke paas abhi yeh share nahi.","You don't own this share now.")}</div>`}
+      ${FAMILY && UI.readOnly ? "" : `<div class="row" style="margin-top:16px"><button class="btn primary" style="flex:1" data-act="new-tx" data-type="BUY" data-s="${s.s}">Buy more</button><button class="btn line" style="flex:1" data-act="new-tx" data-type="SELL" data-s="${s.s}">Sell</button></div>`}`
+      : (() => { const c = closedRows().find(r => r.s === s.s); return c ? `<div class="result stack" style="gap:2px"><div class="small muted">All sold · profit made</div><div class="big num ${tone(c.realized)}">${rsS(c.realized)}</div><div class="tiny faint">Last sale ${fmtDate(c.last)}</div></div>` : `<div class="empty">You don't own this share now.</div>`; })()}
       <h3 class="h-sec" style="margin:20px 0 6px">${L("Is share ki history","History for this share")}</h3>
-      <div class="list">${txs.map(t => `<button class="li" data-act="edit-tx" data-id="${t.id}"><div class="mid"><div class="main-t">${esc(TL[t.type])}</div><div class="sub-t">${fmtDate(t.date)}${t.qty ? ` · ${num(t.qty)} × ${rs(t.price,2)}` : ` · ${rs(t.amount)}`}</div></div><span class="faint">${ic("chev",18)}</span></button>`).join("") || `<p class="muted small">—</p>`}</div>`;
+      <div class="list">${(() => { const ev = Object.fromEntries(replay(S.txs).events.map(e => [e.id, e])); let run = 0; const rows = sortTx(S.txs.filter(t => t.symbol === s.s)).map(t => { if (t.type === "BUY" || t.type === "BONUS") run += t.qty; if (t.type === "SELL" && ev[t.id]) run -= t.qty; return { t, after: run }; }).reverse();
+        return rows.map(({ t, after }) => { const e = ev[t.id]; return `<button class="li" data-act="edit-tx" data-id="${t.id}"><span class="pill ${t.type === "SELL" ? "demo" : t.type === "BUY" ? "info" : "ok"}" style="flex:none;min-width:58px;justify-content:center">${t.type === "SELL" ? "Sold" : t.type === "BUY" ? "Bought" : esc(TL[t.type])}</span><div class="mid"><div class="main-t num">${t.qty ? `${num(t.qty)} × ${rs(t.price,2)}` : rs(t.amount)}</div><div class="sub-t">${fmtDate(t.date)}${t.qty ? ` · ${num(after)} left after` : ""}</div></div>${e ? `<div class="right"><div class="v num ${tone(e.pl)}">${rsS(e.pl)}</div><div class="tiny faint">profit</div></div>` : `<span class="faint">${ic("chev",18)}</span>`}</button>`; }).join("") || `<p class="muted small">—</p>`; })()}</div>`;
   } else if (s.kind === "confirm"){
     const M = {"clear-demo":[L("Demo data hatayein?","Remove demo data?"), L("Demo shares, entries aur misaali tareekhein hat jayengi. Aap ki apni entries rahengi.","Demo shares, entries and example dates will be removed. Your own entries stay.")], "load-demo":[L("Demo data laayein?","Load demo data?"), L("Aap ka maujooda data demo se badal jayega. Pehle backup le lein.","Your current data will be replaced with demo data. Take a backup first.")], "erase":[L("Saara data mitayein?","Erase all data?"), L("Yeh wapas nahi ho sakta. Saari entries, dividends aur yaad-dahaniyan mit jayengi.","This can't be undone. All entries, dividends and reminders will be erased.")], "del-tx":[L("Yeh entry mitayein?","Delete this entry?"), L("Hisaab dobara lagaya jayega.","Your accounts will be recalculated.")]}[s.v] || ["",""];
     const breaks = s.v === "del-tx" && replay(S.txs.filter(t => t.id !== s.id)).issues.length > replay(S.txs).issues.length;
@@ -3204,6 +3271,7 @@ document.addEventListener("click", async (ev) => {
     case "rem-ics": { const { n, ics } = remindersICS(); if (!n) break;
       if (await offerDownload("psx-yaad-dahaniyan.ics", ics, "text/calendar")){ const at = Date.now(); commit(st => st.reminders = st.reminders.map(r => !r.done && r.date && !r.calAt ? { ...r, calAt: at } : r)); toast(L(`${n} yaad-dahaniyan tayyar — file kholein aur "Add" dabayein`, `${n} reminder(s) ready — open the file and tap "Add"`)); }
       break; }
+    case "pick-sym": { const i = $("#f-sym"); if (i){ i.value = v; liveEntry(); } break; }
     case "pmode": { readForm(); const d0 = UI.entry.draft; if (v === "total" && d0.qty > 0 && d0.price > 0) d0.total = round2(d0.qty * d0.price); UI.entry.priceMode = v; render(); break; }
     case "etype": readForm(); UI.entry.draft.type = v; UI.entry.dup = null; UI.entry.dupAck = false; render(); break;
     case "new-tx": closeSheet(); UI.route = "add"; UI.entry = { mode:"manual", draft:{ type: el.dataset.type, date:todayISO(), symbol: el.dataset.s || "", qty:"", price: el.dataset.s && el.dataset.type !== "DIVIDEND" ? quote(el.dataset.s)?.price ?? "" : "", fees:"", amount:"", note:"" } }; render(); window.scrollTo({top:0}); break;
