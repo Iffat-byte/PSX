@@ -660,6 +660,57 @@ select.input option{background:var(--surface);color:var(--ink)}
 .hl-pct{font-size:11.5px!important;font-weight:600!important;padding:1px 7px;border-radius:99px;background:color-mix(in srgb,currentColor 12%,transparent)}
 @media (min-width:760px){ .hlist{display:none} .pf-sec-h{display:none} .pf-hero{padding:26px 28px} }
 @media (max-width:759px){ .pf-desk{display:none} .pf-new{display:none} }
+
+/* ---------- trading journal ---------- */
+.tr-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tr-hero{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;border-radius:20px;overflow:hidden;margin-bottom:14px;background:rgba(214,178,110,.18);border:1px solid rgba(214,178,110,.28)}
+.tr-hero > div{display:grid;gap:3px;padding:14px 16px;background:linear-gradient(160deg,#16130D,#0E0E10);min-width:0}
+:root[data-theme="light"] .tr-hero > div{background:linear-gradient(160deg,#FFFDF8,#F7F0E2)}
+.tr-hero .k{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.tr-hero b{font-family:var(--f-display,serif);font-weight:500;font-size:clamp(20px,5.2vw,28px);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr-hero .tiny{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:620px){ .tr-hero{grid-template-columns:1fr 1fr} }
+.tr-days{margin-bottom:14px}
+.tr-day{display:grid;grid-template-columns:92px minmax(0,1fr) auto;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.tr-day:last-child{border-bottom:0}
+.tr-dbar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.tr-dbar i{display:block;height:100%;border-radius:99px}
+.tr-dbar i.up{background:linear-gradient(90deg,color-mix(in srgb,var(--up) 55%,transparent),var(--up))}
+.tr-dbar i.dn{background:linear-gradient(90deg,color-mix(in srgb,var(--loss) 55%,transparent),var(--loss))}
+.tr-day b{min-width:96px;text-align:right}
+.tr-card{overflow:hidden}
+.tr-row{display:grid;grid-template-columns:92px minmax(70px,1fr) repeat(4,minmax(0,.9fr)) minmax(120px,1.2fr);align-items:center;gap:10px;width:100%;padding:12px 18px;background:none;border:0;border-bottom:1px solid var(--line);color:var(--ink);text-align:left;cursor:pointer;font-size:14px}
+.tr-row:hover{background:rgba(214,178,110,.05)}
+.tr-headrow{cursor:default;background:#15161A!important;color:#E8C98C;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:10px 18px}
+:root[data-theme="light"] .tr-headrow{background:#15161A!important}
+.tr-headrow .r,.tr-n{text-align:right}
+.tr-d{display:grid;color:var(--ink-2)}
+.tr-sd{font-size:10.5px;color:var(--ink-3)}
+.tr-s b{color:var(--emerald-ink);font-weight:650;letter-spacing:.02em}
+.tr-g{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.tr-g b{font-weight:650}
+.tr-pct{font-size:11.5px;font-weight:600}
+.tr-open{font-size:11px}
+.tr-m{display:none}
+.tr-month{display:flex;justify-content:space-between;align-items:center;padding:9px 18px;background:rgba(214,178,110,.07);border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+.tr-imp-list{display:grid;gap:4px}
+.tr-imp-r{display:grid;grid-template-columns:86px 64px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.5px;padding:6px 8px;border-radius:8px;background:var(--surface)}
+.tr-imp-r span:nth-child(3){white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:759px){
+  .tr-headrow{display:none!important}
+  .tr-row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"s g" "m g" "d g";gap:3px 12px;padding:13px 16px}
+  .tr-row .tr-n{display:none}
+  .tr-s{grid-area:s;font-size:15.5px}
+  .tr-d{grid-area:d;font-size:11.5px;display:flex;gap:8px}
+  .tr-m{grid-area:m;display:flex;flex-wrap:wrap;gap:4px 6px;font-size:12.5px;color:var(--ink-2)}
+  .tr-arrow{color:var(--ink-3)}
+  .tr-g{grid-area:g;align-self:center}
+  .tr-g b{font-size:15px}
+  .tr-pct{padding:1px 7px;border-radius:99px;background:color-mix(in srgb,currentColor 12%,transparent)}
+  .tr-month{padding:9px 16px}
+  .tr-day{grid-template-columns:78px minmax(0,1fr) auto;font-size:12.5px}
+  .tr-day b{min-width:84px}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1844,9 +1895,9 @@ function viewPortfolio(){
   const sub = UI.sub.portfolio || "shares";
   const sn = snap();
   const tabs = [
-    ["shares", L("Mere shares","My shares")], ["daily", "Daily earnings"], ["where", L("Paisa kahan laga?","Where's my money?")], ["history", L("Khareed/farokht","Buy/sell history")],
+    ["shares", L("Mere shares","My shares")], ["trading", "Trading"], ["daily", "Daily earnings"], ["where", L("Paisa kahan laga?","Where's my money?")], ["history", L("Khareed/farokht","Buy/sell history")],
     ["dividends", L("Dividends","Dividends")], ["monthly", L("Mahana hisaab","Monthly account")], ["calc", L("Calculators","Calculators")]
-  ].filter(([k]) => !isSimple() || ["shares","daily","history",sub].includes(k));
+  ].filter(([k]) => !isSimple() || ["shares","trading","daily","history",sub].includes(k));
   return `
   <div class="pf-head">
     <div style="min-width:0"><h1 class="h-page">${FAMILY && UI.readOnly ? `${esc(memberName(UI.fam.viewing))}'s portfolio` : L("Mera Portfolio","My Portfolio")}</h1><div class="tiny faint">${sn.holdings.length} ${sn.holdings.length === 1 ? "company" : "companies"}</div></div>
@@ -1855,7 +1906,7 @@ function viewPortfolio(){
   ${issuesNotice(sn)}
   ${sn.holdings.length ? pfHero(sn) : ""}
   <div class="seg pf-tabs" role="tablist">${tabs.map(([k,l]) => `<button role="tab" data-act="psub" data-v="${k}" aria-pressed="${sub===k}">${esc(l)}</button>`).join("")}${moreTabsBtn()}</div>
-  ${sub === "shares" ? pShares(sn) : sub === "daily" ? pDaily() : sub === "prices" ? pPrices(sn) : sub === "where" ? pWhere(sn) : sub === "history" ? pHistory() : sub === "dividends" ? pDividends(sn) : sub === "monthly" ? monthlyView() : sub === "calc" ? pCalc(sn) : pShares(sn)}`;
+  ${sub === "shares" ? pShares(sn) : sub === "trading" ? pTrading() : sub === "daily" ? pDaily() : sub === "prices" ? pPrices(sn) : sub === "where" ? pWhere(sn) : sub === "history" ? pHistory() : sub === "dividends" ? pDividends(sn) : sub === "monthly" ? monthlyView() : sub === "calc" ? pCalc(sn) : pShares(sn)}`;
 }
 function holdingsTable(sn){
   const tot = sn.holdings.reduce((a, h) => ({ cost: a.cost + h.cost, value: a.value + h.value }), { cost: 0, value: 0 }); const tpl = tot.value - tot.cost;
@@ -1919,6 +1970,147 @@ function pDaily(){
     </div>
     <p class="tiny faint" style="margin:10px 4px 0">A day's earning is how much your total profit or loss changed that day, from the closing prices. It can be positive on a day the price rose even if the share is still below your average.</p>`;
 }
+/* =========================================================================
+   Trading journal: one row per trade (buy and sell together), gross profit only.
+   Kept apart from the portfolio entries, like the user's own Excel sheet.
+   ========================================================================= */
+const trGross = t => t.sq > 0 && t.sr > 0 ? t.sq * (t.sr - t.br) : 0;
+const trRet = t => t.sq > 0 && t.br > 0 && t.sr > 0 ? (t.sr - t.br) / t.br : null;
+const trDay = t => t.sd || t.date;
+const trOpen = t => !(t.sq > 0) || t.sq < t.bq;
+function trList(){ return (S.trades || []).slice().sort((a, b) => (b.date + (b.at || 0)) < (a.date + (a.at || 0)) ? -1 : 1); }
+
+function pTrading(){
+  const T = trList(); const t0 = todayISO(); const ro = FAMILY && UI.readOnly;
+  const closed = T.filter(t => t.sq > 0 && t.sr > 0);
+  const total = closed.reduce((a, t) => a + trGross(t), 0);
+  const month = closed.filter(t => trDay(t).slice(0, 7) === t0.slice(0, 7)).reduce((a, t) => a + trGross(t), 0);
+  const wins = closed.filter(t => trGross(t) > 0).length;
+  const best = closed.slice().sort((a, b) => trGross(b) - trGross(a))[0];
+  const days = {}; closed.forEach(t => { const d = trDay(t); (days[d] ||= { d, g: 0, n: 0 }); days[d].g += trGross(t); days[d].n++; });
+  const dayRows = Object.values(days).sort((a, b) => a.d < b.d ? 1 : -1);
+  const mx = Math.max(1, ...dayRows.map(x => Math.abs(x.g)));
+  const head = `<div class="tr-actions">${ro ? "" : `<button class="btn primary sm" data-act="tr-new">${ic("plus",16,2.2)} Add trade</button><button class="btn line sm" data-act="tr-import">${ic("upload",16)} Paste from Excel</button>`}</div>`;
+  if (!T.length) return `${head}<div class="card"><div class="empty"><b>No trades yet</b>Add a trade with its buy and sell, or paste your rows straight from Excel.</div></div>`;
+  const groups = {}; T.forEach(t => (groups[trDay(t).slice(0, 7)] ||= []).push(t));
+  const row = t => { const g = trGross(t), r = trRet(t), open = trOpen(t);
+    return `<button class="tr-row" data-act="tr-edit" data-id="${t.id}">
+      <span class="tr-d num">${esc(fmtDate(t.date).replace(/ \d{4}$/, ""))}${t.sd && t.sd !== t.date ? `<span class="tr-sd">sold ${esc(fmtDate(t.sd).replace(/ \d{4}$/, ""))}</span>` : ""}</span>
+      <span class="tr-s"><b>${esc(t.sym)}</b></span>
+      <span class="tr-n num" data-k="Buy qty">${num(t.bq)}</span>
+      <span class="tr-n num" data-k="Buy rate">${rs(t.br, 2)}</span>
+      <span class="tr-n num" data-k="Sell qty">${t.sq > 0 ? num(t.sq) : "—"}</span>
+      <span class="tr-n num" data-k="Sell rate">${t.sr > 0 ? rs(t.sr, 2) : "—"}</span>
+      <span class="tr-g">${t.sq > 0 && t.sr > 0 ? `<b class="num ${tone(g)}">${rsS(g, 2)}</b>${r != null ? `<span class="tr-pct num ${tone(g)}">${pct(r, 2, true)}</span>` : ""}` : ""}${open ? `<span class="pill info tr-open">${t.sq > 0 ? `${num(t.bq - t.sq)} left` : "Open"}</span>` : ""}</span>
+      <span class="tr-m"><span class="num">Buy ${num(t.bq)} @ ${num(t.br, 2)}</span>${t.sq > 0 && t.sr > 0 ? `<span class="tr-arrow">→</span><span class="num">Sell ${num(t.sq)} @ ${num(t.sr, 2)}</span>` : `<span class="faint">not sold yet</span>`}</span>
+    </button>`; };
+  return `${head}
+  <section class="tr-hero">
+    <div><span class="k">Gross profit</span><b class="num ${tone(total)}">${rsS(total, 2)}</b><span class="tiny faint">${closed.length} closed trade${closed.length === 1 ? "" : "s"}</span></div>
+    <div><span class="k">This month</span><b class="num ${tone(month)}">${rsS(month, 2)}</b><span class="tiny faint">${fmtMonth(t0.slice(0, 7))}</span></div>
+    <div><span class="k">Win rate</span><b class="num">${closed.length ? Math.round(wins / closed.length * 100) + "%" : "—"}</b><span class="tiny faint">${wins} of ${closed.length} in profit</span></div>
+    <div><span class="k">Best trade</span><b class="num ${best ? tone(trGross(best)) : ""}">${best ? rsS(trGross(best), 0) : "—"}</b><span class="tiny faint">${best ? `${esc(best.sym)} · ${fmtDate(trDay(best))}` : ""}</span></div>
+  </section>
+  ${dayRows.length ? `<section class="card pad tr-days"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h2 class="h-sec">Daily gross profit</h2><span class="tiny faint">by sell date</span></div>
+    ${dayRows.slice(0, 31).map(x => `<div class="tr-day"><span class="num">${esc(fmtDate(x.d))}</span><span class="tr-dbar"><i class="${x.g >= 0 ? "up" : "dn"}" style="width:${Math.max(2, Math.abs(x.g) / mx * 100).toFixed(1)}%"></i></span><b class="num ${tone(x.g)}">${rsS(x.g, 2)}</b></div>`).join("")}
+  </section>` : ""}
+  <section class="card tr-card">
+    <div class="tr-row tr-headrow" aria-hidden="true"><span>Date</span><span>Scrip</span><span class="r">Buy qty</span><span class="r">Buy rate</span><span class="r">Sell qty</span><span class="r">Sell rate</span><span class="r">Gross profit</span></div>
+    ${Object.entries(groups).map(([m, rows]) => { const mg = rows.reduce((a, t) => a + trGross(t), 0);
+      return `<div class="tr-month"><span>${fmtMonth(m)}</span><b class="num ${tone(mg)}">${rsS(mg, 2)}</b></div>${rows.map(row).join("")}`; }).join("")}
+    <p class="tiny faint" style="margin:12px 16px 14px">Gross profit = sold shares × (sell rate − buy rate). Broker charges and taxes are not taken out. Tap a trade to edit it or add its sale.</p>
+  </section>`;
+}
+
+function trSheetBody(s){
+  const t = s.id ? (S.trades || []).find(x => x.id === s.id) : null; const d = t || { date: todayISO(), sym: s.sym || "", bq: "", br: "", sq: "", sr: "", sd: "" };
+  const v = x => x === "" || x == null ? "" : x;
+  return `<form class="stack" data-form="trade" novalidate>
+    <div class="fgrid two">
+      <div class="field"><label for="tr-date">Buy date</label><input class="input" type="date" id="tr-date" value="${esc(d.date)}" max="${todayISO()}"></div>
+      <div class="field"><label for="tr-sym">Scrip</label><input class="input" id="tr-sym" list="tr-syms" autocapitalize="characters" value="${esc(d.sym)}" placeholder="e.g. DGKC"><datalist id="tr-syms">${[...new Set([...(S.trades || []).map(x => x.sym), ...SYMBOLS.map(x => x.s)])].map(x => `<option value="${esc(x)}"></option>`).join("")}</datalist></div>
+      <div class="field"><label for="tr-bq">Buy qty</label><input class="input num" id="tr-bq" inputmode="numeric" value="${v(d.bq)}"></div>
+      <div class="field"><label for="tr-br">Buy rate</label><div class="input-wrap"><span class="pre">Rs</span><input class="input num" id="tr-br" inputmode="decimal" value="${v(d.br)}"></div></div>
+      <div class="field"><label for="tr-sq">Sell qty</label><input class="input num" id="tr-sq" inputmode="numeric" value="${v(d.sq)}" placeholder="Leave empty if not sold"></div>
+      <div class="field"><label for="tr-sr">Sell rate</label><div class="input-wrap"><span class="pre">Rs</span><input class="input num" id="tr-sr" inputmode="decimal" value="${v(d.sr)}"></div></div>
+      <div class="field" style="grid-column:1/-1"><label for="tr-sd">Sell date <span class="faint" style="font-weight:400">(if different from buy date)</span></label><input class="input" type="date" id="tr-sd" value="${esc(d.sd || "")}" max="${todayISO()}"></div>
+    </div>
+    <div class="result" id="tr-out"></div>
+    <span class="err" id="tr-err"></span>
+    <button class="btn primary block" type="submit">${ic("check",17,2.4)} ${t ? "Save changes" : "Add trade"}</button>
+    ${t ? `<button type="button" class="btn line block" data-act="tr-del" data-id="${t.id}" style="color:var(--loss)">${ic("trash",16)} Delete this trade</button>` : ""}
+  </form>`;
+}
+function trLive(){
+  const out = $("#tr-out"); if (!out) return;
+  const bq = parseNum($("#tr-bq").value), br = parseNum($("#tr-br").value), sq = parseNum($("#tr-sq").value), sr = parseNum($("#tr-sr").value);
+  if (!(bq > 0 && br > 0)){ out.innerHTML = `<div class="small muted">Enter what you bought to see the profit.</div>`; return; }
+  const cost = bq * br;
+  if (!(sq > 0 && sr > 0)){ out.innerHTML = `<div class="small muted">Bought for</div><div class="big num">${rs(cost, 2)}</div><div class="small muted">Add the sale now or later.</div>`; return; }
+  const g = Math.min(sq, bq) * (sr - br);
+  out.innerHTML = `<div class="small muted">Gross profit</div><div class="big num ${tone(g)}">${rsS(g, 2)}</div><div class="small muted num">${pct((sr - br) / br, 2, true)} · sold for ${rs(sq * sr, 2)}${sq < bq ? ` · ${num(bq - sq)} still held` : ""}</div>`;
+}
+function trSubmit(){
+  const err = $("#tr-err"); const date = $("#tr-date").value, sym = $("#tr-sym").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const bq = parseNum($("#tr-bq").value), br = parseNum($("#tr-br").value), sqv = $("#tr-sq").value.trim(), srv = $("#tr-sr").value.trim(), sd = $("#tr-sd").value;
+  const sq = sqv === "" ? 0 : parseNum(sqv), sr = srv === "" ? 0 : parseNum(srv);
+  if (!validISO(date)) return err.textContent = "Choose the buy date.";
+  if (!sym) return err.textContent = "Write the scrip, e.g. DGKC.";
+  if (!(bq > 0) || !(br > 0)) return err.textContent = "Enter buy qty and buy rate.";
+  if ((sq > 0) !== (sr > 0)) return err.textContent = "Enter both sell qty and sell rate, or leave both empty.";
+  if (!(sq >= 0) || !(sr >= 0)) return err.textContent = "Sell qty and rate must be numbers.";
+  if (sq > bq) return err.textContent = "You can't sell more than you bought in this trade.";
+  if (sd && (!validISO(sd) || sd < date)) return err.textContent = "Sell date must be on or after the buy date.";
+  const id = UI.sheet?.id; const rec = { id: id || uid(), at: Date.now(), date, sym, bq: Math.round(bq), br: round2(br), sq: Math.round(sq), sr: round2(sr), sd: sq > 0 && sd && sd !== date ? sd : "" };
+  commit(st => { st.trades = (st.trades || []).filter(x => x.id !== rec.id).concat(rec); });
+  closeSheet(); toast(id ? "Trade updated" : "Trade added");
+}
+
+/** Rows copied from Excel: Date, Scrip, Buy Qty, Buy Rate, Sell Qty, Sell Rate (extra columns are ignored). */
+const MON3 = { jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12 };
+function trParseDate(c){
+  c = String(c || "").trim(); let m;
+  if ((m = c.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return iso3(+m[1], +m[2], +m[3]);
+  if ((m = c.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})$/))) return iso3(m[3].length === 2 ? 2000 + +m[3] : +m[3], +m[2], +m[1]);
+  if ((m = c.match(/^(\d{1,2})[\s\-]([A-Za-z]{3})[A-Za-z]*[\s\-,]+(\d{2,4})$/))) return MON3[m[2].toLowerCase()] ? iso3(m[3].length === 2 ? 2000 + +m[3] : +m[3], MON3[m[2].toLowerCase()], +m[1]) : null;
+  return null;
+}
+function iso3(y, mo, d){ const s = `${y}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`; return validISO(s) ? s : null; }
+function trParsePaste(text){
+  const out = [], bad = [];
+  String(text || "").split(/\r?\n/).forEach((line, i) => {
+    if (!line.trim()) return;
+    const cells = (line.includes("\t") ? line.split("\t") : line.split(/\s{2,}|,(?=\S)/)).map(c => c.trim()).filter(c => c !== "");
+    const di = cells.findIndex(c => trParseDate(c)); if (di < 0){ if (/\d/.test(line) && !/date|scrip|qty|rate/i.test(line)) bad.push(i + 1); return; }
+    const rest = cells.slice(di + 1); const si = rest.findIndex(c => /^[A-Za-z][A-Za-z0-9&.\- ]{0,15}$/.test(c) && !/^(yes|no)$/i.test(c));
+    if (si < 0){ bad.push(i + 1); return; }
+    const nums = rest.slice(si + 1).filter(c => !/^(yes|no)$/i.test(c)).map(c => parseNum(c)).filter(n => isFinite(n));
+    const [bq, br, sq = 0, sr = 0] = nums;
+    if (!(bq > 0 && br > 0)){ bad.push(i + 1); return; }
+    out.push({ date: trParseDate(cells[di]), sym: rest[si].toUpperCase().replace(/[^A-Z0-9]/g, ""), bq: Math.round(bq), br: round2(br), sq: sq > 0 && sr > 0 ? Math.round(Math.min(sq, bq)) : 0, sr: sq > 0 && sr > 0 ? round2(sr) : 0, sd: "" });
+  });
+  return { rows: out, bad };
+}
+function trImportBody(){
+  const P = UI.trImp || {};
+  return `<p class="small muted" style="margin-top:-8px">In Excel, select your trade rows (Date, Scrip, Buy Qty, Buy Rate, Sell Qty, Sell Rate), copy, and paste here. Extra columns like Same Day or Net Profit are ignored.</p>
+    <textarea class="input" id="tr-imp" rows="6" placeholder="12/06/2026	DGKC	508	196.99	508	205.94">${esc(P.text || "")}</textarea>
+    <div class="row" style="gap:8px;margin-top:10px"><button type="button" class="btn line sm" data-act="tr-imp-clip">${ic("copy",15)} Paste</button><button type="button" class="btn primary sm" data-act="tr-imp-read">${ic("check",15,2.4)} Read rows</button></div>
+    ${P.rows ? (P.rows.length ? `<div class="tr-imp-list">
+      <div class="lbl" style="margin:14px 0 6px">Found ${P.rows.length} trade${P.rows.length === 1 ? "" : "s"}${P.dup ? ` · ${P.dup} already added (skipped)` : ""}</div>
+      ${P.rows.slice(0, 60).map(t => `<div class="tr-imp-r"><span class="num">${esc(fmtDate(t.date))}</span><b>${esc(t.sym)}</b><span class="num faint">${num(t.bq)} @ ${num(t.br, 2)}${t.sq ? ` → ${num(t.sq)} @ ${num(t.sr, 2)}` : " · open"}</span><b class="num ${tone(trGross(t))}">${t.sq ? rsS(trGross(t), 2) : ""}</b></div>`).join("")}
+      ${P.rows.length > 60 ? `<p class="tiny faint">…and ${P.rows.length - 60} more</p>` : ""}
+      ${P.bad?.length ? `<p class="tiny" style="color:var(--loss)">Couldn't read line${P.bad.length === 1 ? "" : "s"} ${P.bad.slice(0, 8).join(", ")}${P.bad.length > 8 ? "…" : ""}.</p>` : ""}
+      <button class="btn primary block" data-act="tr-imp-save" style="margin-top:10px">${ic("check",17,2.4)} Add ${P.rows.length} trade${P.rows.length === 1 ? "" : "s"}</button></div>`
+      : `<p class="small" style="color:var(--loss);margin-top:12px">No trades found. Make sure each row starts with a date, then the scrip and the numbers.</p>`) : ""}`;
+}
+function trImportRead(){
+  const text = $("#tr-imp").value; const { rows, bad } = trParsePaste(text);
+  const key = t => [t.date, t.sym, t.bq, t.br, t.sq, t.sr].join("|"); const have = new Set((S.trades || []).map(key));
+  const fresh = rows.filter(t => !have.has(key(t)));
+  UI.trImp = { text, rows: fresh, bad, dup: rows.length - fresh.length }; renderSheet();
+}
+
 function pWhere(sn){
   if (!sn.holdings.length) return `<div class="card"><div class="empty"><b>${L("Abhi kuch nahi","Nothing yet")}</b></div></div>`;
   const c = hhi(sn.holdings.map(h=>h.value));
@@ -3154,6 +3346,10 @@ function renderSheet(){
       <h3 class="h-sec" style="margin:20px 0 6px">${L("Is share ki history","History for this share")}</h3>
       <div class="list">${(() => { const ev = Object.fromEntries(replay(S.txs).events.map(e => [e.id, e])); let run = 0; const rows = sortTx(S.txs.filter(t => t.symbol === s.s)).map(t => { if (t.type === "BUY" || t.type === "BONUS") run += t.qty; if (t.type === "SELL" && ev[t.id]) run -= t.qty; return { t, after: run }; }).reverse();
         return rows.map(({ t, after }) => { const e = ev[t.id]; return `<button class="li" data-act="edit-tx" data-id="${t.id}"><span class="pill ${t.type === "SELL" ? "demo" : t.type === "BUY" ? "info" : "ok"}" style="flex:none;min-width:58px;justify-content:center">${t.type === "SELL" ? "Sold" : t.type === "BUY" ? "Bought" : esc(TL[t.type])}</span><div class="mid"><div class="main-t num">${t.qty ? `${num(t.qty)} × ${rs(t.price,2)}` : rs(t.amount)}</div><div class="sub-t">${fmtDate(t.date)}${t.qty ? ` · ${num(after)} left after` : ""}</div></div>${e ? `<div class="right"><div class="v num ${tone(e.pl)}">${rsS(e.pl)}</div><div class="tiny faint">profit</div></div>` : `<span class="faint">${ic("chev",18)}</span>`}</button>`; }).join("") || `<p class="muted small">—</p>`; })()}</div>`;
+  } else if (s.kind === "trade"){
+    title = s.id ? "Edit trade" : "Add trade"; body = trSheetBody(s);
+  } else if (s.kind === "trade-import"){
+    title = "Paste trades from Excel"; body = trImportBody();
   } else if (s.kind === "export"){
     const first = sortTx(S.txs)[0]?.date || todayISO(); const t0 = todayISO();
     const ty = t0.slice(5) >= "07-01" ? t0.slice(0, 4) + "-07-01" : (+t0.slice(0, 4) - 1) + "-07-01";
@@ -3639,6 +3835,13 @@ document.addEventListener("click", async (ev) => {
       if (await offerDownload("psx-yaad-dahaniyan.ics", ics, "text/calendar")){ const at = Date.now(); commit(st => st.reminders = st.reminders.map(r => !r.done && r.date && !r.calAt ? { ...r, calAt: at } : r)); toast(L(`${n} yaad-dahaniyan tayyar — file kholein aur "Add" dabayein`, `${n} reminder(s) ready — open the file and tap "Add"`)); }
       break; }
     case "mg-set": mgSave(+v); break;
+    case "tr-new": openSheet({ kind: "trade" }); setTimeout(trLive, 0); break;
+    case "tr-edit": openSheet({ kind: "trade", id: el.dataset.id }); setTimeout(() => { trLive(); if (!(S.trades || []).find(x => x.id === el.dataset.id)?.sq) $("#tr-sq")?.focus(); }, 0); break;
+    case "tr-del": { const id = el.dataset.id; const old = (S.trades || []).find(x => x.id === id); commit(st => st.trades = (st.trades || []).filter(x => x.id !== id)); closeSheet(); toast("Trade deleted", old ? () => commit(st => st.trades = (st.trades || []).concat(old)) : undefined); break; }
+    case "tr-import": UI.trImp = null; openSheet({ kind: "trade-import" }); break;
+    case "tr-imp-read": trImportRead(); break;
+    case "tr-imp-clip": { try { const t = await navigator.clipboard.readText(); $("#tr-imp").value = t || ""; trImportRead(); } catch { toast("Press and hold in the box, then tap Paste"); $("#tr-imp")?.focus(); } break; }
+    case "tr-imp-save": { const rows = UI.trImp?.rows || []; if (!rows.length) break; const now = Date.now(); commit(st => { st.trades = (st.trades || []).concat(rows.map((t, i) => ({ ...t, id: uid(), at: now + i }))); }); UI.trImp = null; closeSheet(); toast(`Added ${rows.length} trade${rows.length === 1 ? "" : "s"}`); break; }
     case "fam-key-paste": { try { const t = await navigator.clipboard.readText(); const inp = $("#fam-key-in"); if (inp) inp.value = t || ""; if (famKeyFrom(t)) famUseKey(t); } catch { toast("Press and hold in the box, then tap Paste"); $("#fam-key-in")?.focus(); } break; }
     case "paste-clip": { try { const t = await navigator.clipboard.readText(); if (!t){ toast("Nothing copied yet"); break; } const ta = $("#paste-txt"); ta.value = (ta.value ? ta.value + "\n" : "") + t; UI.paste = { text: ta.value }; pasteRead(); } catch { toast("Press and hold in the box, then tap Paste"); $("#paste-txt")?.focus(); } break; }
     case "paste-read": UI.paste = { text: $("#paste-txt").value }; pasteRead(); break;
@@ -3761,6 +3964,8 @@ document.addEventListener("input", (ev) => {
   const t = ev.target;
   if (t.closest("[data-live]")) liveCalc();
   if (t.closest("#entry-form")) liveEntry();
+  if (t.closest('[data-form="trade"]')) trLive();
+  if (t.id === "tr-imp") UI.trImp = { ...(UI.trImp || {}), text: t.value };
   if (t.id === "paste-txt") UI.paste = { ...(UI.paste || {}), text: t.value };
   if (t.id === "mg-range"){ const g = +t.value; const n = $("#mg-num"); if (n) n.value = g || ""; moGoalLive(g); }
   if (t.id === "mg-num"){ const g = Math.max(0, Math.round(parseNum(t.value) || 0)); const rg = $("#mg-range"); moGoalLive(g); if (rg) rg.value = g; }
@@ -3770,6 +3975,7 @@ document.addEventListener("submit", async (ev) => {
   const f = ev.target; ev.preventDefault();
   if (f.id === "entry-form"){ submitEntry(); return; }
   const k = f.dataset.form;
+  if (k === "trade"){ trSubmit(); return; }
   if (k === "fam-key"){ famUseKey($("#fam-key-in").value); return; }
   if (k === "prices"){ submitPrices(); return; }
   if (k === "custom-sym"){ submitCustomSym(); return; }
@@ -4536,7 +4742,7 @@ function migrate(st){ if (!st.langChosen) st.lang = "en"; st.readUpd ||= {}; st.
   else if (!("qty" in b)){ const qty = {}; let cash = null; for (const [k, v] of Object.entries(b)){ if (k === "__cash") cash = v === "" || v == null ? null : Number(v); else if (v !== "" && v != null && isFinite(Number(v))) qty[k] = Number(v); } st.broker = { asOf: null, qty, cash, extra: [] }; }
   st.settings = { minPerShare: 0, sstPct: 0, otherPct: 0, flatFee: 0, ...st.settings };
   if (st.settings.simple === undefined) st.settings.simple = true;
-  st.prices ||= {}; st.customSyms ||= []; st.customSyms.forEach(registerCustom);
+  st.prices ||= {}; st.customSyms ||= []; st.trades ||= []; st.customSyms.forEach(registerCustom);
   return st; }
 S = migrate(S);
 const h0 = location.hash.slice(1); if (["home","portfolio","add"].includes(h0)) UI.route = h0;
