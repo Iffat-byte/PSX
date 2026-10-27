@@ -572,6 +572,18 @@ select.input option{background:var(--surface);color:var(--ink)}
 .exi.pdf{background:linear-gradient(160deg,#E5574B,#B3261E)}
 .chipb[aria-pressed="true"]{border-color:#D6B26E;background:rgba(214,178,110,.2)}
 @media (max-width:420px){.exfmt{grid-template-columns:1fr}}
+
+/* ---------- paste prices ---------- */
+.paste-card{border:1px solid rgba(214,178,110,.35)}
+.paste-how summary{cursor:pointer;font-weight:600;color:var(--emerald-ink)}
+.paste-how ol{margin:8px 0 0;padding-left:20px;display:grid;gap:6px}
+#paste-txt{min-height:96px;font-size:14px}
+.paste-res{display:grid;gap:6px}
+.prow{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:9px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);cursor:pointer}
+.prow input{width:18px;height:18px;accent-color:#D6B26E;flex:none}
+.prow .logo{width:28px;height:28px;border-radius:8px}
+.prow .pv{margin-left:auto;text-align:right}
+.prow.odd{border-color:color-mix(in srgb,var(--loss) 45%,transparent)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -3518,6 +3530,15 @@ document.addEventListener("click", async (ev) => {
       if (await offerDownload("psx-yaad-dahaniyan.ics", ics, "text/calendar")){ const at = Date.now(); commit(st => st.reminders = st.reminders.map(r => !r.done && r.date && !r.calAt ? { ...r, calAt: at } : r)); toast(L(`${n} yaad-dahaniyan tayyar — file kholein aur "Add" dabayein`, `${n} reminder(s) ready — open the file and tap "Add"`)); }
       break; }
     case "mg-set": mgSave(+v); break;
+    case "paste-clip": { try { const t = await navigator.clipboard.readText(); if (!t){ toast("Nothing copied yet"); break; } const ta = $("#paste-txt"); ta.value = (ta.value ? ta.value + "\n" : "") + t; UI.paste = { text: ta.value }; pasteRead(); } catch { toast("Press and hold in the box, then tap Paste"); $("#paste-txt")?.focus(); } break; }
+    case "paste-read": UI.paste = { text: $("#paste-txt").value }; pasteRead(); break;
+    case "paste-clear": UI.paste = null; render(); break;
+    case "paste-tick": { const sy = el.dataset.s; UI.paste.on = { ...UI.paste.on, [sy]: el.checked }; UI.paste.off = { ...UI.paste.off, [sy]: !el.checked }; return; }
+    case "paste-save": { const P = UI.paste || {}; const upd = {}; document.querySelectorAll('[data-act="paste-tick"]').forEach(c => { if (c.checked) upd[c.dataset.s] = P.found[c.dataset.s]; });
+      const n = Object.keys(upd).length; if (!n){ toast("Tick at least one price"); break; }
+      if (FAMILY){ UI.paste = null; famPrices(upd).then(ok => ok && toast(`Saved ${n} price${n === 1 ? "" : "s"} for everyone`)); }
+      else { const t0 = todayISO(); UI.paste = null; commit(st => { const pr = { ...(st.prices || {}) }; for (const [k, p] of Object.entries(upd)){ const old = pr[k]; pr[k] = { p, d: t0, prev: old ? (old.d === t0 ? old.prev : old.p) : null }; } st.prices = pr; }); toast(`Saved ${n} price${n === 1 ? "" : "s"}`); }
+      break; }
     case "export-open": UI.exp = null; openSheet({ kind: "export" }); break;
     case "ex-pre": UI.exp = { ...UI.exp, from: el.dataset.f, to: el.dataset.t }; renderSheet(); break;
     case "ex-fmt": UI.exp = { ...UI.exp, from: $("#ex-from").value, to: $("#ex-to").value, fmt: v }; renderSheet(); break;
@@ -3629,6 +3650,7 @@ document.addEventListener("input", (ev) => {
   const t = ev.target;
   if (t.closest("[data-live]")) liveCalc();
   if (t.closest("#entry-form")) liveEntry();
+  if (t.id === "paste-txt") UI.paste = { ...(UI.paste || {}), text: t.value };
   if (t.id === "mg-range"){ const g = +t.value; const n = $("#mg-num"); if (n) n.value = g || ""; moGoalLive(g); }
   if (t.id === "mg-num"){ const g = Math.max(0, Math.round(parseNum(t.value) || 0)); const rg = $("#mg-range"); moGoalLive(g); if (rg) rg.value = g; }
 });
@@ -3988,6 +4010,61 @@ function priceTag(holdings){
   if (p.demo === 0) return L(`Aap ki qeematein · ${fmtDate(p.latest)}`, `Your prices · ${fmtDate(p.latest)}`);
   return L(`${p.user}/${p.all} aap ki qeematein, baaqi demo`, `${p.user} of ${p.all} your prices, rest demo`);
 }
+/** Read share prices from pasted text (broker app via Live Text / Google Lens, a watchlist, or "OGDC 245.5" lines).
+    For each known symbol, the price is the first plain number after it, skipping quantities ("53,710 shares"), averages ("@ 13.76"),
+    volume, day low/high ("l: 12.25 h: 12.48"), signed changes, percentages and PKR amounts. */
+function parsePastedPrices(text, symbols){
+  const src = String(text || "").replace(/[−–—]/g, "-").replace(/ /g, " ");
+  const set = new Set(symbols.map(x => x.toUpperCase()));
+  const find = ci => { const out = []; const re = /[A-Za-z][A-Za-z0-9]{1,9}/g; let m;
+    while ((m = re.exec(src))){ const w = m[0]; const before = src[m.index - 1] || " ", after = src[m.index + w.length] || " ";
+      if (/[A-Za-z0-9]/.test(before) || /[A-Za-z0-9]/.test(after)) continue;
+      const up = w.toUpperCase(); if (set.has(up) && (ci || w === up)) out.push({ s: up, at: m.index, end: m.index + w.length }); }
+    return out; };
+  let hits = find(false); if (!hits.length) hits = find(true);
+  const res = {};
+  hits.forEach((h, i) => {
+    if (res[h.s]) return;
+    const seg = src.slice(h.end, i + 1 < hits.length ? hits[i + 1].at : src.length);
+    const re = /([+-]?)(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?(\s*%)?/g; let m;
+    while ((m = re.exec(seg))){
+      const pre = seg.slice(Math.max(0, m.index - 14), m.index), post = seg.slice(m.index + m[0].length, m.index + m[0].length + 10);
+      if (m[1] || m[4]) continue;                                        // +0.13, -71,434.30, 1.06%
+      if (/[(\d.,]$/.test(pre) || /^[\d]/.test(post)) continue;
+      if (/@\s*$/.test(pre) || /shares?\s*@?\s*$/i.test(pre)) continue; // average price
+      if (/vol(ume)?\s*[:.]?\s*$/i.test(pre)) continue;                  // Mkt Vol: 9,171,773
+      if (/(^|[^A-Za-z])[lhLHI1]\s*[:;]\s*$/.test(pre) || /(low|high)\s*[:.]?\s*$/i.test(pre)) continue; // l: 12.25 h: 12.48
+      if (/(pkr|value|loss|profit|gain)\s*[:.]?\s*$/i.test(pre)) continue;
+      if (/^\s*(shares?|sh\b|qty)/i.test(post)) continue;                // 53,710 shares
+      const v = parseFloat((m[2] + (m[3] || "")).replace(/,/g, ""));
+      if (!(v > 0 && v < 100000)) continue;
+      res[h.s] = Math.round(v * 100) / 100; break;
+    }
+  });
+  return res;
+}
+function pastePricesCard(){
+  const P = UI.paste || {}; const found = P.found ? Object.entries(P.found) : null;
+  const pr = pricesSrc() || {}; const ref = s => pr[s]?.p ?? null;
+  return `<section class="card pad stack paste-card">
+    <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><h2 class="h-sec">${ic("copy",18)} Paste prices</h2><span class="pill info">Fastest way</span></div>
+    <p class="small muted" style="margin:0">After the market closes, copy your broker app's list and paste it here. Every share's closing price is read at once${FAMILY ? " and saved for all three of you" : ""}.</p>
+    <details class="paste-how"><summary class="small">How to copy from the broker app</summary>
+      <ol class="small muted"><li><b>iPhone:</b> take a screenshot of your holdings, open it in Photos, press and hold on the text, tap <b>Select All</b>, then <b>Copy</b>.</li>
+      <li><b>Android:</b> take a screenshot, open it in Google Photos, tap <b>Lens</b> → <b>Text</b> → <b>Select all</b> → <b>Copy</b>.</li>
+      <li>Come back here and tap <b>Paste</b>. You can paste several screenshots one after another.</li></ol></details>
+    <textarea class="input" id="paste-txt" rows="4" placeholder="Paste here… e.g. CNERGY 12.43  DGKC 183.70  LUCK 399.00">${esc(P.text || "")}</textarea>
+    <div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" class="btn line sm" data-act="paste-clip">${ic("copy",15)} Paste</button><button type="button" class="btn primary sm" data-act="paste-read">${ic("check",15,2.4)} Read prices</button>${P.text ? `<button type="button" class="link small" data-act="paste-clear">Clear</button>` : ""}</div>
+    ${found ? (found.length ? `<div class="paste-res">
+      <div class="lbl" style="margin-bottom:6px">Found ${found.length} price${found.length === 1 ? "" : "s"}. Untick any that look wrong.</div>
+      ${found.map(([sy, v]) => { const o = ref(sy); const ch = o ? (v - o) / o : null; const odd = ch != null && Math.abs(ch) > 0.3; const on = P.off?.[sy] ? false : !odd || P.on?.[sy];
+        return `<label class="prow${odd ? " odd" : ""}"><input type="checkbox" data-act="paste-tick" data-s="${sy}" ${on ? "checked" : ""}><span class="logo">${logoMark(sy)}</span><b>${esc(sy)}</b>
+          <span class="pv num">${o != null ? `<span class="faint">${rs(o, 2)} →</span> ` : ""}<b>${rs(v, 2)}</b>${ch != null ? ` <span class="${tone(ch)}">${pct(ch, 1, true)}</span>` : ""}</span>${odd ? `<span class="tiny" style="color:var(--loss);flex-basis:100%;padding-left:30px">Big change. Check before saving.</span>` : ""}</label>`; }).join("")}
+      ${P.missing?.length ? `<p class="tiny faint" style="margin:6px 0 0">Not found: ${P.missing.map(esc).join(", ")}</p>` : ""}
+      <button type="button" class="btn primary block" data-act="paste-save" style="margin-top:10px">${ic("check",17,2.4)} Save these prices</button></div>`
+      : `<p class="small" style="color:var(--loss);margin:0">No share prices found. Make sure the text has the share names (like LUCK or OGDC) with their prices.</p>`) : ""}
+  </section>`;
+}
 function pPrices(sn){
   const pr = pricesSrc() || {}; const p = priceState(sn.holdings);
   const secs = [...new Set(SYMBOLS.map(x => x.sec))].filter(x => x !== "Other").sort();
@@ -3999,7 +4076,7 @@ function pPrices(sn){
       <div style="flex:none;width:132px"><div class="input-wrap"><span class="pre">Rs</span><input class="input num" style="min-height:42px;text-align:right" id="pr-${esc(h.s)}" data-pr="${esc(h.s)}" inputmode="decimal" value="${u ? u.p : ""}" placeholder="${L("Aaj ki","Today's")}" aria-label="${esc(h.s)} ${L("ki aaj ki qeemat","today's price")}"></div>
         ${u && !FAMILY ? `<button type="button" class="link tiny" style="margin-top:4px" data-act="price-clear" data-s="${esc(h.s)}">${L("Demo par wapas","Back to demo")}</button>` : ""}</div>
     </div>`; }).join("");
-  return `<form class="card pad stack" data-form="prices" novalidate>
+  return `${list.length ? pastePricesCard() : ""}<form class="card pad stack" data-form="prices" novalidate>
     <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><h2 class="h-sec">${L("Apne shares ki asli qeematein","Real prices for your shares")}</h2>${p.all ? `<span class="pill ${p.demo ? "demo" : "ok"} num">${p.user}/${p.all} ${L("asli","real")}</span>` : ""}</div>
     <p class="small muted">${L("Apni broker app mein har share ki maujooda qeemat dekh kar yahan likhein. Jis share ki qeemat likhi hogi, us ka hisaab demo ki jagah isi qeemat se hoga, aur portfolio ki value asli ho jayegi.","Look up each share's current price in your broker app and type it here. Wherever you enter a price, your portfolio uses it instead of the demo price, so the value becomes real.")}</p>
     ${FAMILY ? `<p class="small" style="color:var(--gold)">${L("Ye qeematein teeno ke liye ek hi hain. Koi bhi ek banda daal de, sab ka hisaab update ho jayega.","These prices are shared by all three. Anyone can enter them and everyone's numbers update.")}</p>` : ""}
@@ -4020,6 +4097,12 @@ function pPrices(sn){
     <span class="err" id="cs-err"></span>
     <button class="btn line" type="submit">${ic("plus",16)} ${L("Company add karein","Add company")}</button>
   </form>`;
+}
+function pasteRead(){
+  const syms = FAMILY ? famHeldSymbols() : snap().holdings.map(h => h.s);
+  const found = parsePastedPrices(UI.paste.text, syms);
+  UI.paste.found = found; UI.paste.missing = syms.filter(x => !(x in found)); render();
+  setTimeout(() => document.querySelector(".paste-res")?.scrollIntoView({ block: "nearest", behavior: "smooth" }), 50);
 }
 function submitPrices(){
   if (FAMILY){ const upd = {}; let bad = null;
