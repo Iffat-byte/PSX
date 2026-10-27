@@ -2022,8 +2022,53 @@ function viewHoldingsFound(){
 }
 
 /* ---------------- Manual form (with duplicate warning) ---------------- */
+/* ---------------- Simple purchase form: share, how many, at what price → new average ---------------- */
+function simpleEntryForm(){
+  const e = UI.entry; const d = e.draft; const mode = e.priceMode || "each";
+  return `${e.editId ? `<button class="back" data-go="portfolio" data-sub="history">${ic("back",18)} Back</button>` : ""}
+  <div><h1 class="h-page">${e.editId ? "Edit purchase" : "New entry"}</h1>
+  <p class="muted small">Which share, how many, and at what price. We'll work out your new average.</p></div>
+  <form class="card pad stack" id="entry-form" data-simple="1" novalidate>
+    <div class="field"><label for="f-sym">Share</label>
+      <input class="input" id="f-sym" list="sym-list" autocomplete="off" value="${esc(d.symbol||"")}" placeholder="Name or symbol, e.g. OGDC">
+      <datalist id="sym-list">${SYMBOLS.map(x => `<option value="${x.s}">${esc(x.n)}</option>`).join("")}</datalist>
+      <span class="hint" id="f-sym-hint">${d.symbol && SYM[(d.symbol||"").toUpperCase()] ? esc(SYM[d.symbol.toUpperCase()].n) : ""}</span><span class="err" id="e-sym"></span></div>
+    <div class="fgrid two">
+      <div class="field"><label for="f-qty">How many shares</label><input class="input num" id="f-qty" inputmode="numeric" value="${esc(d.qty ?? "")}" placeholder="100"><span class="err" id="e-qty"></span></div>
+      <div class="field">
+        <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><label for="${mode === "each" ? "f-price" : "f-total"}">For how much</label>
+          <div class="seg" role="group" aria-label="Price type" style="padding:2px"><button type="button" data-act="pmode" data-v="each" aria-pressed="${mode === "each"}" style="padding:4px 10px;font-size:12.5px">Per share</button><button type="button" data-act="pmode" data-v="total" aria-pressed="${mode === "total"}" style="padding:4px 10px;font-size:12.5px">Total paid</button></div></div>
+        ${mode === "each"
+          ? `<div class="input-wrap"><span class="pre">Rs</span><input class="input num" id="f-price" inputmode="decimal" value="${esc(d.price ?? "")}" placeholder="210.50"></div>`
+          : `<div class="input-wrap"><span class="pre">Rs</span><input class="input num" id="f-total" inputmode="decimal" value="${esc(d.total ?? "")}" placeholder="21,050"></div>`}
+        <span class="err" id="e-price"></span></div>
+    </div>
+    ${e.editId ? `<div class="field"><label for="f-date">Date</label><input class="input" type="date" id="f-date" max="${todayISO()}" value="${esc(d.date||todayISO())}"><span class="err" id="e-date"></span></div>` : ""}
+    <div class="result" id="f-summary">${simpleSummary(d)}</div>
+    ${e.dup ? `<div class="notice gold">${ic("copy",18)}<div><b>${e.dup.kind === "exact" ? "This entry already exists" : "A similar entry already exists"}</b><div class="small">${esc(TYPE_LABEL()[e.dup.match.type])} ${esc(e.dup.match.symbol || "")} ${e.dup.match.qty ? num(e.dup.match.qty) + " × " + rs(e.dup.match.price,2) : rs(e.dup.match.amount)} · ${fmtDate(e.dup.match.date)}</div><button type="button" class="btn sm line" style="margin-top:8px" data-act="dup-ack">Yes, it's a new entry — save anyway</button></div></div>` : ""}
+    <span class="err" id="e-form"></span>
+    <div class="row" style="flex-wrap:wrap">
+      <button type="submit" class="btn primary" style="flex:1">${ic("check",18,2.4)} ${e.editId ? "Save changes" : "Save"}</button>
+      ${e.editId ? `<button type="button" class="btn danger" data-act="del-tx" data-id="${e.editId}">${ic("trash",17)} Delete</button>` : ""}
+    </div>
+  </form>`;
+}
+function simpleSummary(d){
+  const sym = (d.symbol || "").toUpperCase(); const q = Number(d.qty) || 0, p = Number(d.price) || 0;
+  if (!sym || !(q > 0) || !(p > 0)) return `<span class="muted small">Enter the share, how many and the price to see your new average.</span>`;
+  const others = S.txs.filter(t => t.id !== UI.entry?.editId);
+  const P = replay(others, d.date || todayISO()).pos.get(sym); const q0 = P?.q || 0, c0 = P?.cost || 0;
+  const fee = d.fees !== "" && d.fees != null && isFinite(Number(d.fees)) ? Number(d.fees) : feeEst(q, p);
+  const cost = q * p + fee; const nq = q0 + q; const navg = (c0 + cost) / nq;
+  return `<div class="small muted">Your new average for ${esc(sym)}</div><div class="big num">${rs(navg, 2)}</div>
+    <div class="kv"><span class="k">You had</span><span class="v num">${q0 ? `${num(q0)} at ${rs(c0 / q0, 2)}` : "None yet"}</span></div>
+    <div class="kv"><span class="k">Buying now</span><span class="v num">${num(q)} × ${rs(p, 2)} = ${rs(cost, 2)}</span></div>
+    <div class="kv"><span class="k">You'll have</span><span class="v num">${num(nq)} shares</span></div>
+    ${fee > 0 ? `<p class="tiny faint">Includes ${rs(fee, 2)} estimated broker charges from your Settings.</p>` : ""}`;
+}
 function entryForm(){
   const e = UI.entry; const d = e.draft;
+  if (d.type === "BUY" && !e.full) return simpleEntryForm();
   const isTrade = d.type === "BUY" || d.type === "SELL";
   const needSym = isTrade || d.type === "DIVIDEND" || d.type === "BONUS";
   const isCash = ["DEPOSIT","WITHDRAWAL","DIVIDEND"].includes(d.type);
@@ -2078,6 +2123,8 @@ function readForm(){
   if (g("f-fees")) d.fees = g("f-fees").value === "" ? "" : parseNum(g("f-fees").value);
   if (g("f-amt")) d.amount = g("f-amt").value === "" ? "" : parseNum(g("f-amt").value);
   if (g("f-note")) d.note = g("f-note").value;
+  if (g("f-total")){ d.total = g("f-total").value === "" ? "" : parseNum(g("f-total").value); d.fees = 0; d.price = d.total > 0 && d.qty > 0 ? Math.round(d.total / d.qty * 1e4) / 1e4 : ""; }
+  else if (g("f-price") && UI.entry?.priceMode === "each" && $("#entry-form")?.dataset.simple) d.fees = "";
   return d;
 }
 function liveEntry(){
@@ -2085,7 +2132,7 @@ function liveEntry(){
   const d = readForm();
   const isTrade = d.type === "BUY" || d.type === "SELL";
   const total = isTrade ? (Number(d.qty)||0)*(Number(d.price)||0) : Number(d.amount)||0;
-  $("#f-summary").innerHTML = entrySummary(d, total);
+  $("#f-summary").innerHTML = $("#entry-form").dataset.simple ? simpleSummary(d) : entrySummary(d, total);
   const hint = $("#f-sym-hint"); if (hint) hint.textContent = SYM[d.symbol] ? SYM[d.symbol].n : "";
   const held = $("#f-held");
   if (held && d.symbol){ const h = heldOn(S.txs, d.symbol, d.date || todayISO(), UI.entry.editId); held.textContent = L(`Is tareekh tak aap ke paas ${num(h)} ${d.symbol} the`, `You held ${num(h)} ${d.symbol} on this date`); }
@@ -3157,6 +3204,7 @@ document.addEventListener("click", async (ev) => {
     case "rem-ics": { const { n, ics } = remindersICS(); if (!n) break;
       if (await offerDownload("psx-yaad-dahaniyan.ics", ics, "text/calendar")){ const at = Date.now(); commit(st => st.reminders = st.reminders.map(r => !r.done && r.date && !r.calAt ? { ...r, calAt: at } : r)); toast(L(`${n} yaad-dahaniyan tayyar — file kholein aur "Add" dabayein`, `${n} reminder(s) ready — open the file and tap "Add"`)); }
       break; }
+    case "pmode": { readForm(); const d0 = UI.entry.draft; if (v === "total" && d0.qty > 0 && d0.price > 0) d0.total = round2(d0.qty * d0.price); UI.entry.priceMode = v; render(); break; }
     case "etype": readForm(); UI.entry.draft.type = v; UI.entry.dup = null; UI.entry.dupAck = false; render(); break;
     case "new-tx": closeSheet(); UI.route = "add"; UI.entry = { mode:"manual", draft:{ type: el.dataset.type, date:todayISO(), symbol: el.dataset.s || "", qty:"", price: el.dataset.s && el.dataset.type !== "DIVIDEND" ? quote(el.dataset.s)?.price ?? "" : "", fees:"", amount:"", note:"" } }; render(); window.scrollTo({top:0}); break;
     case "edit-tx": { if (FAMILY && UI.readOnly){ toast(L(`Ye entry ${memberName(UI.fam.viewing)} ki hai. Sirf woh badal sakte hain.`, `This entry belongs to ${memberName(UI.fam.viewing)}. Only they can change it.`)); break; } const t = S.txs.find(x => x.id === el.dataset.id); if (!t) break; closeSheet(); UI.route = "add"; UI.entry = { mode:"manual", editId:t.id, at:t.at, draft:{ type:t.type, date:t.date, symbol:t.symbol||"", qty:t.qty||"", price:t.price||"", fees:t.fees, amount:t.amount||"", note:t.note||"" } }; render(); window.scrollTo({top:0}); break; }
