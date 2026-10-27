@@ -1912,20 +1912,12 @@ function pDaily(){
   const today = rows.find(r => r.d === t0);
   const month = rows.filter(r => r.d.slice(0, 7) === t0.slice(0, 7)).reduce((a, r) => a + r.earn, 0);
   const best = [...rows].sort((a, b) => b.earn - a.earn)[0];
-  const gap = r => r.prev && dayDiff(r.d, r.prev) > (new Date(r.d + "T00:00:00").getDay() === 1 ? 3 : 1);
   return `<div class="card pad stats">
       <div><div class="lbl">Today</div><div class="sv num ${today ? tone(today.earn) : ""}">${today ? rsS(today.earn) : "—"}</div><div class="tiny faint">${today ? (today.pctv != null ? pct(today.pctv, 2, true) : "") : "No trades or price updates yet today"}</div></div>
       <div><div class="lbl">This month</div><div class="sv num ${tone(month)}">${rsS(month)}</div><div class="tiny faint">${rows.filter(r => r.d.slice(0, 7) === t0.slice(0, 7)).length} active days</div></div>
       <div><div class="lbl">Best day</div><div class="sv num ${best ? tone(best.earn) : ""}">${best ? rsS(best.earn) : "—"}</div><div class="tiny faint">${best ? fmtDate(best.d) : ""}</div></div>
     </div>
-    <div class="card pad"><div class="row" style="justify-content:space-between;margin-bottom:4px"><h2 class="h-sec">Day by day</h2><span class="tiny faint">only days with trades or new prices</span></div>
-    ${rows.length ? `<div class="list">${rows.map(r => `<div class="li" style="align-items:flex-start">
-        <div class="logo" style="flex-direction:column;line-height:1;gap:2px"><span style="font-size:10px;color:var(--ink-3)">${MONTHS_EN[Number(r.d.slice(5,7))-1]}</span><span style="font-size:15px">${Number(r.d.slice(8))}</span></div>
-        <div class="mid"><div class="main-t">${r.d === t0 ? "Today" : fmtDate(r.d)}</div>
-          <div class="sub-t wrap">${[r.bought.length ? `Bought ${r.bought.map(t => `${num(t.qty)} ${t.symbol}`).join(", ")}` : "", r.sold.length ? `Sold ${r.sold.map(e => `${num(e.qty)} ${e.symbol}`).join(", ")} (${rsS(r.booked)} booked)` : "", gap(r) ? `Since ${fmtDate(r.prev)}` : ""].filter(Boolean).join(" · ") || "Price change"}</div></div>
-        <div class="right"><div class="v num ${tone(r.earn)}">${rsS(r.earn)}</div>${r.pctv != null ? `<div class="d num ${tone(r.earn)}">${pct(r.pctv, 2, true)}</div>` : ""}</div></div>`).join("")}</div>`
-      : `<div class="empty"><b>No earnings yet</b>Earnings appear once you've added shares and prices have been entered on more than one day.</div>`}
-    <p class="tiny faint" style="margin-top:10px">A day's earning is how much your total profit changed since the last day with a trade or a price update. Days with no trading and no new prices are left out.</p></div>`;
+    <p class="tiny faint" style="margin:10px 4px 0">A day's earning is how much your total profit or loss changed that day, from the closing prices. It can be positive on a day the price rose even if the share is still below your average.</p>`;
 }
 function pWhere(sn){
   if (!sn.holdings.length) return `<div class="card"><div class="empty"><b>${L("Abhi kuch nahi","Nothing yet")}</b></div></div>`;
