@@ -1990,8 +1990,8 @@ function pTrading(){
   const days = {}; closed.forEach(t => { const d = trDay(t); (days[d] ||= { d, g: 0, n: 0 }); days[d].g += trGross(t); days[d].n++; });
   const dayRows = Object.values(days).sort((a, b) => a.d < b.d ? 1 : -1);
   const mx = Math.max(1, ...dayRows.map(x => Math.abs(x.g)));
-  const head = `<div class="tr-actions">${ro ? "" : `<button class="btn primary sm" data-act="tr-new">${ic("plus",16,2.2)} Add trade</button><button class="btn line sm" data-act="tr-import">${ic("upload",16)} Paste from Excel</button>`}</div>`;
-  if (!T.length) return `${head}<div class="card"><div class="empty"><b>No trades yet</b>Add a trade with its buy and sell, or paste your rows straight from Excel.</div></div>`;
+  const head = `<div class="tr-actions">${ro ? "" : `<button class="btn primary sm" data-act="tr-new">${ic("plus",16,2.2)} Add trade</button>`}</div>`;
+  if (!T.length) return `${head}<div class="card"><div class="empty"><b>No trades yet</b>Add a trade with its buy and sell. You can add the sale later.</div></div>`;
   const groups = {}; T.forEach(t => (groups[trDay(t).slice(0, 7)] ||= []).push(t));
   const row = t => { const g = trGross(t), r = trRet(t), open = trOpen(t);
     return `<button class="tr-row" data-act="tr-edit" data-id="${t.id}">
