@@ -659,7 +659,7 @@ select.input option{background:var(--surface);color:var(--ink)}
 .hl-pl{font-size:13px!important;font-weight:600!important}
 .hl-pct{font-size:11.5px!important;font-weight:600!important;padding:1px 7px;border-radius:99px;background:color-mix(in srgb,currentColor 12%,transparent)}
 @media (min-width:760px){ .hlist{display:none} .pf-sec-h{display:none} .pf-hero{padding:26px 28px} }
-@media (max-width:759px){ .pf-desk{display:none} }
+@media (max-width:759px){ .pf-desk{display:none} .pf-new{display:none} }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1850,7 +1850,7 @@ function viewPortfolio(){
   return `
   <div class="pf-head">
     <div style="min-width:0"><h1 class="h-page">${FAMILY && UI.readOnly ? `${esc(memberName(UI.fam.viewing))}'s portfolio` : L("Mera Portfolio","My Portfolio")}</h1><div class="tiny faint">${sn.holdings.length} ${sn.holdings.length === 1 ? "company" : "companies"}</div></div>
-    <div class="row" style="gap:8px"><button class="icon-btn pf-ib" data-act="export-open" aria-label="Download portfolio" title="Download">${ic("download",19,2.1)}</button><button class="btn primary sm" data-go="add">${ic("plus",16,2.2)} ${L("Nayi entry","New entry")}</button></div>
+    <div class="row" style="gap:8px"><button class="icon-btn pf-ib" data-act="export-open" aria-label="Download portfolio" title="Download">${ic("download",19,2.1)}</button><button class="btn primary sm pf-new" data-go="add">${ic("plus",16,2.2)} ${L("Nayi entry","New entry")}</button></div>
   </div>
   ${issuesNotice(sn)}
   ${sn.holdings.length ? pfHero(sn) : ""}
