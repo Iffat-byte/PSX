@@ -601,6 +601,10 @@ select.input option{background:var(--surface);color:var(--ink)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .or-line{display:flex;align-items:center;gap:10px;text-transform:uppercase;letter-spacing:.12em}
 .or-line::before,.or-line::after{content:"";flex:1;height:1px;background:var(--line-2)}
+
+.auto-line{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--up) 9%,transparent);border:1px solid color-mix(in srgb,var(--up) 28%,transparent);color:var(--ink-2)}
+.auto-line > svg{color:var(--up);flex:none}
+.auto-line b{color:var(--ink)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -4066,8 +4070,8 @@ function pastePricesCard(){
   const P = UI.paste || {}; const found = P.found ? Object.entries(P.found) : null;
   const pr = pricesSrc() || {}; const ref = s => pr[s]?.p ?? null;
   return `<section class="card pad stack paste-card">
-    <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><h2 class="h-sec">${ic("camera",18)} Today's prices from a screenshot</h2><span class="pill info">Fastest way</span></div>
-    <p class="small muted" style="margin:0">After the market closes, take a screenshot of your broker app's holdings and upload it here. The website reads every share's closing price itself${FAMILY ? " and saves it for all three of you" : ""}. Nothing to install; the picture stays on your phone.</p>
+    <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><h2 class="h-sec">${ic("camera",18)} Today's prices from a screenshot</h2><span class="pill info">${autoPricesOn() ? "Optional" : "Fastest way"}</span></div>
+    <p class="small muted" style="margin:0">${autoPricesOn() ? "Only needed if you want prices before the evening update, or if a share is missing. " : ""}After the market closes, take a screenshot of your broker app's holdings and upload it here. The website reads every share's closing price itself${FAMILY ? " and saves it for all three of you" : ""}. Nothing to install; the picture stays on your phone.</p>
     <label class="shot-drop${P.busy ? " busy" : ""}">
       <input type="file" id="px-shot" accept="image/*" multiple ${P.busy ? "disabled" : ""}>
       ${P.busy ? `<span class="spin" aria-hidden="true"></span><span><b>Reading screenshot…</b><span class="tiny faint" id="shot-prog">${esc(P.busy)}</span></span>`
@@ -4098,11 +4102,11 @@ function pPrices(sn){
   const rows = list.map(h => { const u = pr[h.s]; const d = FAMILY ? null : demoClose(h.s);
     return `<div class="li" style="flex-wrap:wrap;gap:10px 12px">
       <div class="logo">${logoMark(h.s)}</div>
-      <div class="mid"><div class="main-t">${esc(h.s)}</div><div class="sub-t">${u ? (FAMILY ? `${fmtDate(u.d)}${u.by ? " · " + esc(memberName(u.by)) : ""}` : L(`Aap ki qeemat · ${fmtDate(u.d)}`, `Your price · ${fmtDate(u.d)}`)) : FAMILY ? L("Abhi qeemat nahi","No price yet") : L(`Abhi demo: ${d != null ? rs(d, 2) : "—"}`, `Now demo: ${d != null ? rs(d, 2) : "—"}`)}</div></div>
+      <div class="mid"><div class="main-t">${esc(h.s)}</div><div class="sub-t">${u ? (FAMILY ? `${fmtDate(u.d)}${u.by === "auto" ? " · closing price (auto)" : u.by ? " · " + esc(memberName(u.by)) : ""}` : L(`Aap ki qeemat · ${fmtDate(u.d)}`, `Your price · ${fmtDate(u.d)}`)) : FAMILY ? L("Abhi qeemat nahi","No price yet") : L(`Abhi demo: ${d != null ? rs(d, 2) : "—"}`, `Now demo: ${d != null ? rs(d, 2) : "—"}`)}</div></div>
       <div style="flex:none;width:132px"><div class="input-wrap"><span class="pre">Rs</span><input class="input num" style="min-height:42px;text-align:right" id="pr-${esc(h.s)}" data-pr="${esc(h.s)}" inputmode="decimal" value="${u ? u.p : ""}" placeholder="${L("Aaj ki","Today's")}" aria-label="${esc(h.s)} ${L("ki aaj ki qeemat","today's price")}"></div>
         ${u && !FAMILY ? `<button type="button" class="link tiny" style="margin-top:4px" data-act="price-clear" data-s="${esc(h.s)}">${L("Demo par wapas","Back to demo")}</button>` : ""}</div>
     </div>`; }).join("");
-  return `${list.length ? pastePricesCard() : ""}<form class="card pad stack" data-form="prices" novalidate>
+  return `${autoPricesLine()}${list.length ? pastePricesCard() : ""}<form class="card pad stack" data-form="prices" novalidate>
     <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><h2 class="h-sec">${L("Apne shares ki asli qeematein","Real prices for your shares")}</h2>${p.all ? `<span class="pill ${p.demo ? "demo" : "ok"} num">${p.user}/${p.all} ${L("asli","real")}</span>` : ""}</div>
     <p class="small muted">${L("Apni broker app mein har share ki maujooda qeemat dekh kar yahan likhein. Jis share ki qeemat likhi hogi, us ka hisaab demo ki jagah isi qeemat se hoga, aur portfolio ki value asli ho jayegi.","Look up each share's current price in your broker app and type it here. Wherever you enter a price, your portfolio uses it instead of the demo price, so the value becomes real.")}</p>
     ${FAMILY ? `<p class="small" style="color:var(--gold)">${L("Ye qeematein teeno ke liye ek hi hain. Koi bhi ek banda daal de, sab ka hisaab update ho jayega.","These prices are shared by all three. Anyone can enter them and everyone's numbers update.")}</p>` : ""}
@@ -4362,6 +4366,13 @@ function famGateView(){
   if (s === "badkey") return box("alert", L("Ye link kaam nahi kar raha","This link doesn't work"), L("Link purana ya adhoora hai. Javeria se poora link dobara lein.","The link is old or incomplete. Ask Javeria for the full link again."));
   return box("alert", L("Internet nahi","You're offline"), L("Family ka data laane ke liye internet chahiye. Rabta bahal hone par dobara kholein.","The family data needs an internet connection. Try again once you're online."), `<button class="btn primary" data-act="fam-retry">${L("Dobara koshish karein","Try again")}</button>`);
 }
+/** Closing prices arrive by themselves (EODHD, run by the database every weekday evening). */
+function autoPricesOn(){ const a = FAMILY && UI.fam?.shared?.auto; return !!(a && a.at && (Date.now() - Date.parse(a.at)) < 5 * 864e5); }
+function autoPricesLine(){
+  if (!autoPricesOn()) return "";
+  const pr = UI.fam.shared.prices || {}; const ds = Object.values(pr).filter(x => x.by === "auto").map(x => x.d).sort(); const last = ds[ds.length - 1];
+  return `<div class="auto-line small">${ic("check",15,2.4)}<span>Closing prices update by themselves every weekday evening.${last ? ` Latest: <b>${fmtDate(last)}</b>.` : ""}</span></div>`;
+}
 function famBanner(){
   if (!FAMILY || UI.fam.status !== "ready" || UI.route === "home") return "";
   if (!UI.fam.me) return `<div class="notice gold">${ic("info",18)}<div>${L("Pehle batayein aap kaun hain, phir apni entries kar sakte hain.","First tell us who you are, then you can add your entries.")} <button class="link" data-act="fam-who">${L("Chunein","Choose")}</button></div></div>`;
@@ -4372,7 +4383,8 @@ function viewBoard(){
   const stats = MEMBERS.map(m => memberStats(m.id)).sort((a, b) => (b.hasData - a.hasData) || (b.pct - a.pct));
   const t0 = todayISO(); const medal = ["🥇","🥈","🥉"];
   const held = famHeldSymbols(); const missing = held.filter(s => !UI.fam.shared.prices[s]);
-  const stale = held.filter(s => UI.fam.shared.prices[s] && UI.fam.shared.prices[s].d < t0);
+  const autoOn = autoPricesOn();
+  const stale = autoOn ? [] : held.filter(s => UI.fam.shared.prices[s] && UI.fam.shared.prices[s].d < t0);
   const leader = stats[0]?.hasData ? stats[0] : null;
   const awards = [];
   const withData = stats.filter(s => s.hasData);
@@ -4385,6 +4397,7 @@ function viewBoard(){
   return `
   <div class="page-head"><div style="min-width:0"><div class="eyebrow">Family portfolio · ${fmtDate(t0)}</div><h1 class="h-page">Family investments at a glance</h1></div>
     ${UI.fam.me ? `<button class="btn primary sm" data-go="add">${ic("plus",16,2.2)} ${L("Meri entry","My entry")}</button>` : ""}</div>
+  ${autoPricesLine()}
   ${missing.length || stale.length ? `<div class="notice gold" style="align-items:center">${ic("info",18)}<div style="flex:1;min-width:0">${missing.length ? L(`${missing.length} shares ki qeemat abhi darj nahi, is liye un ka munafa 0 gina ja raha hai.`, `${missing.length} share(s) have no price yet, so they count as no gain or loss.`) : L(`${stale.length} shares ki qeemat aaj ki nahi.`, `${stale.length} share(s) don't have today's price.`)} ${L("Ranking theek rakhne ke liye aaj ki qeematein daal dein.","Add today's prices to keep the ranking fair.")}</div><button class="btn sm primary" data-go="portfolio" data-sub="prices">${L("Qeematein","Prices")}</button></div>` : ""}
   <section class="podium" aria-label="${L("Ranking","Ranking")}">${stats.map((s, i) => {
     const m = MEM[s.id]; const me = s.id === UI.fam.me;
