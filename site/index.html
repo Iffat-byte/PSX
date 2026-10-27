@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place. A private family hub for three portfolios."><meta name="theme-color" content="#08090B"><link rel="icon" href="/icon-192.png" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><link rel="canonical" href="https://psx-pilot.netlify.app/"><meta property="og:type" content="website"><meta property="og:site_name" content="PSX Personal Assistant"><meta property="og:title" content="PSX Personal Assistant — your shares, our accounts"><meta property="og:description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place. A private family hub for three portfolios."><meta property="og:url" content="https://psx-pilot.netlify.app/"><meta property="og:image" content="https://psx-pilot.netlify.app/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="PSX Personal Assistant"><meta name="twitter:description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place. A private family hub for three portfolios."><meta name="twitter:image" content="https://psx-pilot.netlify.app/og.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place. A private portfolio with automatic daily closing prices."><meta name="theme-color" content="#08090B"><link rel="icon" href="/icon-192.png" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><link rel="canonical" href="https://psx-pilot.netlify.app/"><meta property="og:type" content="website"><meta property="og:site_name" content="PSX Personal Assistant"><meta property="og:title" content="PSX Personal Assistant — your shares, our accounts"><meta property="og:description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place. A private portfolio with automatic daily closing prices."><meta property="og:url" content="https://psx-pilot.netlify.app/"><meta property="og:image" content="https://psx-pilot.netlify.app/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="PSX Personal Assistant"><meta name="twitter:description" content="Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place. A private portfolio with automatic daily closing prices."><meta name="twitter:image" content="https://psx-pilot.netlify.app/og.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>PSX Personal Assistant</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1647,9 +1647,9 @@ function buildTasks(sn){
    Shell rendering
    ========================================================================= */
 const NAV = () => [
-  {r:"home", label: FAMILY ? "Family Hub" : L("Home","Home"), icon: "home"},
-  {r:"add", label:L("Add Entry","Add Entry"), icon:"plus"},
-  {r:"portfolio", label:L("Mera Portfolio","My Portfolio"), icon:"wallet"}
+  ...(FAMILY ? [] : [{r:"home", label: L("Home","Home"), icon: "home"}]),
+  {r:"portfolio", label:L("Mera Portfolio","My Portfolio"), icon:"wallet"},
+  {r:"add", label:L("Add Entry","Add Entry"), icon:"plus"}
 ];
 function brandHTML(){ return `<div class="brand"><div class="mark">${MARK}</div><div style="min-width:0"><div class="brand-t">PSX Personal Assistant</div><div class="brand-s">Your shares. Our accounts.</div></div></div>`; }
 function renderShell(){
@@ -1665,13 +1665,13 @@ function renderShell(){
     </div>`;
   $("#topbar-in").innerHTML = `${brandHTML()}
     <div class="top-actions">
-      ${FAMILY && UI.fam.status === "ready" ? `<button class="who" data-act="fam-who" aria-label="${L("Aap kaun hain? Badlein","Who are you? Change")}">${UI.fam.me ? avatar(UI.fam.me, 26) + `<span>${esc(memberName(UI.fam.me))}</span>` : `<span>${L("Aap kaun?","Who are you?")}</span>`}</button>` : ""}
+      ${FAMILY && UI.fam.status === "ready" && MEMBERS.length > 1 ? `<button class="who" data-act="fam-who" aria-label="${L("Aap kaun hain? Badlein","Who are you? Change")}">${UI.fam.me ? avatar(UI.fam.me, 26) + `<span>${esc(memberName(UI.fam.me))}</span>` : `<span>${L("Aap kaun?","Who are you?")}</span>`}</button>` : ""}
       <button class="icon-btn" data-act="theme" aria-label="${L("Theme badlein","Change theme")}">${ic(isDark() ? "sun" : "moon", 19)}</button>
       <button class="icon-btn" data-act="tool" data-v="settings" aria-label="Settings and backup">${ic("gear", 19)}</button>
     </div>`;
   $("#tabbar").innerHTML = `<div class="tabbar-in">${nav.map(n => n.r === "add"
     ? `<a href="#add" class="tab tab-add" data-go="add" ${UI.route==="add"?'aria-current="page"':''}><div class="plus">${ic("plus",26,2.4)}</div><span>${esc(n.label)}</span></a>`
-    : `<a href="#${n.r}" class="tab" data-go="${n.r}" ${UI.route===n.r?'aria-current="page"':''}>${ic(n.icon)}${n.badge ? `<span class="nbadge num" aria-label="${n.badge} ${L("nayi","new")}">${n.badge}</span>` : ""}<span>${esc(n.label)}</span></a>`).join("")}</div>`;
+    : `<a href="#${n.r}" class="tab" data-go="${n.r}" ${UI.route===n.r?'aria-current="page"':''}>${ic(n.icon)}${n.badge ? `<span class="nbadge num" aria-label="${n.badge} ${L("nayi","new")}">${n.badge}</span>` : ""}<span>${esc(n.label)}</span></a>`).join("")}${FAMILY ? `<a href="#more" class="tab" data-act="tool" data-v="settings" ${UI.route === "more" ? 'aria-current="page"' : ""}>${ic("gear")}<span>Settings</span></a>` : ""}</div>`;
 }
 function isDark(){ return S.theme !== "light"; }
 function applyTheme(){ S.lang = "en"; if (S.theme) document.documentElement.setAttribute("data-theme", S.theme); else document.documentElement.removeAttribute("data-theme"); document.documentElement.lang = S.lang === "en" ? "en" : "ur-Latn"; }
@@ -1680,7 +1680,7 @@ function render(){
   const ae = document.activeElement; const fid = ae && ae.id && ae !== document.body ? ae.id : null; let ss = null, se = null; try { ss = ae.selectionStart; se = ae.selectionEnd; } catch {}
   applyTheme(); renderShell();
   const v = $("#view");
-  if (UI.route === "updates" || (UI.route === "more" && !UI.sub.more)){ UI.route = "home"; try { window.history.replaceState(null, "", "#home"); } catch {} }
+  if (UI.route === "updates" || (UI.route === "more" && !UI.sub.more) || (FAMILY && UI.route === "home")){ UI.route = FAMILY ? "portfolio" : "home"; try { window.history.replaceState(null, "", "#" + UI.route); } catch {} }
   const r = UI.route;
   if (FAMILY && UI.fam.status !== "ready"){ v.innerHTML = `<div class="screen">${famGateView()}</div>`; renderSheet(); return; }
   if (FAMILY && r === "add" && UI.readOnly && UI.fam.me) famSelect(UI.fam.me);   // entries always go into your own portfolio
@@ -1840,13 +1840,13 @@ function holdingsList(sn){
     </button>`).join("")}</div>`;
 }
 function viewPortfolio(){
-  if (UI.sub.portfolio === "broker") UI.sub.portfolio = "shares";
+  if (UI.sub.portfolio === "broker" || UI.sub.portfolio === "prices") UI.sub.portfolio = "shares";
   const sub = UI.sub.portfolio || "shares";
   const sn = snap();
   const tabs = [
-    ["shares", L("Mere shares","My shares")], ["daily", "Daily earnings"], ["prices", L("Qeematein","Prices")], ["where", L("Paisa kahan laga?","Where's my money?")], ["history", L("Khareed/farokht","Buy/sell history")],
+    ["shares", L("Mere shares","My shares")], ["daily", "Daily earnings"], ["where", L("Paisa kahan laga?","Where's my money?")], ["history", L("Khareed/farokht","Buy/sell history")],
     ["dividends", L("Dividends","Dividends")], ["monthly", L("Mahana hisaab","Monthly account")], ["calc", L("Calculators","Calculators")]
-  ].filter(([k]) => !isSimple() || ["shares","daily","prices","history",sub].includes(k));
+  ].filter(([k]) => !isSimple() || ["shares","daily","history",sub].includes(k));
   return `
   <div class="pf-head">
     <div style="min-width:0"><h1 class="h-page">${FAMILY && UI.readOnly ? `${esc(memberName(UI.fam.viewing))}'s portfolio` : L("Mera Portfolio","My Portfolio")}</h1><div class="tiny faint">${sn.holdings.length} ${sn.holdings.length === 1 ? "company" : "companies"}</div></div>
@@ -4308,7 +4308,9 @@ const SB_URL = "https://qhhifruqhystrsmssbyi.supabase.co";
 const SB_KEY = "sb_publishable_5U91VVYnxCQckyR-81RE1Q_psNUUF5q";   // publishable key; the database only answers to the secret family link
 const SB_LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js";
 const FAMILY = !inClaude();
-const MEMBERS = [{ id:"zahid", name:"Zahid", hue:205 }, { id:"tahira", name:"Tahira", hue:330 }, { id:"javeria", name:"Javeria", hue:40 }];
+/* The website now belongs to one person. (Tahira's and Javeria's rows stay untouched in the database.) */
+const SOLO = "zahid";
+const MEMBERS = [{ id:"zahid", name:"Zahid", hue:205 }];
 const MEM = Object.fromEntries(MEMBERS.map(m => [m.id, m]));
 const FK = { key:"psx-family:key", me:"psx-family:me", cache:"psx-family:cache", lang:"psx-family:lang", theme:"psx-family:theme" };
 const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
@@ -4333,7 +4335,7 @@ async function famBoot(){
   if (!FAMILY) return;
   const url = new URL(location.href); const k = url.searchParams.get("k");
   if (k){ lsSet(FK.key, k); url.searchParams.delete("k"); try { window.history.replaceState(null, "", url.pathname + (url.search || "") + url.hash); } catch {} }
-  UI.fam.key = lsGet(FK.key); UI.fam.me = MEM[lsGet(FK.me)] ? lsGet(FK.me) : null;
+  UI.fam.key = lsGet(FK.key); UI.fam.me = SOLO; lsSet(FK.me, SOLO);
   if (!UI.fam.key){ UI.fam.status = "nokey"; render(); return; }
   try { const c = JSON.parse(lsGet(FK.cache) || "null"); if (c?.states){ UI.fam.dirty = !!UI.fam.me && c.dirty === UI.fam.me; applyFamily(c, true); } } catch {}
   render();
@@ -4342,7 +4344,6 @@ async function famBoot(){
   UI.sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
   await famRefresh();
   if (UI.fam.dirty) famPush();   // edits that never reached the server last time
-  if (UI.fam.status === "ready" && !UI.fam.me) openSheet({ kind:"who" });
   // Leaving the page: send anything still waiting.
   addEventListener("pagehide", () => { if (UI.fam.dirty){ clearTimeout(famSaveTimer); famPush(); } });
   setInterval(() => { if (document.visibilityState === "visible") famRefresh(); }, 60000);
@@ -4419,7 +4420,7 @@ function refreshSyncLines(){ ["sync-line"].forEach(id => { const el = document.g
 function syncLine(){
   if (!FAMILY) return UI.storage === "cloud" ? ic("lock",13) + " " + L("Data aap ke Claude account mein private save hai","Data saved privately to your Claude account") : L("Data sirf is browser mein save hai","Data saved in this browser only");
   const n = UI.fam.net;
-  return ic("lock",13) + " " + (n === "offline" ? L("Internet nahi — tabdeeliyan is device par hain, baad mein save hongi","Offline — changes are kept on this device and saved later") : n === "saving" ? L("Save ho raha hai…","Saving…") : L("Family ke liye save hai","Saved for the family"));
+  return ic("lock",13) + " " + (n === "offline" ? L("Internet nahi — tabdeeliyan is device par hain, baad mein save hongi","Offline — changes are kept on this device and saved later") : n === "saving" ? L("Save ho raha hai…","Saving…") : "Saved");
 }
 
 /* ---------- returns ---------- */
@@ -4462,20 +4463,20 @@ function raceChart(){
 
 /* ---------- screens ---------- */
 function famKeyFrom(t){ t = String(t || "").trim(); const m = t.match(/[?&#]k=([A-Za-z0-9_-]{16,})/); if (m) return m[1]; return /^[A-Za-z0-9_-]{16,}$/.test(t) ? t : null; }
-function famUseKey(raw){ const k = famKeyFrom(raw); const err = $("#fam-key-err"); if (!k){ if (err) err.textContent = "That doesn't look like the family link. Paste the full link."; return; } location.replace(location.pathname + "?k=" + encodeURIComponent(k)); }
+function famUseKey(raw){ const k = famKeyFrom(raw); const err = $("#fam-key-err"); if (!k){ if (err) err.textContent = "That doesn't look like the right link. Paste the full link."; return; } location.replace(location.pathname + "?k=" + encodeURIComponent(k)); }
 function famGateView(){
   const s = UI.fam.status;
   const box = (icon, title, body, extra = "") => `<div class="card pad stack" style="max-width:520px;margin:8vh auto 0;text-align:center;align-items:center"><div class="quick-btn" style="padding:0;border:0;background:none"><span class="qi" style="width:56px;height:56px;border-radius:16px">${ic(icon,26)}</span></div><h1 class="h-page" style="font-size:30px">${title}</h1><p class="muted">${body}</p>${extra}</div>`;
-  if (s === "loading") return box("clock", L("Family ka hisaab aa raha hai…","Loading the family accounts…"), L("Bas ek pal.","Just a moment."), `<span class="spin" style="color:var(--emerald)"></span>`);
+  if (s === "loading") return box("clock", "Loading your portfolio…", L("Bas ek pal.","Just a moment."), `<span class="spin" style="color:var(--emerald)"></span>`);
   const keyForm = `<form class="stack gate-key" data-form="fam-key" novalidate style="width:100%;text-align:left;margin-top:6px">
-      <label class="lbl" for="fam-key-in">Paste your family link</label>
+      <label class="lbl" for="fam-key-in">Paste your link</label>
       <input class="input" id="fam-key-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://psx-pilot.netlify.app/?k=…">
       <span class="err" id="fam-key-err"></span>
       <div class="row" style="gap:8px"><button type="button" class="btn line" data-act="fam-key-paste">${ic("copy",16)} Paste</button><button type="submit" class="btn primary" style="flex:1">${ic("lock",16)} Open</button></div>
       <p class="tiny faint" style="margin:0">Only needed once on this phone. Opened from the home screen icon, the website keeps its own memory, so it needs the link one time too.</p></form>`;
-  if (s === "nokey") return box("lock", L("Ye family ki private website hai","This is a private family website"), "Open it with your family's special link. Ask Javeria for it.", keyForm);
-  if (s === "badkey") return box("alert", L("Ye link kaam nahi kar raha","This link doesn't work"), "The link is old or incomplete. Ask Javeria for the full link again.", keyForm);
-  return box("alert", L("Internet nahi","You're offline"), L("Family ka data laane ke liye internet chahiye. Rabta bahal hone par dobara kholein.","The family data needs an internet connection. Try again once you're online."), `<button class="btn primary" data-act="fam-retry">${L("Dobara koshish karein","Try again")}</button>`);
+  if (s === "nokey") return box("lock", "This is a private website", "Open it with your special link.", keyForm);
+  if (s === "badkey") return box("alert", L("Ye link kaam nahi kar raha","This link doesn't work"), "The link is old or incomplete. Paste the full link again.", keyForm);
+  return box("alert", L("Internet nahi","You're offline"), "Your portfolio needs an internet connection. Try again once you're online.", `<button class="btn primary" data-act="fam-retry">${L("Dobara koshish karein","Try again")}</button>`);
 }
 /** Closing prices arrive by themselves (EODHD, run by the database every weekday evening). */
 function autoPricesOn(){ const a = FAMILY && UI.fam?.shared?.auto; return !!(a && a.at && (Date.now() - Date.parse(a.at)) < 5 * 864e5); }

@@ -12,7 +12,7 @@ const viewport = '<meta name=viewport content="width=device-width,initial-scale=
 if (!app.includes(viewport)) throw new Error("app/index.html: viewport meta not found, head layout changed");
 
 const title = "PSX Personal Assistant";
-const description = "Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place. A private family hub for three portfolios.";
+const description = "Track your Pakistan Stock Exchange shares, average price, dividends and profit in one place. A private portfolio with automatic daily closing prices.";
 const head = [
   `<meta name="description" content="${description}">`,
   `<meta name="theme-color" content="#08090B">`,
