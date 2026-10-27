@@ -13,7 +13,11 @@ Live: https://psx-pilot.netlify.app
 - Family Hub: three people, one private link, ranking by total return %, "Our journey" chart and awards
 - Installable as a phone app, opens offline
 
-Prices shown as "demo" and announcements shown as "sample" are not real PSX data. A licensed PSX data feed is needed for live prices.
+Prices shown as "demo" and announcements shown as "sample" are not real PSX data.
+
+## Automatic closing prices
+
+Every weekday the database fetches end-of-day closing prices for every share the family holds from EODHD (licensed market data, free plan: 20 calls/day, one call per share). `public._psx_auto_prices()` runs from pg_cron at 13:00 and 17:00 UTC Mon–Fri and 05:00 UTC Saturday, skips shares already updated that day, and writes `prices` + the daily `log` into the `_shared` row (`by: "auto"`). The token is kept in Supabase Vault as `eodhd_key`. Screenshot / paste on the Prices page stays as a manual fallback.
 
 ## Layout
 
