@@ -498,6 +498,26 @@ button.hrow:hover{background:rgba(214,178,110,.05)}
   .ttable .hrow .hpl{grid-column:1 / 4;grid-row:auto;flex-direction:row;display:flex!important;justify-content:space-between;align-items:baseline;gap:8px;padding-top:2px}
   .ttable .hrow .hpl .hk{margin-right:auto}
 }
+
+/* ---------- history by share ---------- */
+.stable .hrow{grid-template-columns:minmax(0,1.3fr) minmax(0,1.3fr) minmax(0,1.3fr) minmax(0,.7fr) minmax(0,1fr)}
+.stable .hrow.head > div:nth-child(2),.stable .hrow.head > div:nth-child(3){text-align:left}
+.stable .hrow .hb,.stable .hrow .hsold{text-align:left;justify-items:start}
+.stable .hrow[data-act]{cursor:pointer;transition:background .15s}
+.stable .hrow[data-act]:hover{background:rgba(214,178,110,.05)}
+.stable .hs b{margin-bottom:1px}
+.stable .hs .pill{display:inline-flex}
+.stable .sellbtn{min-height:34px;border-color:rgba(214,178,110,.45);color:var(--emerald-ink)}
+@media (max-width:759px){
+  .stable .hrow{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stable .hrow .hs{grid-column:1 / 2;grid-row:1}
+  .stable .hrow .hpl{grid-column:2;grid-row:1}
+  .stable .hrow .hb{grid-column:1;grid-row:2}
+  .stable .hrow .hsold{grid-column:2;grid-row:2}
+  .stable .hrow .hleft{grid-column:1 / 3;grid-row:3;display:flex!important;justify-content:space-between;align-items:center}
+  .stable .hrow .hsold:has(.sellbtn){padding:0!important;background:none!important;box-shadow:none!important;align-content:stretch}
+  .stable .hrow .hsold .sellbtn{width:100%;height:100%;min-height:56px}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1748,12 +1768,16 @@ function pHistory(){
   const booked = Object.values(ev).reduce((a, e) => a + e.pl, 0);
   const groups = {}; txs.forEach(t => { (groups[t.date.slice(0, 7)] ||= []).push(t); });
   const cell = (k, v, cls = "") => `<div class="hc ${cls}"><span class="hk">${k}</span><span class="hv num">${v}</span></div>`;
-  const kind = t => t.type === "BUY" ? ["Bought", "info"] : t.type === "SELL" ? ["Sold", "demo"] : [TL[t.type] || t.type, "ok"];
-  return `<div class="card pad stats">
+  const mode = UI.sub.histMode || "share";
+  const toggle = `<div class="seg" role="group" aria-label="Group history"><button data-act="hist-mode" data-v="share" aria-pressed="${mode === "share"}">By share</button><button data-act="hist-mode" data-v="date" aria-pressed="${mode === "date"}">By date</button></div>`;
+  const summary = `<div class="card pad stats">
       <div><div class="lbl">Bought</div><div class="sv num">${rs(spent)}</div><div class="tiny faint">${buys.length} purchase${buys.length === 1 ? "" : "s"}</div></div>
       <div><div class="lbl">Sold</div><div class="sv num">${rs(got)}</div><div class="tiny faint">${sells.length} sale${sells.length === 1 ? "" : "s"}</div></div>
       <div><div class="lbl">Profit from sales</div><div class="sv num ${tone(booked)}">${sells.length ? rsS(booked) : "—"}</div><div class="tiny faint">booked when you sold</div></div>
-    </div>
+    </div>`;
+  if (mode === "share") return summary + toggle + byShareTable(ev);
+  const kind = t => t.type === "BUY" ? ["Bought", "info"] : t.type === "SELL" ? ["Sold", "demo"] : [TL[t.type] || t.type, "ok"];
+  return `${summary}${toggle}
     <div class="card htable-card">
     <div class="htable ttable" role="table" aria-label="Buy and sell history">
       <div class="hrow head" role="row"><div>Date</div><div>Type</div><div>Share</div><div>Shares</div><div>Price</div><div>Amount</div><div>Profit</div></div>
@@ -1772,6 +1796,37 @@ function pHistory(){
     </div>
     <p class="tiny faint" style="margin:12px 20px 16px">Profit is shown on sales: what you received minus your average cost for those shares. Tap an entry to edit or delete it.</p>
     </div>`;
+}
+/** One row per share: what was bought, what was sold (or a Sell button), what's left, and the profit once something was sold. */
+function byShareTable(ev){
+  const L0 = replay(S.txs); const syms = [...new Set(S.txs.filter(t => t.symbol && (t.type === "BUY" || t.type === "SELL" || t.type === "BONUS")).map(t => t.symbol))];
+  const rows = syms.map(sym => {
+    const tx = S.txs.filter(t => t.symbol === sym);
+    const b = tx.filter(t => t.type === "BUY"), sl = tx.filter(t => t.type === "SELL" && ev[t.id]);
+    const bq = b.reduce((a, t) => a + t.qty, 0) + tx.filter(t => t.type === "BONUS").reduce((a, t) => a + t.qty, 0);
+    const bc = b.reduce((a, t) => a + t.qty * t.price + t.fees, 0);
+    const sq = sl.reduce((a, t) => a + t.qty, 0), sv = sl.reduce((a, t) => a + t.qty * t.price - t.fees, 0);
+    const pl = sl.reduce((a, t) => a + ev[t.id].pl, 0), removed = sl.reduce((a, t) => a + ev[t.id].removed, 0);
+    const left = L0.pos.get(sym)?.q || 0; const dates = tx.map(t => t.date).sort();
+    const bd = b.map(t => t.date).sort(), sd = sl.map(t => t.date).sort();
+    return { sym, bq, bavg: bq ? bc / bq : 0, sq, savg: sq ? sv / sq : 0, pl, plPct: removed ? pl / removed : 0, left, last: dates[dates.length - 1],
+      bdate: bd.length ? (bd.length > 1 ? `${fmtDate(bd[0])} – ${fmtDate(bd[bd.length - 1])}` : fmtDate(bd[0])) : "",
+      sdate: sd.length ? (sd.length > 1 ? `${fmtDate(sd[0])} – ${fmtDate(sd[sd.length - 1])}` : fmtDate(sd[0])) : "",
+      status: !sq ? ["Holding", "info"] : left > 0 ? ["Partly sold", "demo"] : ["Sold out", "ok"] };
+  }).sort((a, b) => a.last < b.last ? 1 : -1);
+  const canSell = !(FAMILY && UI.readOnly);
+  return `<div class="card htable-card"><div class="htable stable" role="table" aria-label="Buy and sell by share">
+    <div class="hrow head" role="row"><div>Share</div><div>Bought</div><div>Sold</div><div>Left</div><div>Profit / loss</div></div>
+    ${rows.map(r => `<div class="hrow" role="row" tabindex="0" data-act="share" data-s="${r.sym}">
+      <div class="hc hs"><span class="logo">${logoMark(r.sym)}</span><span style="min-width:0"><b>${esc(r.sym)}</b><span class="pill ${r.status[1]}" style="margin-top:3px">${r.status[0]}</span></span></div>
+      <div class="hc hb"><span class="hk">Bought</span><span class="hv num">${num(r.bq)} @ ${rs(r.bavg, 2)}</span><span class="hn">${esc(r.bdate)}</span></div>
+      <div class="hc hsold">${r.sq ? `<span class="hk">Sold</span><span class="hv num">${num(r.sq)} @ ${rs(r.savg, 2)}</span><span class="hn">${esc(r.sdate)}</span>`
+        : canSell && r.left > 0 ? `<button class="btn sm line sellbtn" data-act="new-tx" data-type="SELL" data-s="${r.sym}">${ic("down",14)} Sell</button>` : `<span class="hk">Sold</span><span class="hv faint">Not sold</span>`}</div>
+      <div class="hc hleft"><span class="hk">Left</span><span class="hv num">${r.left ? num(r.left) : "0"}</span>${r.sq && r.left > 0 && canSell ? `<button class="link tiny" data-act="new-tx" data-type="SELL" data-s="${r.sym}">Sell more</button>` : ""}</div>
+      <div class="hc hpl"><span class="hk">Profit / loss</span>${r.sq ? `<span class="hv num ${tone(r.pl)}">${rsS(r.pl)}</span><span class="hp num ${tone(r.pl)}">${pct(r.plPct, 1, true)}</span>` : `<span class="hv faint">—</span><span class="hn">after you sell</span>`}</div>
+    </div>`).join("")}
+  </div>
+  <p class="tiny faint" style="margin:12px 20px 16px">Profit shows once a share has been both bought and sold: what you received minus your average cost for the shares you sold. Tap a share for every entry.</p></div>`;
 }
 function pDividends(sn){
   const recs = S.txs.filter(t => t.type === "DIVIDEND").sort((a,b) => a.date < b.date ? 1 : -1);
@@ -3359,6 +3414,7 @@ document.addEventListener("click", async (ev) => {
     case "rem-ics": { const { n, ics } = remindersICS(); if (!n) break;
       if (await offerDownload("psx-yaad-dahaniyan.ics", ics, "text/calendar")){ const at = Date.now(); commit(st => st.reminders = st.reminders.map(r => !r.done && r.date && !r.calAt ? { ...r, calAt: at } : r)); toast(L(`${n} yaad-dahaniyan tayyar — file kholein aur "Add" dabayein`, `${n} reminder(s) ready — open the file and tap "Add"`)); }
       break; }
+    case "hist-mode": UI.sub.histMode = v; render(); break;
     case "pick-sym": { const i = $("#f-sym"); if (i){ i.value = v; liveEntry(); } break; }
     case "pmode": { readForm(); const d0 = UI.entry.draft; if (v === "total" && d0.qty > 0 && d0.price > 0) d0.total = round2(d0.qty * d0.price); UI.entry.priceMode = v; render(); break; }
     case "etype": readForm(); UI.entry.draft.type = v; UI.entry.dup = null; UI.entry.dupAck = false; render(); break;
