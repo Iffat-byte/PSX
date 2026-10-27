@@ -80,7 +80,7 @@ p{margin:0}
 
 /* bottom nav — floating */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:50;padding:0 max(12px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));pointer-events:none}
-.tabbar-in{pointer-events:auto;max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:saturate(1.4) blur(18px);-webkit-backdrop-filter:saturate(1.4) blur(18px);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-md);padding:6px 4px}
+.tabbar-in{pointer-events:auto;max-width:380px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);align-items:center;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:saturate(1.4) blur(18px);-webkit-backdrop-filter:saturate(1.4) blur(18px);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-md);padding:6px 4px}
 .tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;font-size:10.5px;font-weight:560;color:var(--ink-3);text-decoration:none;line-height:1.15;text-align:center;border-radius:14px;transition:color .15s}
 .tab svg{width:22px;height:22px}
 .tab[aria-current="page"]{color:var(--ink)}
@@ -584,6 +584,10 @@ select.input option{background:var(--surface);color:var(--ink)}
 .prow .logo{width:28px;height:28px;border-radius:8px}
 .prow .pv{margin-left:auto;text-align:right}
 .prow.odd{border-color:color-mix(in srgb,var(--loss) 45%,transparent)}
+
+.rail-set{display:flex;align-items:center;gap:12px;margin:8px 0 0;padding:11px 14px;border-radius:12px;color:var(--ink-2);text-decoration:none;font-weight:560}
+.rail-set:hover{background:rgba(255,255,255,.04);color:var(--ink)}
+.rail-set[aria-current="page"]{color:var(--ink);background:rgba(214,178,110,.1)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -1572,10 +1576,8 @@ function buildTasks(sn){
    ========================================================================= */
 const NAV = () => [
   {r:"home", label: FAMILY ? L("Muqabla","League") : L("Home","Home"), icon: FAMILY ? "star" : "home"},
-  {r:"portfolio", label:L("Mera Portfolio","My Portfolio"), icon:"wallet"},
   {r:"add", label:L("Add Entry","Add Entry"), icon:"plus"},
-  {r:"updates", label:L("Meri Updates","My Updates"), icon:"bell", badge: unreadToday()},
-  {r:"more", label:L("More Tools","More Tools"), icon:"grid"}
+  {r:"portfolio", label:L("Mera Portfolio","My Portfolio"), icon:"wallet"}
 ];
 function brandHTML(){ return `<div class="brand"><div class="mark">${MARK}</div><div style="min-width:0"><div class="brand-t">PSX Personal Assistant</div><div class="brand-s">Your shares. Our accounts.</div></div></div>`; }
 function renderShell(){
@@ -1584,6 +1586,7 @@ function renderShell(){
     <nav aria-label="Main">${nav.map(n => n.r === "add"
       ? `<a href="#add" data-go="add" class="rail-add" ${UI.route==="add"?'aria-current="page"':''}>${ic("plus")}${esc(n.label)}</a>`
       : `<a href="#${n.r}" data-go="${n.r}" ${UI.route===n.r?'aria-current="page"':''}>${ic(n.icon)}${esc(n.label)}${n.badge ? `<span class="nbadge num" aria-label="${n.badge} ${L("nayi","new")}">${n.badge}</span>` : ""}</a>`).join("")}</nav>
+    <a href="#more" class="rail-set" data-act="tool" data-v="settings" ${UI.route === "more" && UI.sub.more === "settings" ? 'aria-current="page"' : ""}>${ic("gear")}Settings &amp; backup</a>
     <div class="rail-foot stack">
       ${S.demo ? `<div class="notice gold small">${ic("info",18)}<div>${L("Aap demo data dekh rahe hain. Prices bhi demo hain, asli PSX prices nahi.","You are viewing demo data. Prices are demo too, not real PSX prices.")}</div></div>` : ""}
       <div class="tiny faint" id="sync-line">${syncLine()}</div>
@@ -1592,6 +1595,7 @@ function renderShell(){
     <div class="top-actions">
       ${FAMILY && UI.fam.status === "ready" ? `<button class="who" data-act="fam-who" aria-label="${L("Aap kaun hain? Badlein","Who are you? Change")}">${UI.fam.me ? avatar(UI.fam.me, 26) + `<span>${esc(memberName(UI.fam.me))}</span>` : `<span>${L("Aap kaun?","Who are you?")}</span>`}</button>` : ""}
       <button class="icon-btn" data-act="theme" aria-label="${L("Theme badlein","Change theme")}">${ic(isDark() ? "sun" : "moon", 19)}</button>
+      <button class="icon-btn" data-act="tool" data-v="settings" aria-label="Settings and backup">${ic("gear", 19)}</button>
     </div>`;
   $("#tabbar").innerHTML = `<div class="tabbar-in">${nav.map(n => n.r === "add"
     ? `<a href="#add" class="tab tab-add" data-go="add" ${UI.route==="add"?'aria-current="page"':''}><div class="plus">${ic("plus",26,2.4)}</div><span>${esc(n.label)}</span></a>`
@@ -1604,6 +1608,7 @@ function render(){
   const ae = document.activeElement; const fid = ae && ae.id && ae !== document.body ? ae.id : null; let ss = null, se = null; try { ss = ae.selectionStart; se = ae.selectionEnd; } catch {}
   applyTheme(); renderShell();
   const v = $("#view");
+  if (UI.route === "updates" || (UI.route === "more" && !UI.sub.more)){ UI.route = "home"; try { window.history.replaceState(null, "", "#home"); } catch {} }
   const r = UI.route;
   if (FAMILY && UI.fam.status !== "ready"){ v.innerHTML = `<div class="screen">${famGateView()}</div>`; renderSheet(); return; }
   if (FAMILY && r === "add" && UI.readOnly && UI.fam.me) famSelect(UI.fam.me);   // entries always go into your own portfolio
@@ -1909,7 +1914,7 @@ function pDividends(sn){
       ${Object.keys(byYear).length ? Object.entries(byYear).sort().reverse().map(([y,v]) => `<div class="kv"><span class="k">${L("Saal","Year")} ${y}</span><span class="v num">${rs(v)}</span></div>`).join("") : `<p class="muted small">—</p>`}
       <div class="divider"></div>
       <div class="kv"><span class="k">${L("Kul dividend","Total dividends")}</span><span class="v num gain">${rs(sn.dividends)}</span></div>
-      <button class="btn line sm" data-go="updates" data-sub="dividend">${L("Aane wale dividend dekhein","See upcoming dividends")} ${ic("chev",15)}</button>
+
     </div></div>`;
 }
 function pCalc(sn){
@@ -2898,7 +2903,7 @@ function uShariah(){
    ========================================================================= */
 function viewMore(){
   const t = UI.sub.more;
-  if (t) return `<button class="back" data-act="tool-back">${ic("back",18)} ${L("Sab tools","All tools")}</button>` + toolView(t);
+  if (t) return `<button class="back" data-act="tool-back">${ic("back",18)} Back</button>` + toolView(t);
   const aiTag = UI.sample ? `<span class="pill ok">AI</span>` : "";
   const groups = [
     [L("Samajhne mein madad","Help me understand"), [
@@ -3578,7 +3583,7 @@ document.addEventListener("click", async (ev) => {
       startReview(useful, "parser"); break; }
     case "shot-read": readScreenshot(); break;
     case "tool": UI.sub.more = v; UI.route = "more"; render(); window.scrollTo({top:0}); break;
-    case "tool-back": UI.sub.more = null; render(); break;
+    case "tool-back": UI.sub.more = null; go("portfolio"); break;
     case "tip-ai": {
       const A0 = UI.ai.tip; if (!A0?.res || !UI.sample) break; const res = A0.res;
       const found = { claims: res.claims.map(c => ({ kind: c.kind, quote: c.quote })), warningSigns: res.flags.map(f => f.key), knownSymbols: res.symbols, unknownSymbols: res.unknownTickers, priceTypedByUser: res.price ?? null, maths: res.math };
@@ -3746,7 +3751,7 @@ document.addEventListener("submit", async (ev) => {
 });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && UI.sheet) closeSheet(); });
 window.addEventListener("scroll", () => $("#topbar").classList.toggle("scrolled", window.scrollY > 4), {passive:true});
-window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (["home","portfolio","add","updates","more"].includes(h) && h !== UI.route) go(h); });
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (["home","portfolio","add"].includes(h) && h !== UI.route) go(h); });
 
 /** Returns true when the file was saved; false when declined or when it fell back to copying the text. */
 async function offerDownload(filename, data, type){
@@ -4369,7 +4374,7 @@ function migrate(st){ if (!st.langChosen) st.lang = "en"; st.readUpd ||= {}; st.
   st.prices ||= {}; st.customSyms ||= []; st.customSyms.forEach(registerCustom);
   return st; }
 S = migrate(S);
-const h0 = location.hash.slice(1); if (["home","portfolio","add","updates","more"].includes(h0)) UI.route = h0;
+const h0 = location.hash.slice(1); if (["home","portfolio","add"].includes(h0)) UI.route = h0;
 render();
 connectCloud();
 connectExtras();
